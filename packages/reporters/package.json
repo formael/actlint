@@ -1,0 +1,22 @@
+{
+  "name": "@formael/actlint-reporters",
+  "version": "0.0.0",
+  "private": true,
+  "description": "PURE. (ServerResult) -> string for the human scorecard, JSON, and SARIF. Pure functions over one Finding[]; no I/O, no clock.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@formael/actlint-core": "workspace:*"
+  }
+}

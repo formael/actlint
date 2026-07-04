@@ -1,0 +1,103 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "files": {
+    "ignore": ["**/dist/**", "**/node_modules/**", "**/coverage/**", "**/__fixtures__/**"]
+  },
+  "organizeImports": { "enabled": true },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 110,
+    "lineEnding": "lf"
+  },
+  "javascript": {
+    "formatter": { "quoteStyle": "single", "trailingCommas": "all", "semicolons": "always" }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true
+    }
+  },
+  "overrides": [
+    {
+      "include": ["packages/vocabulary/**"],
+      "linter": {
+        "rules": {
+          "nursery": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "@formael/actlint-core": "boundary: vocabulary is the base layer and depends on nothing.",
+                  "@formael/actlint-core/contracts": "boundary: vocabulary is the base layer and depends on nothing.",
+                  "@formael/actlint-reporters": "boundary: vocabulary is the base layer and depends on nothing.",
+                  "@formael/actlint-mcp-fetch": "boundary: vocabulary is the base layer and depends on nothing.",
+                  "actlint": "boundary: vocabulary is the base layer and depends on nothing."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "include": ["packages/core/**"],
+      "linter": {
+        "rules": {
+          "nursery": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "@formael/actlint-reporters": "boundary: core is pure and downstream of nothing but vocabulary.",
+                  "@formael/actlint-mcp-fetch": "boundary: core must never depend on the impure fetch edge.",
+                  "actlint": "boundary: core must never depend on the CLI shell."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "include": ["packages/reporters/**"],
+      "linter": {
+        "rules": {
+          "nursery": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "@formael/actlint-mcp-fetch": "boundary: reporters are pure and depend only on core/vocabulary.",
+                  "actlint": "boundary: reporters must never depend on the CLI shell."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "include": ["packages/mcp-fetch/**"],
+      "linter": {
+        "rules": {
+          "nursery": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "@formael/actlint-core": "boundary: mcp-fetch may import ONLY the shared types at @formael/actlint-core/contracts, never core's scoring.",
+                  "@formael/actlint-reporters": "boundary: mcp-fetch produces a ToolManifest; it does not render.",
+                  "actlint": "boundary: mcp-fetch must never depend on the CLI shell."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

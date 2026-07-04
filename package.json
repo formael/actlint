@@ -1,0 +1,36 @@
+{
+  "name": "actlint-monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "description": "actlint — a static action-risk linter for MCP servers. Reads a server's advertised tools, derives an honest action-risk profile, compares it against what each tool declares, and reports the gaps. It never runs, routes, blocks, or executes anything.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@9.15.4",
+  "scripts": {
+    "build": "pnpm -r --filter \"./packages/*\" run build",
+    "clean": "pnpm -r --filter \"./packages/*\" run clean",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "biome check --error-on-warnings .",
+    "lint:fix": "biome check --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "guard:purity": "tsx scripts/check-purity.ts",
+    "guard:sdk": "tsx scripts/check-sdk-boundary.ts",
+    "guard:determinism": "tsx scripts/check-determinism.ts",
+    "guards": "pnpm guard:purity && pnpm guard:sdk && pnpm guard:determinism",
+    "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm guards"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "@types/node": "^22.10.2",
+    "@vitest/coverage-v8": "^2.1.8",
+    "fast-check": "^3.23.1",
+    "tsup": "^8.3.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

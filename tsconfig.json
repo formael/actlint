@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "allowImportingTsExtensions": true
+  },
+  "include": ["packages/*/src/**/*.ts", "scripts/**/*.ts", "*.config.ts", "vitest.config.ts"],
+  "exclude": ["**/node_modules/**", "**/dist/**", "**/__fixtures__/**"]
+}

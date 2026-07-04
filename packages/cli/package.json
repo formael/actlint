@@ -1,0 +1,27 @@
+{
+  "name": "actlint",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The `actlint` command — the imperative shell. Orchestrates fetch -> core -> reporters -> exit code. Contains NO scoring logic.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "bin": {
+    "actlint": "./dist/index.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@formael/actlint-core": "workspace:*",
+    "@formael/actlint-mcp-fetch": "workspace:*",
+    "@formael/actlint-reporters": "workspace:*"
+  }
+}
