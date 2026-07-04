@@ -21,6 +21,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@formael/action-risk-vocabulary": "workspace:*"
+    "@formael/action-risk-vocabulary": "workspace:*",
+    "zod": "^4.4.3"
   }
 }
