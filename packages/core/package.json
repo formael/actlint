@@ -15,7 +15,7 @@
       "import": "./dist/contracts/index.js"
     }
   },
-  "files": ["dist"],
+  "files": ["dist", "schema"],
   "scripts": {
     "build": "tsup",
     "clean": "rm -rf dist"

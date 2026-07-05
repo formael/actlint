@@ -65,6 +65,14 @@ export type { DeclaredHint, DeclaredProfile, EffectiveDeclaredValue, McpHintDefa
 export { verdictSchema, severitySchema, ruleClassSchema, standardsRefSchema } from './finding.ts';
 export type { Verdict, Severity, RuleClass, StandardsRef, Finding } from './finding.ts';
 
+// Server-level result (what reporters and the CLI consume) and the honesty grade
+export { serverGradeSchema } from './server-result.ts';
+export type { ServerGrade, ServerResult } from './server-result.ts';
+
+// The `--json` report schema — a versioned public API (single source of truth for the payload shape)
+export { reportSchema, REPORT_SCHEMA_VERSION } from './report-schema.ts';
+export type { Report, ReportSummary } from './report-schema.ts';
+
 // Outcome / error model (pure core never throws for control flow)
 export { ok, err, assertNever, errorCodeSchema, actlintErrorSchema } from './outcome.ts';
 export type { Outcome, ActlintError, ErrorCode } from './outcome.ts';

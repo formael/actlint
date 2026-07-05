@@ -1,0 +1,466 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`jsonReporter (the machine report) > renders a spotless server 1`] = `
+"{
+  "reportSchemaVersion": "1.0.0",
+  "tool": "actlint",
+  "actlintVersion": "0.1.0",
+  "vocabularyVersion": "0.1.0",
+  "crosswalkVersion": "0.1.0",
+  "source": {
+    "kind": "server-card",
+    "url": "https://example.com/.well-known/mcp"
+  },
+  "grade": "A",
+  "summary": {
+    "tools": 5,
+    "underDeclared": 0,
+    "undeclared": 0,
+    "overDeclared": 0,
+    "consistent": 5
+  },
+  "findings": []
+}
+"
+`;
+
+exports[`jsonReporter (the machine report) > renders the mixed server the same way every time 1`] = `
+"{
+  "reportSchemaVersion": "1.0.0",
+  "tool": "actlint",
+  "actlintVersion": "0.1.0",
+  "vocabularyVersion": "0.1.0",
+  "crosswalkVersion": "0.1.0",
+  "source": {
+    "kind": "server-card",
+    "url": "https://example.com/.well-known/mcp"
+  },
+  "grade": "C",
+  "summary": {
+    "tools": 10,
+    "underDeclared": 2,
+    "undeclared": 1,
+    "overDeclared": 1,
+    "consistent": 6
+  },
+  "findings": [
+    {
+      "ruleId": "write-as-readonly",
+      "ruleClass": "honesty",
+      "toolName": "delete_repository",
+      "verdict": "under-declared",
+      "severity": "critical",
+      "confidence": "high",
+      "rationale": "The tool declares readOnlyHint: true, but its action is derived as deleting (from the signal verb.delete). A read-only declaration on a tool that writes suppresses the confirmation a spec-conformant client would otherwise show.",
+      "standards": {
+        "owaspAsi": [
+          "ASI02:2026",
+          "ASI03:2026"
+        ],
+        "owaspMcp": [
+          "MCP02:2025"
+        ],
+        "cosaiOasis": [
+          "MCP-T9"
+        ],
+        "euAiAct": [
+          "Art.14",
+          "Art.15"
+        ],
+        "nist": [
+          "AI-RMF:MEASURE"
+        ],
+        "mcpField": [
+          "readOnlyHint"
+        ]
+      },
+      "derived": {
+        "reversibility": {
+          "level": "irreversible",
+          "confidence": "medium",
+          "provenance": [
+            {
+              "id": "verb.delete",
+              "weight": "definitive"
+            }
+          ]
+        },
+        "destructiveness": {
+          "level": "deleting",
+          "confidence": "high",
+          "provenance": [
+            {
+              "id": "verb.delete",
+              "weight": "definitive"
+            }
+          ]
+        },
+        "externalReach": {
+          "level": "local",
+          "confidence": "high",
+          "provenance": []
+        },
+        "idempotency": {
+          "level": "idempotent",
+          "confidence": "high",
+          "provenance": []
+        },
+        "blastRadius": {
+          "level": "contained",
+          "confidence": "high",
+          "provenance": []
+        }
+      },
+      "declared": {
+        "unknownHints": {},
+        "readOnly": {
+          "state": "true"
+        }
+      },
+      "evidence": [
+        {
+          "id": "verb.delete",
+          "weight": "definitive"
+        }
+      ]
+    },
+    {
+      "ruleId": "external-reach-undeclared",
+      "ruleClass": "honesty",
+      "toolName": "send_message",
+      "verdict": "under-declared",
+      "severity": "medium",
+      "confidence": "uncertain",
+      "rationale": "The tool declares openWorldHint: false, but its reach is derived as open-world (from the signal verb.send). Denying open-world reach on a tool that contacts an external boundary understates where its effects land. This reading is uncertain.",
+      "standards": {
+        "owaspAsi": [
+          "ASI02:2026"
+        ],
+        "owaspMcp": [
+          "MCP02:2025"
+        ],
+        "cosaiOasis": [
+          "MCP-T9"
+        ],
+        "euAiAct": [
+          "Art.14",
+          "Art.15",
+          "Art.26"
+        ],
+        "nist": [
+          "AI-RMF:MEASURE"
+        ],
+        "mcpField": [
+          "openWorldHint"
+        ]
+      },
+      "derived": {
+        "reversibility": {
+          "level": "reversible",
+          "confidence": "high",
+          "provenance": []
+        },
+        "destructiveness": {
+          "level": "read-only",
+          "confidence": "high",
+          "provenance": []
+        },
+        "externalReach": {
+          "level": "open-world",
+          "confidence": "uncertain",
+          "provenance": [
+            {
+              "id": "verb.send",
+              "weight": "definitive"
+            }
+          ]
+        },
+        "idempotency": {
+          "level": "idempotent",
+          "confidence": "high",
+          "provenance": []
+        },
+        "blastRadius": {
+          "level": "contained",
+          "confidence": "high",
+          "provenance": []
+        }
+      },
+      "declared": {
+        "unknownHints": {},
+        "openWorld": {
+          "state": "false"
+        }
+      },
+      "evidence": [
+        {
+          "id": "verb.send",
+          "weight": "definitive"
+        }
+      ]
+    },
+    {
+      "ruleId": "destructive-absent",
+      "ruleClass": "honesty",
+      "toolName": "update_record",
+      "verdict": "undeclared",
+      "severity": "low",
+      "confidence": "high",
+      "rationale": "The action is derived as mutating (from the signal verb.mutate), and the tool declares neither readOnlyHint nor destructiveHint. A spec-conformant client still prompts here, so this is a nudge to declare the destructive nature explicitly rather than rely on defaults.",
+      "standards": {
+        "owaspAsi": [
+          "ASI02:2026"
+        ],
+        "owaspMcp": [
+          "MCP02:2025"
+        ],
+        "euAiAct": [
+          "Art.13"
+        ],
+        "nist": [
+          "AI-RMF:MAP"
+        ],
+        "mcpField": [
+          "destructiveHint"
+        ]
+      },
+      "derived": {
+        "reversibility": {
+          "level": "reversible",
+          "confidence": "high",
+          "provenance": []
+        },
+        "destructiveness": {
+          "level": "mutating",
+          "confidence": "high",
+          "provenance": [
+            {
+              "id": "verb.mutate",
+              "weight": "definitive"
+            }
+          ]
+        },
+        "externalReach": {
+          "level": "local",
+          "confidence": "high",
+          "provenance": []
+        },
+        "idempotency": {
+          "level": "idempotent",
+          "confidence": "high",
+          "provenance": []
+        },
+        "blastRadius": {
+          "level": "contained",
+          "confidence": "high",
+          "provenance": []
+        }
+      },
+      "declared": {
+        "unknownHints": {}
+      },
+      "evidence": [
+        {
+          "id": "verb.mutate",
+          "weight": "definitive"
+        }
+      ]
+    },
+    {
+      "ruleId": "over-declared-risk",
+      "ruleClass": "honesty",
+      "toolName": "list_items",
+      "verdict": "over-declared",
+      "severity": "low",
+      "confidence": "high",
+      "rationale": "The tool declares more risk than its action is derived to carry (destructiveness read-only, reach local). Over-declaration is honest but costs alarm fatigue; the annotation could be tightened to match the tool.",
+      "standards": {
+        "owaspAsi": [
+          "ASI02:2026"
+        ],
+        "owaspMcp": [
+          "MCP02:2025"
+        ],
+        "nist": [
+          "AI-RMF:MEASURE"
+        ],
+        "mcpField": [
+          "readOnlyHint",
+          "destructiveHint",
+          "openWorldHint"
+        ]
+      },
+      "derived": {
+        "reversibility": {
+          "level": "reversible",
+          "confidence": "high",
+          "provenance": []
+        },
+        "destructiveness": {
+          "level": "read-only",
+          "confidence": "high",
+          "provenance": []
+        },
+        "externalReach": {
+          "level": "local",
+          "confidence": "high",
+          "provenance": []
+        },
+        "idempotency": {
+          "level": "idempotent",
+          "confidence": "high",
+          "provenance": []
+        },
+        "blastRadius": {
+          "level": "contained",
+          "confidence": "high",
+          "provenance": []
+        }
+      },
+      "declared": {
+        "unknownHints": {},
+        "destructive": {
+          "state": "true"
+        }
+      },
+      "evidence": []
+    },
+    {
+      "ruleId": "freeform-input-as-code",
+      "ruleClass": "advisory",
+      "toolName": "run_task",
+      "verdict": "consistent",
+      "severity": "medium",
+      "confidence": "medium",
+      "rationale": "The input schema accepts an unconstrained free-form parameter interpreted as code (from the signal shape.freeform-code-input). There is no MCP hint for this; it is a capability-hygiene note that the parameter lets a caller drive arbitrary behavior.",
+      "standards": {
+        "owaspAsi": [
+          "ASI05:2026"
+        ],
+        "owaspMcp": [
+          "MCP05:2025"
+        ],
+        "cosaiOasis": [
+          "MCP-T3"
+        ],
+        "euAiAct": [
+          "Art.15"
+        ],
+        "nist": [
+          "AI-RMF:MANAGE"
+        ]
+      },
+      "derived": {
+        "reversibility": {
+          "level": "reversible",
+          "confidence": "high",
+          "provenance": []
+        },
+        "destructiveness": {
+          "level": "mutating",
+          "confidence": "medium",
+          "provenance": [
+            {
+              "id": "shape.freeform-code-input",
+              "weight": "definitive"
+            }
+          ]
+        },
+        "externalReach": {
+          "level": "local",
+          "confidence": "high",
+          "provenance": []
+        },
+        "idempotency": {
+          "level": "idempotent",
+          "confidence": "high",
+          "provenance": []
+        },
+        "blastRadius": {
+          "level": "contained",
+          "confidence": "high",
+          "provenance": []
+        }
+      },
+      "declared": {
+        "unknownHints": {},
+        "destructive": {
+          "state": "true"
+        }
+      },
+      "evidence": [
+        {
+          "id": "shape.freeform-code-input",
+          "weight": "definitive"
+        }
+      ]
+    },
+    {
+      "ruleId": "no-scope-constraint",
+      "ruleClass": "advisory",
+      "toolName": "purge_cache",
+      "verdict": "consistent",
+      "severity": "medium",
+      "confidence": "uncertain",
+      "rationale": "This is a sensitive action (destructiveness deleting, reach open-world) whose input schema carries no narrowing constraint — no enum, pattern, format, or limit bounds its parameters. A tighter schema would scope what the tool can be asked to do.",
+      "standards": {
+        "owaspAsi": [
+          "ASI02:2026"
+        ],
+        "owaspMcp": [
+          "MCP02:2025"
+        ],
+        "cosaiOasis": [
+          "MCP-T3"
+        ],
+        "euAiAct": [
+          "Art.15"
+        ],
+        "nist": [
+          "AI-RMF:MANAGE"
+        ]
+      },
+      "derived": {
+        "reversibility": {
+          "level": "reversible",
+          "confidence": "high",
+          "provenance": []
+        },
+        "destructiveness": {
+          "level": "deleting",
+          "confidence": "uncertain",
+          "provenance": [
+            {
+              "id": "verb.delete",
+              "weight": "definitive"
+            }
+          ]
+        },
+        "externalReach": {
+          "level": "open-world",
+          "confidence": "uncertain",
+          "provenance": []
+        },
+        "idempotency": {
+          "level": "idempotent",
+          "confidence": "high",
+          "provenance": []
+        },
+        "blastRadius": {
+          "level": "contained",
+          "confidence": "high",
+          "provenance": []
+        }
+      },
+      "declared": {
+        "unknownHints": {},
+        "destructive": {
+          "state": "true"
+        }
+      },
+      "evidence": []
+    }
+  ]
+}
+"
+`;

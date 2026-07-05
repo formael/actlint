@@ -274,6 +274,49 @@ export const severityPolicySchema = z
   .strict();
 export type SeverityPolicy = z.infer<typeof severityPolicySchema>;
 
+// --- The honesty-grade policy -----------------------------------------------------------------
+//
+// The letter grade is a downstream view of the finding set, computed by the reporters, but its
+// bands and weights are JUDGMENT and so live here as reviewable data. ServerGrade is re-declared
+// (like Verdict and Severity above): the base layer cannot import the engine's type, and the
+// grade-policy schema / core pin the two lists together.
+
+export const serverGradeSchema = z.enum(['A', 'B', 'C', 'D', 'E', 'F']);
+export type ServerGrade = z.infer<typeof serverGradeSchema>;
+
+// The honesty weight [0,1] of a single tool, or a band threshold. 1.0 is fully honest.
+const gradeWeightSchema = z.number().min(0).max(1);
+
+export const gradePolicySchema = z
+  .object({
+    $schema: z.string().optional(),
+    version: z
+      .string()
+      .regex(/^\d+\.\d+\.\d+$/, { message: 'version must be plain semver (MAJOR.MINOR.PATCH)' }),
+    note: z.string().min(1).optional(),
+    // Per-tool honesty weight, keyed by the tool's worst verdict. The ordering encodes the
+    // product's asymmetry: consistent (fully honest) ≫ undeclared ≈ over-declared ≫ under-declared.
+    weights: z
+      .object({
+        consistent: gradeWeightSchema,
+        undeclared: gradeWeightSchema,
+        'over-declared': gradeWeightSchema,
+        'under-declared': gradeWeightSchema,
+      })
+      .strict(),
+    // Score-to-letter bands, best grade first. A score takes the first band it meets or exceeds.
+    bands: z.array(z.object({ grade: serverGradeSchema, minScore: gradeWeightSchema }).strict()).min(1),
+    // Ceilings the worst dishonesty imposes regardless of score; the strictest applicable one wins.
+    caps: z
+      .object({
+        anyUnderDeclared: serverGradeSchema,
+        criticalUnderDeclared: serverGradeSchema,
+      })
+      .strict(),
+  })
+  .strict();
+export type GradePolicy = z.infer<typeof gradePolicySchema>;
+
 // --- Validators (the package's only functions) ------------------------------------------------
 
 /** Validate an unknown value as a vocabulary document. Throws on a malformed shape. */
@@ -294,4 +337,9 @@ export function parseCrosswalk(data: unknown): Crosswalk {
 /** Validate an unknown value as a severity policy document. Throws on a malformed shape. */
 export function parseSeverityPolicy(data: unknown): SeverityPolicy {
   return severityPolicySchema.parse(data);
+}
+
+/** Validate an unknown value as an honesty-grade policy document. Throws on a malformed shape. */
+export function parseGradePolicy(data: unknown): GradePolicy {
+  return gradePolicySchema.parse(data);
 }

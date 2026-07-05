@@ -11,15 +11,18 @@
 // downstream.
 
 import rawCrosswalk from '../data/crosswalk.json' with { type: 'json' };
+import rawGradePolicy from '../data/grade-policy.json' with { type: 'json' };
 import rawMcpMapping from '../data/mcp-mapping.json' with { type: 'json' };
 import rawSeverityPolicy from '../data/severity-policy.json' with { type: 'json' };
 import rawVocabulary from '../data/vocabulary.json' with { type: 'json' };
 import {
   type Crosswalk,
+  type GradePolicy,
   type McpMapping,
   type SeverityPolicy,
   type Vocabulary,
   parseCrosswalk,
+  parseGradePolicy,
   parseMcpMapping,
   parseSeverityPolicy,
   parseVocabulary,
@@ -58,6 +61,15 @@ export const SEVERITY_POLICY: SeverityPolicy = Object.freeze(parseSeverityPolicy
 
 /** Semver of the severity policy dataset — versioned alongside the crosswalk. */
 export const SEVERITY_POLICY_VERSION: string = SEVERITY_POLICY.version;
+
+/**
+ * The validated honesty-grade policy: the reviewable bands and weights the reporters read to
+ * reduce a server's findings to a single letter. It grades labelling honesty, never safety.
+ */
+export const GRADE_POLICY: GradePolicy = Object.freeze(parseGradePolicy(rawGradePolicy));
+
+/** Semver of the grade policy dataset — an independent line, like the severity policy and crosswalk. */
+export const GRADE_POLICY_VERSION: string = GRADE_POLICY.version;
 
 // Re-export the schemas, inferred types, and validators for consumers and tests.
 export * from './schema.ts';

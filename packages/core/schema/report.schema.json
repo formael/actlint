@@ -1,0 +1,797 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "reportSchemaVersion": {
+      "type": "string"
+    },
+    "tool": {
+      "type": "string",
+      "const": "actlint"
+    },
+    "actlintVersion": {
+      "type": "string"
+    },
+    "vocabularyVersion": {
+      "type": "string"
+    },
+    "crosswalkVersion": {
+      "type": "string"
+    },
+    "source": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "live"
+            },
+            "transport": {
+              "type": "string",
+              "enum": [
+                "stdio",
+                "http"
+              ]
+            },
+            "endpoint": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "transport",
+            "endpoint"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "server-card"
+            },
+            "url": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "url"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "registry"
+            },
+            "serverId": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "serverId"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "file"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "path"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "grade": {
+      "type": "string",
+      "enum": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F"
+      ]
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "tools": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "underDeclared": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "undeclared": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "overDeclared": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "consistent": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "tools",
+        "underDeclared",
+        "undeclared",
+        "overDeclared",
+        "consistent"
+      ],
+      "additionalProperties": false
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "ruleId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "ruleClass": {
+            "type": "string",
+            "enum": [
+              "honesty",
+              "advisory"
+            ]
+          },
+          "toolName": {
+            "type": "string"
+          },
+          "verdict": {
+            "type": "string",
+            "enum": [
+              "consistent",
+              "under-declared",
+              "over-declared",
+              "undeclared"
+            ]
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "info",
+              "low",
+              "medium",
+              "high",
+              "critical"
+            ]
+          },
+          "confidence": {
+            "type": "string",
+            "enum": [
+              "high",
+              "medium",
+              "low",
+              "uncertain"
+            ]
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 1
+          },
+          "standards": {
+            "readOnly": true,
+            "type": "object",
+            "properties": {
+              "owaspAsi": {
+                "readOnly": true,
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "owaspMcp": {
+                "readOnly": true,
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "cosaiOasis": {
+                "readOnly": true,
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "euAiAct": {
+                "readOnly": true,
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "nist": {
+                "readOnly": true,
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "mcpField": {
+                "readOnly": true,
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "derived": {
+            "readOnly": true,
+            "type": "object",
+            "properties": {
+              "reversibility": {
+                "readOnly": true,
+                "type": "object",
+                "properties": {
+                  "level": {
+                    "type": "string",
+                    "enum": [
+                      "reversible",
+                      "recoverable-with-effort",
+                      "irreversible",
+                      "unknown"
+                    ]
+                  },
+                  "confidence": {
+                    "type": "string",
+                    "enum": [
+                      "high",
+                      "medium",
+                      "low",
+                      "uncertain"
+                    ]
+                  },
+                  "provenance": {
+                    "readOnly": true,
+                    "type": "array",
+                    "items": {
+                      "readOnly": true,
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "weight": {
+                          "type": "string",
+                          "enum": [
+                            "definitive",
+                            "strong",
+                            "weak"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "weight"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "level",
+                  "confidence",
+                  "provenance"
+                ],
+                "additionalProperties": false
+              },
+              "destructiveness": {
+                "readOnly": true,
+                "type": "object",
+                "properties": {
+                  "level": {
+                    "type": "string",
+                    "enum": [
+                      "read-only",
+                      "additive",
+                      "mutating",
+                      "deleting",
+                      "unknown"
+                    ]
+                  },
+                  "confidence": {
+                    "type": "string",
+                    "enum": [
+                      "high",
+                      "medium",
+                      "low",
+                      "uncertain"
+                    ]
+                  },
+                  "provenance": {
+                    "readOnly": true,
+                    "type": "array",
+                    "items": {
+                      "readOnly": true,
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "weight": {
+                          "type": "string",
+                          "enum": [
+                            "definitive",
+                            "strong",
+                            "weak"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "weight"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "level",
+                  "confidence",
+                  "provenance"
+                ],
+                "additionalProperties": false
+              },
+              "externalReach": {
+                "readOnly": true,
+                "type": "object",
+                "properties": {
+                  "level": {
+                    "type": "string",
+                    "enum": [
+                      "local",
+                      "org-internal",
+                      "open-world",
+                      "unknown"
+                    ]
+                  },
+                  "confidence": {
+                    "type": "string",
+                    "enum": [
+                      "high",
+                      "medium",
+                      "low",
+                      "uncertain"
+                    ]
+                  },
+                  "provenance": {
+                    "readOnly": true,
+                    "type": "array",
+                    "items": {
+                      "readOnly": true,
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "weight": {
+                          "type": "string",
+                          "enum": [
+                            "definitive",
+                            "strong",
+                            "weak"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "weight"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "level",
+                  "confidence",
+                  "provenance"
+                ],
+                "additionalProperties": false
+              },
+              "idempotency": {
+                "readOnly": true,
+                "type": "object",
+                "properties": {
+                  "level": {
+                    "type": "string",
+                    "enum": [
+                      "idempotent",
+                      "non-idempotent",
+                      "unknown"
+                    ]
+                  },
+                  "confidence": {
+                    "type": "string",
+                    "enum": [
+                      "high",
+                      "medium",
+                      "low",
+                      "uncertain"
+                    ]
+                  },
+                  "provenance": {
+                    "readOnly": true,
+                    "type": "array",
+                    "items": {
+                      "readOnly": true,
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "weight": {
+                          "type": "string",
+                          "enum": [
+                            "definitive",
+                            "strong",
+                            "weak"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "weight"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "level",
+                  "confidence",
+                  "provenance"
+                ],
+                "additionalProperties": false
+              },
+              "blastRadius": {
+                "readOnly": true,
+                "type": "object",
+                "properties": {
+                  "level": {
+                    "type": "string",
+                    "enum": [
+                      "contained",
+                      "moderate",
+                      "severe",
+                      "critical",
+                      "unknown"
+                    ]
+                  },
+                  "confidence": {
+                    "type": "string",
+                    "enum": [
+                      "high",
+                      "medium",
+                      "low",
+                      "uncertain"
+                    ]
+                  },
+                  "provenance": {
+                    "readOnly": true,
+                    "type": "array",
+                    "items": {
+                      "readOnly": true,
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "weight": {
+                          "type": "string",
+                          "enum": [
+                            "definitive",
+                            "strong",
+                            "weak"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "weight"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "level",
+                  "confidence",
+                  "provenance"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "reversibility",
+              "destructiveness",
+              "externalReach",
+              "idempotency",
+              "blastRadius"
+            ],
+            "additionalProperties": false
+          },
+          "declared": {
+            "type": "object",
+            "properties": {
+              "readOnly": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "state": {
+                        "type": "string",
+                        "const": "true"
+                      }
+                    },
+                    "required": [
+                      "state"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "state": {
+                        "type": "string",
+                        "const": "false"
+                      }
+                    },
+                    "required": [
+                      "state"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "state": {
+                        "type": "string",
+                        "const": "absent"
+                      }
+                    },
+                    "required": [
+                      "state"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "destructive": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "state": {
+                        "type": "string",
+                        "const": "true"
+                      }
+                    },
+                    "required": [
+                      "state"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "state": {
+                        "type": "string",
+                        "const": "false"
+                      }
+                    },
+                    "required": [
+                      "state"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "state": {
+                        "type": "string",
+                        "const": "absent"
+                      }
+                    },
+                    "required": [
+                      "state"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "idempotent": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "state": {
+                        "type": "string",
+                        "const": "true"
+                      }
+                    },
+                    "required": [
+                      "state"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "state": {
+                        "type": "string",
+                        "const": "false"
+                      }
+                    },
+                    "required": [
+                      "state"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "state": {
+                        "type": "string",
+                        "const": "absent"
+                      }
+                    },
+                    "required": [
+                      "state"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "openWorld": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "state": {
+                        "type": "string",
+                        "const": "true"
+                      }
+                    },
+                    "required": [
+                      "state"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "state": {
+                        "type": "string",
+                        "const": "false"
+                      }
+                    },
+                    "required": [
+                      "state"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "state": {
+                        "type": "string",
+                        "const": "absent"
+                      }
+                    },
+                    "required": [
+                      "state"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "unknownHints": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {}
+              }
+            },
+            "required": [
+              "unknownHints"
+            ],
+            "additionalProperties": false
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "readOnly": true,
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "weight": {
+                  "type": "string",
+                  "enum": [
+                    "definitive",
+                    "strong",
+                    "weak"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "weight"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "ruleId",
+          "ruleClass",
+          "toolName",
+          "verdict",
+          "severity",
+          "confidence",
+          "rationale",
+          "standards",
+          "derived",
+          "declared",
+          "evidence"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "reportSchemaVersion",
+    "tool",
+    "actlintVersion",
+    "vocabularyVersion",
+    "crosswalkVersion",
+    "source",
+    "grade",
+    "summary",
+    "findings"
+  ],
+  "additionalProperties": false,
+  "$id": "https://formael.dev/schemas/actlint/report.schema.json",
+  "title": "actlint report",
+  "description": "actlint's --json report: a versioned, machine-readable account of one server's action-risk honesty. The canonical output is `findings`; `grade` and `summary` are deterministic reductions of it. This schema is a public API — its shape changes only on a semver decision."
+}

@@ -17,6 +17,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
+    "@formael/action-risk-vocabulary": "workspace:*",
     "@formael/actlint-core": "workspace:*"
   }
 }

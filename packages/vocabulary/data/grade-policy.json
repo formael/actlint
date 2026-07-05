@@ -1,0 +1,23 @@
+{
+  "$schema": "../schema/grade-policy.schema.json",
+  "version": "0.1.0",
+  "note": "This is an honesty grade, not a safety score. A server full of honestly-declared destructive tools earns an A: it labelled its actions truthfully. The grade falls only when a server's declarations understate, overstate, or omit the action risk actlint derives.",
+  "weights": {
+    "consistent": 1.0,
+    "undeclared": 0.9,
+    "over-declared": 0.8,
+    "under-declared": 0.25
+  },
+  "bands": [
+    { "grade": "A", "minScore": 0.95 },
+    { "grade": "B", "minScore": 0.85 },
+    { "grade": "C", "minScore": 0.7 },
+    { "grade": "D", "minScore": 0.55 },
+    { "grade": "E", "minScore": 0.4 },
+    { "grade": "F", "minScore": 0.0 }
+  ],
+  "caps": {
+    "anyUnderDeclared": "B",
+    "criticalUnderDeclared": "C"
+  }
+}
