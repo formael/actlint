@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://formael.dev/schemas/action-risk-vocabulary/mcp-mapping.schema.json",
+  "title": "actlint action-risk to MCP-hint mapping",
+  "description": "Expresses actlint's five risk dimensions in terms of MCP's four annotation booleans, so a finding stays legible to anyone who knows MCP. The discipline it encodes: a verdict fires only where an MCP hint exists to be honest or dishonest about. Dimensions with no corresponding hint (reversibility, blastRadius) are supporting context only.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "mappings"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "mappings": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/mapping" }
+    }
+  },
+  "$defs": {
+    "mapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mcpHint", "dimension", "raisesVerdict", "correspondence", "note"],
+      "properties": {
+        "mcpHint": {
+          "description": "The MCP annotation this dimension corresponds to, or null when the protocol defines no such field.",
+          "oneOf": [
+            { "enum": ["readOnlyHint", "destructiveHint", "openWorldHint", "idempotentHint"] },
+            { "type": "null" }
+          ]
+        },
+        "dimension": {
+          "enum": ["reversibility", "destructiveness", "externalReach", "idempotency", "blastRadius"]
+        },
+        "raisesVerdict": {
+          "type": "boolean",
+          "description": "Whether a declared-vs-derived gap on this dimension may raise a verdict. True only where an MCP hint exists; dimensions with no hint enrich the explanation but never invent a compliance failure."
+        },
+        "correspondence": { "type": "string", "minLength": 1 },
+        "note": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

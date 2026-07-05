@@ -2,18 +2,25 @@
   "name": "@formael/action-risk-vocabulary",
   "version": "0.0.0",
   "private": true,
-  "description": "PURE DATA. The action-risk vocabulary and standards crosswalk, JSON-Schema'd and independently versioned. The single shared artifact between actlint (open) and the Formael platform — data with a schema, never code.",
+  "description": "PURE DATA. The action-risk vocabulary and MCP-hint mapping, JSON-Schema'd and independently versioned. The single shared artifact between actlint (open) and the Formael platform — data with a schema, never code.",
   "license": "Apache-2.0",
   "type": "module",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    }
+    },
+    "./schema/vocabulary.schema.json": "./schema/vocabulary.schema.json",
+    "./schema/mcp-mapping.schema.json": "./schema/mcp-mapping.schema.json",
+    "./data/vocabulary.json": "./data/vocabulary.json",
+    "./data/mcp-mapping.json": "./data/mcp-mapping.json"
   },
-  "files": ["dist"],
+  "files": ["dist", "schema", "data", "docs"],
   "scripts": {
     "build": "tsup",
     "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "zod": "^4.4.3"
   }
 }
