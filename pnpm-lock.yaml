@@ -35,6 +35,9 @@ importers:
 
   packages/cli:
     dependencies:
+      '@formael/action-risk-vocabulary':
+        specifier: workspace:*
+        version: link:../vocabulary
       '@formael/actlint-core':
         specifier: workspace:*
         version: link:../core

@@ -1,0 +1,23 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`output formats > renders a stable human scorecard 1`] = `
+"  actlint  ▸  -                                                 honesty grade: F
+  ──────────────────────────────────────────────────────────────────────────────
+  1 tool scanned · 1 under-declared · 0 undeclared · 0 over-declared
+
+  ✖ CRIT  exec_sql  write-as-readonly
+      The tool declares readOnlyHint: true, but its action is derived as mutating (from the signals shape.freeform-code-input, verb.execute). A read-only declaration on a tool that writes suppresses the confirmation a spec-conformant client would otherwise show.
+      ↳ OWASP ASI02:2026, ASI03:2026 · OWASP MCP02:2025 · CoSAI MCP-T9 · EU AI Act Art.14, Art.15 · NIST AI-RMF:MEASURE · MCP field readOnlyHint
+
+  advisories — capability hygiene, not honesty verdicts
+  ◐ ADV   exec_sql  freeform-input-as-code
+      The input schema accepts an unconstrained free-form parameter interpreted as code (from the signal shape.freeform-code-input). There is no MCP hint for this; it is a capability-hygiene note that the parameter lets a caller drive arbitrary behavior.
+      ↳ OWASP ASI05:2026 · OWASP MCP05:2025 · CoSAI MCP-T3 · EU AI Act Art.15 · NIST AI-RMF:MANAGE
+  ◐ ADV   exec_sql  no-scope-constraint
+      This is a sensitive action (destructiveness mutating, reach unknown) whose input schema carries no narrowing constraint — no enum, pattern, format, or limit bounds its parameters. A tighter schema would scope what the tool can be asked to do.
+      ↳ OWASP ASI02:2026 · OWASP MCP02:2025 · CoSAI MCP-T3 · EU AI Act Art.15 · NIST AI-RMF:MANAGE
+  ──────────────────────────────────────────────────────────────────────────────
+  0 of 1 tool consistent.
+  Full report: --json
+"
+`;
