@@ -26,7 +26,7 @@ export { Redacted, isoTimestampSchema, redactedSchema } from '../primitives.ts';
 
 // Error model: mcp-fetch returns Outcome<ToolManifest> from toManifest
 export type { Outcome, ActlintError, ErrorCode } from '../outcome.ts';
-export { ok, err, errorCodeSchema } from '../outcome.ts';
+export { ok, err, errorCodeSchema, assertNever } from '../outcome.ts';
 
 // ---------------------------------------------------------------------------
 // toManifest — the translation function contract that mcp-fetch must satisfy.
