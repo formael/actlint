@@ -1,0 +1,334 @@
+{
+  "family": "schema-shape",
+  "intent": "The input schema is the highest-signal, language-independent evidence. Matching is a typed walk over structure, not text: a nested destination field is found; a coincidental substring is not. Names are neutral so the schema is the sole evidence.",
+  "cases": [
+    {
+      "name": "destination-format",
+      "intent": "a declared string format (uri) -> open-world (high)",
+      "tool": {
+        "name": "relay_payload",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        },
+        "annotations": {
+          "unknownHints": {}
+        }
+      },
+      "expected": {
+        "profile": {
+          "reversibility": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "destructiveness": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "externalReach": {
+            "level": "open-world",
+            "confidence": "high",
+            "provenance": [
+              {
+                "id": "shape.destination-format",
+                "weight": "definitive"
+              }
+            ]
+          },
+          "idempotency": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "blastRadius": {
+            "level": "moderate",
+            "confidence": "medium",
+            "provenance": [
+              {
+                "id": "shape.destination-format",
+                "weight": "definitive"
+              }
+            ]
+          }
+        },
+        "signals": [
+          {
+            "id": "shape.destination-format",
+            "weight": "definitive"
+          }
+        ]
+      }
+    },
+    {
+      "name": "destination-param-name",
+      "intent": "a destination-shaped parameter name (webhook) -> open-world (medium)",
+      "tool": {
+        "name": "handle_request",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "webhook": {
+              "type": "string"
+            }
+          }
+        },
+        "annotations": {
+          "unknownHints": {}
+        }
+      },
+      "expected": {
+        "profile": {
+          "reversibility": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "destructiveness": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "externalReach": {
+            "level": "open-world",
+            "confidence": "medium",
+            "provenance": [
+              {
+                "id": "shape.destination-param-name",
+                "weight": "strong"
+              }
+            ]
+          },
+          "idempotency": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "blastRadius": {
+            "level": "moderate",
+            "confidence": "low",
+            "provenance": [
+              {
+                "id": "shape.destination-param-name",
+                "weight": "strong"
+              }
+            ]
+          }
+        },
+        "signals": [
+          {
+            "id": "shape.destination-param-name",
+            "weight": "strong"
+          }
+        ]
+      }
+    },
+    {
+      "name": "freeform-code-input",
+      "intent": "an unconstrained free-form code parameter (command) -> mutating; reach unknown",
+      "tool": {
+        "name": "handle_task",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "command": {
+              "type": "string"
+            }
+          }
+        },
+        "annotations": {
+          "unknownHints": {}
+        }
+      },
+      "expected": {
+        "profile": {
+          "reversibility": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "destructiveness": {
+            "level": "mutating",
+            "confidence": "medium",
+            "provenance": [
+              {
+                "id": "shape.freeform-code-input",
+                "weight": "strong"
+              }
+            ]
+          },
+          "externalReach": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": [
+              {
+                "id": "shape.freeform-code-input",
+                "weight": "weak"
+              }
+            ]
+          },
+          "idempotency": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "blastRadius": {
+            "level": "moderate",
+            "confidence": "low",
+            "provenance": [
+              {
+                "id": "shape.freeform-code-input",
+                "weight": "strong"
+              }
+            ]
+          }
+        },
+        "signals": [
+          {
+            "id": "shape.freeform-code-input",
+            "weight": "strong"
+          }
+        ]
+      }
+    },
+    {
+      "name": "nested-destination-found",
+      "intent": "a destination nested inside an object is still found by the typed walk",
+      "tool": {
+        "name": "handle_payload",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "config": {
+              "type": "object",
+              "properties": {
+                "callback_url": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            }
+          }
+        },
+        "annotations": {
+          "unknownHints": {}
+        }
+      },
+      "expected": {
+        "profile": {
+          "reversibility": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "destructiveness": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "externalReach": {
+            "level": "open-world",
+            "confidence": "high",
+            "provenance": [
+              {
+                "id": "shape.destination-format",
+                "weight": "definitive"
+              },
+              {
+                "id": "shape.destination-param-name",
+                "weight": "strong"
+              }
+            ]
+          },
+          "idempotency": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "blastRadius": {
+            "level": "moderate",
+            "confidence": "medium",
+            "provenance": [
+              {
+                "id": "shape.destination-format",
+                "weight": "definitive"
+              },
+              {
+                "id": "shape.destination-param-name",
+                "weight": "strong"
+              }
+            ]
+          }
+        },
+        "signals": [
+          {
+            "id": "shape.destination-format",
+            "weight": "definitive"
+          },
+          {
+            "id": "shape.destination-param-name",
+            "weight": "strong"
+          }
+        ]
+      }
+    },
+    {
+      "name": "constrained-string-is-not-freeform",
+      "intent": "a code-shaped name that is constrained (enum) does NOT fire the free-form signal",
+      "tool": {
+        "name": "handle_mode",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "command": {
+              "type": "string",
+              "enum": [
+                "start",
+                "stop"
+              ]
+            }
+          }
+        },
+        "annotations": {
+          "unknownHints": {}
+        }
+      },
+      "expected": {
+        "profile": {
+          "reversibility": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "destructiveness": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "externalReach": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "idempotency": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "blastRadius": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          }
+        },
+        "signals": []
+      }
+    }
+  ]
+}

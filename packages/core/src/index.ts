@@ -68,3 +68,14 @@ export type { Verdict, Severity, StandardsRef, Finding } from './finding.ts';
 // Outcome / error model (pure core never throws for control flow)
 export { ok, err, assertNever, errorCodeSchema, actlintErrorSchema } from './outcome.ts';
 export type { Outcome, ActlintError, ErrorCode } from './outcome.ts';
+
+// Derivation engine (ToolDefinition + Vocabulary -> ActionRiskProfile, declaration-blind)
+export {
+  derive,
+  compose,
+  scoreBlastRadius,
+  nameSignals,
+  descriptionSignals,
+  schemaShapeSignals,
+} from './derive/index.ts';
+export type { Contribution, DerivationResult, PrimaryDimension } from './derive/index.ts';
