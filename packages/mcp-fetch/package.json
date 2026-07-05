@@ -17,6 +17,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@formael/actlint-core": "workspace:*"
+    "@formael/actlint-core": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.29.0"
   }
 }
