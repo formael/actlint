@@ -1,0 +1,226 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://formael.dev/schemas/action-risk-vocabulary/vocabulary.schema.json",
+  "title": "actlint action-risk vocabulary",
+  "description": "A versioned, evidence-backed dataset mapping observable MCP tool signals to derived action-risk dimensions. Pure data: it carries no scoring, walking, or composition mechanism — those live in the engine (packages/core). Each entry is a single reviewable claim, and any high-weight claim must cite a source.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "entries"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": {
+      "type": "string",
+      "description": "Semver of the vocabulary dataset itself — an independent line from the engine's version. Adding an entry is a MINOR; a change that flips an existing tool's classification is a MAJOR.",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "limitations": {
+      "type": "array",
+      "description": "Known, deliberately-documented gaps in this dataset — stated, never hidden. The English-centric verb lexicon and its alias-incompleteness are honest limitations, not silent failures.",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/entry" }
+    }
+  },
+  "$defs": {
+    "weight": {
+      "description": "How strongly this entry argues for its contribution. `high` demands a citation.",
+      "enum": ["high", "medium", "low"]
+    },
+    "confidence": {
+      "description": "Seeds the confidence the engine assigns to the dimension. `uncertain` downgrades severity but never suppresses a finding.",
+      "enum": ["high", "medium", "low", "uncertain"]
+    },
+    "reversibilityLevel": {
+      "enum": ["reversible", "recoverable-with-effort", "irreversible", "unknown"]
+    },
+    "destructivenessLevel": {
+      "enum": ["read-only", "additive", "mutating", "deleting", "unknown"]
+    },
+    "externalReachLevel": {
+      "enum": ["local", "org-internal", "open-world", "unknown"]
+    },
+    "idempotencyLevel": {
+      "enum": ["idempotent", "non-idempotent", "unknown"]
+    },
+    "reversibilityContribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "weight"],
+      "properties": {
+        "level": { "$ref": "#/$defs/reversibilityLevel" },
+        "weight": { "$ref": "#/$defs/weight" }
+      }
+    },
+    "destructivenessContribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "weight"],
+      "properties": {
+        "level": { "$ref": "#/$defs/destructivenessLevel" },
+        "weight": { "$ref": "#/$defs/weight" }
+      }
+    },
+    "externalReachContribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "weight"],
+      "properties": {
+        "level": { "$ref": "#/$defs/externalReachLevel" },
+        "weight": { "$ref": "#/$defs/weight" }
+      }
+    },
+    "idempotencyContribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "weight"],
+      "properties": {
+        "level": { "$ref": "#/$defs/idempotencyLevel" },
+        "weight": { "$ref": "#/$defs/weight" }
+      }
+    },
+    "contributes": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "description": "The dimensions this signal argues for. Only the four primary dimensions may appear here; blastRadius is a derived composite and is never contributed to directly.",
+      "properties": {
+        "reversibility": { "$ref": "#/$defs/reversibilityContribution" },
+        "destructiveness": { "$ref": "#/$defs/destructivenessContribution" },
+        "externalReach": { "$ref": "#/$defs/externalReachContribution" },
+        "idempotency": { "$ref": "#/$defs/idempotencyContribution" }
+      }
+    },
+    "lexicalSignal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "match"],
+      "properties": {
+        "kind": {
+          "description": "Where the signal is read. A tool's name carries more weight than its description.",
+          "enum": ["name-verb", "description-phrase"]
+        },
+        "match": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "schemaShapeSignal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "match"],
+      "properties": {
+        "kind": { "const": "schema-shape" },
+        "match": { "$ref": "#/$defs/schemaShapeMatch" }
+      }
+    },
+    "schemaShapeMatch": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "description": "Named tokens the engine looks for in a typed, defensive walk of a tool's inputSchema — never a raw-text match.",
+      "properties": {
+        "paramNameMatches": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Parameter names to look for in the input schema (matched against property names, at any depth)."
+        },
+        "stringFormatMatches": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "JSON Schema `format` values that mark an external destination (e.g. uri, email)."
+        },
+        "unconstrained": {
+          "type": "boolean",
+          "description": "When true, the signal fires only for a free-form string parameter — one with no enum, format, or tight pattern — i.e. a value interpreted as code."
+        }
+      },
+      "anyOf": [{ "required": ["paramNameMatches"] }, { "required": ["stringFormatMatches"] }]
+    },
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "signal", "contributes", "evidence", "confidence"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable entry identity. Renaming an id is a semver event.",
+          "pattern": "^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*$"
+        },
+        "signal": {
+          "oneOf": [{ "$ref": "#/$defs/lexicalSignal" }, { "$ref": "#/$defs/schemaShapeSignal" }]
+        },
+        "contributes": { "$ref": "#/$defs/contributes" },
+        "evidence": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The plain-language reason this signal argues for its contribution. Surfaces verbatim in a finding's rationale."
+        },
+        "citation": {
+          "type": "string",
+          "minLength": 1,
+          "description": "A source for the claim. Required whenever any contribution is high-weight."
+        },
+        "confidence": { "$ref": "#/$defs/confidence" }
+      },
+      "allOf": [
+        {
+          "$comment": "A high-weight judgment must carry a citation (no overclaiming).",
+          "if": {
+            "required": ["contributes"],
+            "properties": {
+              "contributes": {
+                "anyOf": [
+                  {
+                    "required": ["reversibility"],
+                    "properties": {
+                      "reversibility": {
+                        "required": ["weight"],
+                        "properties": { "weight": { "const": "high" } }
+                      }
+                    }
+                  },
+                  {
+                    "required": ["destructiveness"],
+                    "properties": {
+                      "destructiveness": {
+                        "required": ["weight"],
+                        "properties": { "weight": { "const": "high" } }
+                      }
+                    }
+                  },
+                  {
+                    "required": ["externalReach"],
+                    "properties": {
+                      "externalReach": {
+                        "required": ["weight"],
+                        "properties": { "weight": { "const": "high" } }
+                      }
+                    }
+                  },
+                  {
+                    "required": ["idempotency"],
+                    "properties": {
+                      "idempotency": {
+                        "required": ["weight"],
+                        "properties": { "weight": { "const": "high" } }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": ["citation"],
+            "properties": { "citation": { "type": "string", "minLength": 1 } }
+          }
+        }
+      ]
+    }
+  }
+}

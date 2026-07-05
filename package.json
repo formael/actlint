@@ -20,7 +20,8 @@
     "guard:purity": "tsx scripts/check-purity.ts",
     "guard:sdk": "tsx scripts/check-sdk-boundary.ts",
     "guard:determinism": "tsx scripts/check-determinism.ts",
-    "guards": "pnpm guard:purity && pnpm guard:sdk && pnpm guard:determinism",
+    "guard:vocabulary": "tsx scripts/check-vocabulary-data.ts",
+    "guards": "pnpm guard:purity && pnpm guard:sdk && pnpm guard:determinism && pnpm guard:vocabulary",
     "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm guards"
   },
   "devDependencies": {

@@ -1,0 +1,48 @@
+{
+  "$schema": "../schema/mcp-mapping.schema.json",
+  "version": "0.1.0",
+  "mappings": [
+    {
+      "mcpHint": "readOnlyHint",
+      "dimension": "destructiveness",
+      "raisesVerdict": true,
+      "correspondence": "readOnlyHint:true corresponds to destructiveness = read-only",
+      "note": "The cleanest 1:1. A derived non-read-only tool that declares readOnlyHint:true is the flagship write-as-readonly gap."
+    },
+    {
+      "mcpHint": "destructiveHint",
+      "dimension": "destructiveness",
+      "raisesVerdict": true,
+      "correspondence": "destructiveHint:true corresponds to destructiveness in {mutating, deleting}",
+      "note": "A derived deleting/mutating tool that declares destructiveHint:false, or omits it, is a destructive-unflagged gap."
+    },
+    {
+      "mcpHint": "openWorldHint",
+      "dimension": "externalReach",
+      "raisesVerdict": true,
+      "correspondence": "openWorldHint:true corresponds to externalReach = open-world",
+      "note": "A derived open-world tool that omits openWorldHint is an external-reach-undeclared gap."
+    },
+    {
+      "mcpHint": "idempotentHint",
+      "dimension": "idempotency",
+      "raisesVerdict": true,
+      "correspondence": "idempotentHint:true corresponds to idempotency = idempotent",
+      "note": "Lower-stakes. Primarily informs blast radius; rarely a standalone verdict."
+    },
+    {
+      "mcpHint": null,
+      "dimension": "reversibility",
+      "raisesVerdict": false,
+      "correspondence": "no corresponding MCP hint",
+      "note": "actlint's value-add. Supporting context and grade input only — never a phantom compliance failure against a field the protocol does not define."
+    },
+    {
+      "mcpHint": null,
+      "dimension": "blastRadius",
+      "raisesVerdict": false,
+      "correspondence": "no corresponding MCP hint",
+      "note": "A derived composite of the primary dimensions. Supporting context and grade input only — never a standalone verdict."
+    }
+  ]
+}

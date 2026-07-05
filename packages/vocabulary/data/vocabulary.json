@@ -1,0 +1,311 @@
+{
+  "$schema": "../schema/vocabulary.schema.json",
+  "version": "0.1.0",
+  "limitations": [
+    "The verb lexicon is English-centric. A tool named with a non-English verb (e.g. `supprimer`, `borrar`) will not match the name-verb signals and may derive as `uncertain`.",
+    "The verb lexicon is alias-incomplete. Uncommon spellings and compounded names (e.g. `rm_node`, `nuke`, `yeet`) are not enumerated and may be missed.",
+    "Name and description signals are natural language and therefore inherently ambiguous; schema-shape signals are language-independent and are weighted more heavily to compensate.",
+    "This is a v0 seed. Coverage of read/create/mutate/delete/send/transfer families and the two highest-signal schema shapes is deliberate; breadth grows by evidence-backed contribution, not by guessing.",
+    "Name-verb and parameter-name signals match exact tokens after case and separator normalization; the data cannot see negation or prefixing. A negated description (\"does not permanently delete\") still matches a deletion phrase — one reason description-phrase weights are low — and a prefixed name (`undelete`) simply fails to match, resolving conservatively to uncertain.",
+    "`query` is deliberately excluded from the free-form-code-input parameter names: it names benign natural-language search input far more often than executable code, and search tools are the most common benign tool class. `sql`, `statement`, `command`, and `script` carry the code-input claim instead."
+  ],
+  "entries": [
+    {
+      "id": "verb.read",
+      "signal": {
+        "kind": "name-verb",
+        "match": [
+          "get",
+          "list",
+          "read",
+          "search",
+          "fetch",
+          "describe",
+          "show",
+          "view",
+          "find",
+          "lookup",
+          "retrieve",
+          "count",
+          "exists"
+        ]
+      },
+      "contributes": {
+        "destructiveness": { "level": "read-only", "weight": "high" }
+      },
+      "evidence": "Retrieval verbs denote reading state without changing it; a tool named this way is a strong read-only signal.",
+      "citation": "MCP tool annotations, readOnlyHint (Model Context Protocol specification, 2025-03-26).",
+      "confidence": "high"
+    },
+    {
+      "id": "verb.create",
+      "signal": {
+        "kind": "name-verb",
+        "match": [
+          "create",
+          "add",
+          "insert",
+          "append",
+          "register",
+          "upload",
+          "new",
+          "generate",
+          "submit",
+          "import"
+        ]
+      },
+      "contributes": {
+        "destructiveness": { "level": "additive", "weight": "medium" },
+        "idempotency": { "level": "non-idempotent", "weight": "medium" }
+      },
+      "evidence": "Creation verbs add new state; repeating the call typically creates another instance, so the action is not naturally idempotent.",
+      "confidence": "medium"
+    },
+    {
+      "id": "verb.mutate",
+      "signal": {
+        "kind": "name-verb",
+        "match": [
+          "update",
+          "edit",
+          "modify",
+          "patch",
+          "set",
+          "put",
+          "replace",
+          "rename",
+          "move",
+          "configure",
+          "enable",
+          "disable",
+          "deactivate",
+          "toggle",
+          "approve",
+          "assign",
+          "cancel"
+        ]
+      },
+      "contributes": {
+        "destructiveness": { "level": "mutating", "weight": "high" }
+      },
+      "evidence": "Mutation verbs change existing state in place; a tool named this way overwrites a value that was there before.",
+      "citation": "MCP tool annotations, destructiveHint (Model Context Protocol specification, 2025-03-26).",
+      "confidence": "high"
+    },
+    {
+      "id": "verb.delete",
+      "signal": {
+        "kind": "name-verb",
+        "match": [
+          "delete",
+          "remove",
+          "destroy",
+          "drop",
+          "purge",
+          "wipe",
+          "erase",
+          "truncate",
+          "clear",
+          "revoke",
+          "terminate",
+          "uninstall"
+        ]
+      },
+      "contributes": {
+        "destructiveness": { "level": "deleting", "weight": "high" },
+        "reversibility": { "level": "irreversible", "weight": "medium" }
+      },
+      "evidence": "Deletion and revocation verbs remove state or access; recovery is not guaranteed by the action itself.",
+      "citation": "MCP tool annotations, destructiveHint (Model Context Protocol specification, 2025-03-26).",
+      "confidence": "high"
+    },
+    {
+      "id": "verb.send",
+      "signal": {
+        "kind": "name-verb",
+        "match": [
+          "send",
+          "email",
+          "post",
+          "publish",
+          "notify",
+          "dispatch",
+          "transmit",
+          "share",
+          "broadcast",
+          "deliver",
+          "message",
+          "tweet"
+        ]
+      },
+      "contributes": {
+        "externalReach": { "level": "open-world", "weight": "high" },
+        "reversibility": { "level": "irreversible", "weight": "medium" },
+        "idempotency": { "level": "non-idempotent", "weight": "medium" }
+      },
+      "evidence": "Communication verbs emit information beyond the local boundary; a sent message is externally visible and cannot be unsent, and repeating the call sends again.",
+      "citation": "MCP tool annotations, openWorldHint (Model Context Protocol specification, 2025-03-26).",
+      "confidence": "high"
+    },
+    {
+      "id": "verb.payment",
+      "signal": {
+        "kind": "name-verb",
+        "match": ["pay", "charge", "refund", "wire", "payout", "purchase", "checkout", "withdraw", "deposit"]
+      },
+      "contributes": {
+        "reversibility": { "level": "irreversible", "weight": "high" },
+        "externalReach": { "level": "open-world", "weight": "medium" },
+        "idempotency": { "level": "non-idempotent", "weight": "medium" }
+      },
+      "evidence": "Payment verbs move value. Once settled, the movement cannot be undone by the tool itself, repeating the call moves value again, and settlement typically involves an external system.",
+      "citation": "Formael Capability Risk Profile — monetary sensitivity mapping.",
+      "confidence": "high"
+    },
+    {
+      "id": "verb.transfer",
+      "signal": { "kind": "name-verb", "match": ["transfer"] },
+      "contributes": {
+        "reversibility": { "level": "irreversible", "weight": "medium" },
+        "externalReach": { "level": "open-world", "weight": "medium" }
+      },
+      "evidence": "Transfer verbs move an asset between parties, and when the asset is money, ownership, or access the movement is hard to reverse. The verb also names benign relocations — files, calls — so it is a supporting signal rather than a decisive one.",
+      "confidence": "medium"
+    },
+    {
+      "id": "verb.execute",
+      "signal": {
+        "kind": "name-verb",
+        "match": [
+          "execute",
+          "run",
+          "exec",
+          "eval",
+          "invoke",
+          "spawn",
+          "shell",
+          "compile",
+          "deploy",
+          "apply",
+          "install"
+        ]
+      },
+      "contributes": {
+        "destructiveness": { "level": "mutating", "weight": "medium" },
+        "idempotency": { "level": "non-idempotent", "weight": "low" }
+      },
+      "evidence": "Execution verbs let a caller drive behavior the annotations rarely capture; conservatively treated as at least mutating, since the specific effect is not knowable from the name.",
+      "confidence": "medium"
+    },
+    {
+      "id": "phrase.deletion",
+      "signal": {
+        "kind": "description-phrase",
+        "match": [
+          "permanently delete",
+          "cannot be undone",
+          "cannot be recovered",
+          "irreversible",
+          "permanently remove",
+          "destroys"
+        ]
+      },
+      "contributes": {
+        "destructiveness": { "level": "deleting", "weight": "low" },
+        "reversibility": { "level": "irreversible", "weight": "low" }
+      },
+      "evidence": "Prose that mentions permanent or irreversible removal is a weak supporting signal — it corroborates a name-verb reading but is not decisive on its own.",
+      "confidence": "low"
+    },
+    {
+      "id": "phrase.external-communication",
+      "signal": {
+        "kind": "description-phrase",
+        "match": [
+          "sends an email",
+          "posts to",
+          "third party",
+          "external service",
+          "to a webhook",
+          "publicly visible"
+        ]
+      },
+      "contributes": {
+        "externalReach": { "level": "open-world", "weight": "low" }
+      },
+      "evidence": "Prose describing outbound communication weakly supports open-world reach; the schema-shape destination signal is the stronger, language-independent evidence.",
+      "confidence": "low"
+    },
+    {
+      "id": "shape.freeform-code-input",
+      "signal": {
+        "kind": "schema-shape",
+        "match": {
+          "paramNameMatches": [
+            "sql",
+            "command",
+            "cmd",
+            "script",
+            "code",
+            "expression",
+            "eval",
+            "statement",
+            "program"
+          ],
+          "unconstrained": true
+        }
+      },
+      "contributes": {
+        "destructiveness": { "level": "mutating", "weight": "medium" },
+        "externalReach": { "level": "unknown", "weight": "low" }
+      },
+      "evidence": "An unconstrained free-form string parameter interpreted as code (a command, script, or SQL statement with no enum, format, or tight pattern) lets a caller drive arbitrary behavior; conservatively treated as at least mutating, and its reach cannot be determined from the shape alone.",
+      "citation": "Practical-DevSecOps MCP server security misconfigurations audit guide — free-form input interpreted as code is among the two most common critical findings in a 100+ production-server survey.",
+      "confidence": "medium"
+    },
+    {
+      "id": "shape.destination-format",
+      "signal": {
+        "kind": "schema-shape",
+        "match": {
+          "stringFormatMatches": ["uri", "uri-reference", "iri", "email", "idn-email", "hostname"]
+        }
+      },
+      "contributes": {
+        "externalReach": { "level": "open-world", "weight": "high" }
+      },
+      "evidence": "A string parameter whose declared format is a URI, an email address, or a hostname is structured, self-describing evidence that the tool addresses something beyond the local boundary.",
+      "citation": "MCP tool annotations, openWorldHint (Model Context Protocol specification, 2025-03-26).",
+      "confidence": "high"
+    },
+    {
+      "id": "shape.destination-param-name",
+      "signal": {
+        "kind": "schema-shape",
+        "match": {
+          "paramNameMatches": [
+            "url",
+            "uri",
+            "webhook",
+            "callback",
+            "callback_url",
+            "endpoint",
+            "recipient",
+            "recipients",
+            "cc",
+            "bcc",
+            "email",
+            "channel",
+            "host",
+            "redirect_uri"
+          ]
+        }
+      },
+      "contributes": {
+        "externalReach": { "level": "open-world", "weight": "medium" }
+      },
+      "evidence": "A parameter named like a communication destination — a URL, webhook, recipient, or channel — suggests the tool can reach outside the local boundary; a bare name is weaker evidence than a declared format.",
+      "confidence": "medium"
+    }
+  ]
+}
