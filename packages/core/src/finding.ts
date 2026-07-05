@@ -17,6 +17,14 @@ export type Verdict = z.infer<typeof verdictSchema>;
 export const severitySchema = z.enum(['info', 'low', 'medium', 'high', 'critical']);
 export type Severity = z.infer<typeof severitySchema>;
 
+// RuleClass — the two-class split that keeps the honesty grade coherent.
+//   'honesty'  — verdict-bearing, gate-eligible; compares derived risk to a declared MCP hint.
+//   'advisory' — capability-hygiene checks with no declared-hint counterpart; never gating by
+//                default, never contributing to the honesty grade. Reporters and importers filter
+//                on this field so an advisory nudge is never read as an honesty verdict.
+export const ruleClassSchema = z.enum(['honesty', 'advisory']);
+export type RuleClass = z.infer<typeof ruleClassSchema>;
+
 // StandardsRef — the typed crosswalk reference that makes every finding speak to Builder, Guardian,
 // and auditor simultaneously. At least one array must be non-empty (crosswalk-completeness
 // contract, enforced by the smart constructor and its contract test).
@@ -59,6 +67,7 @@ export const standardsRefSchema = z
 // The scorecard, JSON report, and exit code are all views of a readonly Finding[].
 export interface Finding {
   readonly ruleId: RuleId;
+  readonly ruleClass: RuleClass;
   readonly toolName: string;
   readonly verdict: Verdict;
   readonly severity: Severity;

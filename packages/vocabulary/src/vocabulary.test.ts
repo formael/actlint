@@ -12,16 +12,23 @@ import { describe, expect, it } from 'vitest';
 
 import vocabularySchemaJson from '../schema/vocabulary.schema.json' with { type: 'json' };
 import {
+  CROSSWALK,
+  CROSSWALK_VERSION,
   MCP_MAPPING,
   MCP_MAPPING_VERSION,
+  SEVERITY_POLICY,
+  SEVERITY_POLICY_VERSION,
   VOCABULARY,
   VOCABULARY_VERSION,
   type VocabularyEntry,
+  crosswalkSchema,
   destructivenessLevelSchema,
   externalReachLevelSchema,
   idempotencyLevelSchema,
   mcpMappingRowSchema,
   reversibilityLevelSchema,
+  severityPolicySchema,
+  standardsRefSchema,
   vocabularyConfidenceSchema,
   vocabularyEntrySchema,
   vocabularySchema,
@@ -283,6 +290,87 @@ describe('ratification fixtures — data-layer guards', () => {
 
   it('negation blindness is documented in limitations', () => {
     expect((VOCABULARY.limitations ?? []).join(' ').toLowerCase()).toContain('negat');
+  });
+});
+
+describe('standards crosswalk', () => {
+  it('is a non-empty, versioned dataset', () => {
+    expect(Object.keys(CROSSWALK.map).length).toBeGreaterThan(0);
+    expect(CROSSWALK_VERSION).toMatch(/^\d+\.\d+\.\d+$/);
+  });
+
+  it('every entry cites at least one external standard or MCP field', () => {
+    for (const [ruleId, ref] of Object.entries(CROSSWALK.map)) {
+      expect(standardsRefSchema.safeParse(ref).success, `crosswalk entry ${ruleId}`).toBe(true);
+    }
+  });
+
+  it('carries the relevant-not-prescriptive caveat in the data', () => {
+    expect((CROSSWALK.note ?? '').toLowerCase()).toContain('relevant, not prescriptive');
+  });
+
+  it('rejects an entry with every standards array empty', () => {
+    expect(
+      standardsRefSchema.safeParse({
+        owaspAsi: [],
+        owaspMcp: [],
+        cosaiOasis: [],
+        euAiAct: [],
+        nist: [],
+        mcpField: [],
+      }).success,
+    ).toBe(false);
+  });
+
+  it('rejects an entry with no fields at all', () => {
+    expect(standardsRefSchema.safeParse({}).success).toBe(false);
+  });
+
+  it('rejects a bare (non-year-suffixed) ASI identifier', () => {
+    expect(standardsRefSchema.safeParse({ owaspAsi: ['ASI02'] }).success).toBe(false);
+  });
+
+  it('rejects a bare (non-year-suffixed) MCP identifier', () => {
+    expect(standardsRefSchema.safeParse({ owaspMcp: ['MCP02'] }).success).toBe(false);
+  });
+
+  it('rejects a nonexistent CoSAI category slug', () => {
+    expect(standardsRefSchema.safeParse({ cosaiOasis: ['operational-visibility'] }).success).toBe(false);
+  });
+
+  it('rejects an unknown mcpField value', () => {
+    expect(standardsRefSchema.safeParse({ mcpField: ['unknownHint'] }).success).toBe(false);
+  });
+
+  it('the whole crosswalk satisfies its top-level schema', () => {
+    expect(crosswalkSchema.safeParse(CROSSWALK).success).toBe(true);
+  });
+});
+
+describe('severity policy', () => {
+  it('is a versioned dataset that maps every verdict', () => {
+    expect(SEVERITY_POLICY_VERSION).toMatch(/^\d+\.\d+\.\d+$/);
+    for (const verdict of ['under-declared', 'undeclared', 'over-declared', 'consistent'] as const) {
+      expect(SEVERITY_POLICY.byVerdict[verdict]).toBeTruthy();
+    }
+  });
+
+  it('reserves critical for the under-declared verdict (the asymmetry, as data)', () => {
+    expect(SEVERITY_POLICY.byVerdict['under-declared']).toBe('critical');
+    expect(SEVERITY_POLICY.byVerdict.undeclared).toBe('low');
+    expect(SEVERITY_POLICY.byVerdict['over-declared']).toBe('low');
+  });
+
+  it('steps confidence down, never up (uncertain and low are negative; certain are zero)', () => {
+    expect(SEVERITY_POLICY.confidenceAdjust.uncertain).toBeLessThan(0);
+    expect(SEVERITY_POLICY.confidenceAdjust.low).toBeLessThan(0);
+    expect(SEVERITY_POLICY.confidenceAdjust.medium).toBe(0);
+    expect(SEVERITY_POLICY.confidenceAdjust.high).toBe(0);
+    expect(SEVERITY_POLICY.confidenceAdjust.uncertain).toBeLessThan(SEVERITY_POLICY.confidenceAdjust.low);
+  });
+
+  it('the whole policy satisfies its top-level schema', () => {
+    expect(severityPolicySchema.safeParse(SEVERITY_POLICY).success).toBe(true);
   });
 });
 

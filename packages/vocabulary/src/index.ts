@@ -10,9 +10,20 @@
 // JSON Schemas' Zod mirror so a malformed dataset fails loudly at import rather than silently
 // downstream.
 
+import rawCrosswalk from '../data/crosswalk.json' with { type: 'json' };
 import rawMcpMapping from '../data/mcp-mapping.json' with { type: 'json' };
+import rawSeverityPolicy from '../data/severity-policy.json' with { type: 'json' };
 import rawVocabulary from '../data/vocabulary.json' with { type: 'json' };
-import { type McpMapping, type Vocabulary, parseMcpMapping, parseVocabulary } from './schema.ts';
+import {
+  type Crosswalk,
+  type McpMapping,
+  type SeverityPolicy,
+  type Vocabulary,
+  parseCrosswalk,
+  parseMcpMapping,
+  parseSeverityPolicy,
+  parseVocabulary,
+} from './schema.ts';
 
 /** The npm package name — the single shared artifact between actlint (open) and the Formael platform. */
 export const VOCABULARY_PACKAGE = '@formael/action-risk-vocabulary';
@@ -28,6 +39,25 @@ export const VOCABULARY_VERSION: string = VOCABULARY.version;
 
 /** Semver of the MCP-hint mapping dataset. */
 export const MCP_MAPPING_VERSION: string = MCP_MAPPING.version;
+
+/**
+ * The validated standards & regulatory crosswalk: each RuleId → the external frameworks it is
+ * relevant to. Consumed by the engine, whose makeFinding refuses to build a finding whose RuleId
+ * has no entry here.
+ */
+export const CROSSWALK: Crosswalk = Object.freeze(parseCrosswalk(rawCrosswalk));
+
+/** Semver of the crosswalk dataset — an independent line from the vocabulary and engine versions. */
+export const CROSSWALK_VERSION: string = CROSSWALK.version;
+
+/**
+ * The validated severity policy: the reviewable table the engine reads to compute a finding's
+ * severity from its verdict, rule class, and confidence. Severity is never hand-assigned.
+ */
+export const SEVERITY_POLICY: SeverityPolicy = Object.freeze(parseSeverityPolicy(rawSeverityPolicy));
+
+/** Semver of the severity policy dataset — versioned alongside the crosswalk. */
+export const SEVERITY_POLICY_VERSION: string = SEVERITY_POLICY.version;
 
 // Re-export the schemas, inferred types, and validators for consumers and tests.
 export * from './schema.ts';
