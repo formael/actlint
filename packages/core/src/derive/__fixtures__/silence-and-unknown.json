@@ -1,0 +1,50 @@
+{
+  "family": "silence-and-unknown",
+  "intent": "Silence is `unknown`, never benign. A tool with no matched signal derives every dimension `unknown`/`uncertain`, and blast radius is `unknown` — not a comfortable `contained`. Absence of evidence of danger is not evidence of safety.",
+  "cases": [
+    {
+      "name": "no-signal",
+      "intent": "a name with no verb and an empty schema -> all unknown",
+      "tool": {
+        "name": "ping",
+        "inputSchema": {
+          "type": "object",
+          "properties": {}
+        },
+        "annotations": {
+          "unknownHints": {}
+        }
+      },
+      "expected": {
+        "profile": {
+          "reversibility": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "destructiveness": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "externalReach": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "idempotency": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "blastRadius": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          }
+        },
+        "signals": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,321 @@
+{
+  "family": "name-verb",
+  "intent": "A tool's name is terse and intentional — the high-value, low-noise signal. Each case pins one verb family; the description and schema are empty so the name is the sole evidence.",
+  "cases": [
+    {
+      "name": "read",
+      "intent": "retrieval verb -> read-only",
+      "tool": {
+        "name": "get_user",
+        "inputSchema": {
+          "type": "object",
+          "properties": {}
+        },
+        "annotations": {
+          "unknownHints": {}
+        }
+      },
+      "expected": {
+        "profile": {
+          "reversibility": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "destructiveness": {
+            "level": "read-only",
+            "confidence": "high",
+            "provenance": [
+              {
+                "id": "verb.read",
+                "weight": "definitive"
+              }
+            ]
+          },
+          "externalReach": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "idempotency": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "blastRadius": {
+            "level": "contained",
+            "confidence": "medium",
+            "provenance": [
+              {
+                "id": "verb.read",
+                "weight": "definitive"
+              }
+            ]
+          }
+        },
+        "signals": [
+          {
+            "id": "verb.read",
+            "weight": "definitive"
+          }
+        ]
+      }
+    },
+    {
+      "name": "create",
+      "intent": "creation verb -> additive + non-idempotent",
+      "tool": {
+        "name": "create_record",
+        "inputSchema": {
+          "type": "object",
+          "properties": {}
+        },
+        "annotations": {
+          "unknownHints": {}
+        }
+      },
+      "expected": {
+        "profile": {
+          "reversibility": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "destructiveness": {
+            "level": "additive",
+            "confidence": "medium",
+            "provenance": [
+              {
+                "id": "verb.create",
+                "weight": "strong"
+              }
+            ]
+          },
+          "externalReach": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "idempotency": {
+            "level": "non-idempotent",
+            "confidence": "medium",
+            "provenance": [
+              {
+                "id": "verb.create",
+                "weight": "strong"
+              }
+            ]
+          },
+          "blastRadius": {
+            "level": "moderate",
+            "confidence": "low",
+            "provenance": [
+              {
+                "id": "verb.create",
+                "weight": "strong"
+              }
+            ]
+          }
+        },
+        "signals": [
+          {
+            "id": "verb.create",
+            "weight": "strong"
+          }
+        ]
+      }
+    },
+    {
+      "name": "mutate",
+      "intent": "mutation verb -> mutating",
+      "tool": {
+        "name": "update_config",
+        "inputSchema": {
+          "type": "object",
+          "properties": {}
+        },
+        "annotations": {
+          "unknownHints": {}
+        }
+      },
+      "expected": {
+        "profile": {
+          "reversibility": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "destructiveness": {
+            "level": "mutating",
+            "confidence": "high",
+            "provenance": [
+              {
+                "id": "verb.mutate",
+                "weight": "definitive"
+              }
+            ]
+          },
+          "externalReach": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "idempotency": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "blastRadius": {
+            "level": "moderate",
+            "confidence": "medium",
+            "provenance": [
+              {
+                "id": "verb.mutate",
+                "weight": "definitive"
+              }
+            ]
+          }
+        },
+        "signals": [
+          {
+            "id": "verb.mutate",
+            "weight": "definitive"
+          }
+        ]
+      }
+    },
+    {
+      "name": "delete",
+      "intent": "deletion verb -> deleting + irreversible",
+      "tool": {
+        "name": "delete_repository",
+        "inputSchema": {
+          "type": "object",
+          "properties": {}
+        },
+        "annotations": {
+          "unknownHints": {}
+        }
+      },
+      "expected": {
+        "profile": {
+          "reversibility": {
+            "level": "irreversible",
+            "confidence": "medium",
+            "provenance": [
+              {
+                "id": "verb.delete",
+                "weight": "strong"
+              }
+            ]
+          },
+          "destructiveness": {
+            "level": "deleting",
+            "confidence": "high",
+            "provenance": [
+              {
+                "id": "verb.delete",
+                "weight": "definitive"
+              }
+            ]
+          },
+          "externalReach": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "idempotency": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "blastRadius": {
+            "level": "severe",
+            "confidence": "low",
+            "provenance": [
+              {
+                "id": "verb.delete",
+                "weight": "definitive"
+              }
+            ]
+          }
+        },
+        "signals": [
+          {
+            "id": "verb.delete",
+            "weight": "definitive"
+          }
+        ]
+      }
+    },
+    {
+      "name": "send",
+      "intent": "communication verb -> open-world + irreversible + non-idempotent",
+      "tool": {
+        "name": "send_notification",
+        "inputSchema": {
+          "type": "object",
+          "properties": {}
+        },
+        "annotations": {
+          "unknownHints": {}
+        }
+      },
+      "expected": {
+        "profile": {
+          "reversibility": {
+            "level": "irreversible",
+            "confidence": "medium",
+            "provenance": [
+              {
+                "id": "verb.send",
+                "weight": "strong"
+              }
+            ]
+          },
+          "destructiveness": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "externalReach": {
+            "level": "open-world",
+            "confidence": "high",
+            "provenance": [
+              {
+                "id": "verb.send",
+                "weight": "definitive"
+              }
+            ]
+          },
+          "idempotency": {
+            "level": "non-idempotent",
+            "confidence": "medium",
+            "provenance": [
+              {
+                "id": "verb.send",
+                "weight": "strong"
+              }
+            ]
+          },
+          "blastRadius": {
+            "level": "severe",
+            "confidence": "low",
+            "provenance": [
+              {
+                "id": "verb.send",
+                "weight": "definitive"
+              }
+            ]
+          }
+        },
+        "signals": [
+          {
+            "id": "verb.send",
+            "weight": "definitive"
+          }
+        ]
+      }
+    }
+  ]
+}

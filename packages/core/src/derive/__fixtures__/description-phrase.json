@@ -1,0 +1,212 @@
+{
+  "family": "description-phrase",
+  "intent": "Prose is low-weight, supporting evidence: it corroborates a name/schema signal but rarely originates a high-confidence finding. A negated phrase still matches (one reason prose is weak).",
+  "cases": [
+    {
+      "name": "corroborates-name",
+      "intent": "deletion phrase corroborates a delete verb -> deleting stays high, reversibility rises",
+      "tool": {
+        "name": "delete_account",
+        "description": "This will permanently delete the user and cannot be undone.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {}
+        },
+        "annotations": {
+          "unknownHints": {}
+        }
+      },
+      "expected": {
+        "profile": {
+          "reversibility": {
+            "level": "irreversible",
+            "confidence": "medium",
+            "provenance": [
+              {
+                "id": "phrase.deletion",
+                "weight": "weak"
+              },
+              {
+                "id": "verb.delete",
+                "weight": "strong"
+              }
+            ]
+          },
+          "destructiveness": {
+            "level": "deleting",
+            "confidence": "high",
+            "provenance": [
+              {
+                "id": "phrase.deletion",
+                "weight": "weak"
+              },
+              {
+                "id": "verb.delete",
+                "weight": "definitive"
+              }
+            ]
+          },
+          "externalReach": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "idempotency": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "blastRadius": {
+            "level": "severe",
+            "confidence": "low",
+            "provenance": [
+              {
+                "id": "phrase.deletion",
+                "weight": "weak"
+              },
+              {
+                "id": "verb.delete",
+                "weight": "definitive"
+              }
+            ]
+          }
+        },
+        "signals": [
+          {
+            "id": "phrase.deletion",
+            "weight": "weak"
+          },
+          {
+            "id": "verb.delete",
+            "weight": "definitive"
+          }
+        ]
+      }
+    },
+    {
+      "name": "phrase-only-is-low",
+      "intent": "deletion phrase with a neutral name -> deleting/irreversible at LOW confidence",
+      "tool": {
+        "name": "process_item",
+        "description": "This permanently removes the record and cannot be recovered.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {}
+        },
+        "annotations": {
+          "unknownHints": {}
+        }
+      },
+      "expected": {
+        "profile": {
+          "reversibility": {
+            "level": "irreversible",
+            "confidence": "low",
+            "provenance": [
+              {
+                "id": "phrase.deletion",
+                "weight": "weak"
+              }
+            ]
+          },
+          "destructiveness": {
+            "level": "deleting",
+            "confidence": "low",
+            "provenance": [
+              {
+                "id": "phrase.deletion",
+                "weight": "weak"
+              }
+            ]
+          },
+          "externalReach": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "idempotency": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "blastRadius": {
+            "level": "severe",
+            "confidence": "uncertain",
+            "provenance": [
+              {
+                "id": "phrase.deletion",
+                "weight": "weak"
+              }
+            ]
+          }
+        },
+        "signals": [
+          {
+            "id": "phrase.deletion",
+            "weight": "weak"
+          }
+        ]
+      }
+    },
+    {
+      "name": "external-communication-phrase",
+      "intent": "outbound-communication phrase with a neutral name -> open-world at LOW confidence",
+      "tool": {
+        "name": "handle_event",
+        "description": "Posts to an external service when triggered.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {}
+        },
+        "annotations": {
+          "unknownHints": {}
+        }
+      },
+      "expected": {
+        "profile": {
+          "reversibility": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "destructiveness": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "externalReach": {
+            "level": "open-world",
+            "confidence": "low",
+            "provenance": [
+              {
+                "id": "phrase.external-communication",
+                "weight": "weak"
+              }
+            ]
+          },
+          "idempotency": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "blastRadius": {
+            "level": "moderate",
+            "confidence": "uncertain",
+            "provenance": [
+              {
+                "id": "phrase.external-communication",
+                "weight": "weak"
+              }
+            ]
+          }
+        },
+        "signals": [
+          {
+            "id": "phrase.external-communication",
+            "weight": "weak"
+          }
+        ]
+      }
+    }
+  ]
+}

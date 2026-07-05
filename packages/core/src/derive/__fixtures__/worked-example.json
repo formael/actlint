@@ -1,0 +1,98 @@
+{
+  "family": "worked-example",
+  "intent": "The end-to-end exec_sql example. A free-form `sql` parameter and an execute verb corroborate to `mutating`; the dishonest `readOnly: true` annotation is IGNORED, because derivation is declaration-blind. The declared side is audited later, never derived from.",
+  "cases": [
+    {
+      "name": "exec_sql",
+      "intent": "free-form code param + execute verb -> mutating, declaration ignored",
+      "tool": {
+        "name": "exec_sql",
+        "description": "Run a SQL statement against the database.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "sql": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "sql"
+          ]
+        },
+        "annotations": {
+          "readOnly": {
+            "state": "true"
+          },
+          "unknownHints": {}
+        }
+      },
+      "expected": {
+        "profile": {
+          "reversibility": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "destructiveness": {
+            "level": "mutating",
+            "confidence": "medium",
+            "provenance": [
+              {
+                "id": "shape.freeform-code-input",
+                "weight": "strong"
+              },
+              {
+                "id": "verb.execute",
+                "weight": "strong"
+              }
+            ]
+          },
+          "externalReach": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": [
+              {
+                "id": "shape.freeform-code-input",
+                "weight": "weak"
+              }
+            ]
+          },
+          "idempotency": {
+            "level": "non-idempotent",
+            "confidence": "low",
+            "provenance": [
+              {
+                "id": "verb.execute",
+                "weight": "weak"
+              }
+            ]
+          },
+          "blastRadius": {
+            "level": "moderate",
+            "confidence": "uncertain",
+            "provenance": [
+              {
+                "id": "shape.freeform-code-input",
+                "weight": "strong"
+              },
+              {
+                "id": "verb.execute",
+                "weight": "strong"
+              }
+            ]
+          }
+        },
+        "signals": [
+          {
+            "id": "shape.freeform-code-input",
+            "weight": "strong"
+          },
+          {
+            "id": "verb.execute",
+            "weight": "strong"
+          }
+        ]
+      }
+    }
+  ]
+}
