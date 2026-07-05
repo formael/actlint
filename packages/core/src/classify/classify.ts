@@ -6,7 +6,7 @@
 // against the EFFECTIVE declared value (the explicit hint, or the MCP spec default when absent) and
 // emits at most one RawFinding per aspect. A clean tool emits none.
 //
-// The whole judgment is the asymmetry (docs "the verdict matrix"):
+// The whole judgment is the asymmetry:
 //   under-declared (an explicit false claim that removes a spec-default safety prompt) ≫
 //   undeclared (silence the spec default already covers, a low nudge) ≈
 //   over-declared (honest over-caution, alarm fatigue).

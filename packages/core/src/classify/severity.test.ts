@@ -37,6 +37,18 @@ describe('honesty severity from verdict + confidence', () => {
   });
 });
 
+// The gate boundary is the single most consequential cell in the severity policy: it decides which
+// softened findings break a default CI gate (--fail-on high). Uncertain never gates; low may gate.
+describe('gate-boundary fixtures: uncertain never gates, low confidence may gate', () => {
+  it('destructive-unflagged under-declared at uncertain → medium (below --fail-on high, does not gate)', () => {
+    expect(computeSeverity(RULE.destructiveUnflagged, 'under-declared', 'uncertain')).toBe('medium');
+  });
+
+  it('destructive-unflagged under-declared at low → high (at --fail-on high, gates)', () => {
+    expect(computeSeverity(RULE.destructiveUnflagged, 'under-declared', 'low')).toBe('high');
+  });
+});
+
 describe('advisory severity is a floor, independent of confidence', () => {
   it('advisory rules sit at medium regardless of the confidence carried', () => {
     for (const c of ['high', 'medium', 'low', 'uncertain'] as const) {

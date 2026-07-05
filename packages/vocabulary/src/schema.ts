@@ -202,19 +202,25 @@ const ruleIdKeySchema = z.string().regex(/^[a-z][a-z0-9-]*$/, {
 
 // --- The standards & regulatory crosswalk -----------------------------------------------------
 
-// One RuleId's mapping to the external frameworks it is relevant to. At least one array must be
-// present and non-empty: a finding that cannot locate itself in the standards landscape is
-// unshippable (the engine's makeFinding refuses it, and a completeness test re-asserts it).
-const refListSchema = z.array(z.string().min(1)).min(1);
+// Per-column typed ref arrays. Patterns enforce that identifiers use the exact form each issuing
+// body publishes, so a malformed or nonexistent ID fails validation rather than silently ships.
+const owaspAsiRefSchema = z.array(z.string().regex(/^ASI(0[1-9]|10):2026$/)).min(1);
+const owaspMcpRefSchema = z.array(z.string().regex(/^MCP(0[1-9]|10):2025$/)).min(1);
+const cosaiOasisRefSchema = z.array(z.string().regex(/^MCP-T([1-9]|1[0-2])$/)).min(1);
+const euAiActRefSchema = z.array(z.string().regex(/^Art\.\d{1,3}$/)).min(1);
+const nistRefSchema = z.array(z.string().regex(/^AI-RMF:(GOVERN|MAP|MEASURE|MANAGE)$/)).min(1);
+const mcpFieldRefSchema = z
+  .array(z.enum(['readOnlyHint', 'destructiveHint', 'idempotentHint', 'openWorldHint']))
+  .min(1);
 
 export const standardsRefSchema = z
   .object({
-    owaspAsi: refListSchema.optional(),
-    owaspMcp: refListSchema.optional(),
-    cosaiOasis: refListSchema.optional(),
-    euAiAct: refListSchema.optional(),
-    nist: refListSchema.optional(),
-    mcpField: refListSchema.optional(),
+    owaspAsi: owaspAsiRefSchema.optional(),
+    owaspMcp: owaspMcpRefSchema.optional(),
+    cosaiOasis: cosaiOasisRefSchema.optional(),
+    euAiAct: euAiActRefSchema.optional(),
+    nist: nistRefSchema.optional(),
+    mcpField: mcpFieldRefSchema.optional(),
   })
   .strict()
   .refine(

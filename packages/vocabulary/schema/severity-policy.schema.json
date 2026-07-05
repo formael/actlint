@@ -36,7 +36,7 @@
     },
     "ruleFloor": {
       "type": "object",
-      "description": "Per-RuleId severity floors, applied after confidence adjustment. Keys are stable, kebab-case RuleIds.",
+      "description": "Per-RuleId severity floors, applied after confidence adjustment via higher(floor, adjusted). A floor on a honesty rule partially overrides confidence softening — the floor wins if it outranks the adjusted severity. Today floors exist only for advisory rules (where confidence never applies), but a future floor on a honesty rule would re-promote a softened finding. Keys are stable, kebab-case RuleIds.",
       "propertyNames": { "pattern": "^[a-z][a-z0-9-]*$" },
       "additionalProperties": { "$ref": "#/$defs/severity" }
     },

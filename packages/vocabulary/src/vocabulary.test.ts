@@ -326,6 +326,22 @@ describe('standards crosswalk', () => {
     expect(standardsRefSchema.safeParse({}).success).toBe(false);
   });
 
+  it('rejects a bare (non-year-suffixed) ASI identifier', () => {
+    expect(standardsRefSchema.safeParse({ owaspAsi: ['ASI02'] }).success).toBe(false);
+  });
+
+  it('rejects a bare (non-year-suffixed) MCP identifier', () => {
+    expect(standardsRefSchema.safeParse({ owaspMcp: ['MCP02'] }).success).toBe(false);
+  });
+
+  it('rejects a nonexistent CoSAI category slug', () => {
+    expect(standardsRefSchema.safeParse({ cosaiOasis: ['operational-visibility'] }).success).toBe(false);
+  });
+
+  it('rejects an unknown mcpField value', () => {
+    expect(standardsRefSchema.safeParse({ mcpField: ['unknownHint'] }).success).toBe(false);
+  });
+
   it('the whole crosswalk satisfies its top-level schema', () => {
     expect(crosswalkSchema.safeParse(CROSSWALK).success).toBe(true);
   });

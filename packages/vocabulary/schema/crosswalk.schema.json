@@ -32,12 +32,59 @@
       "additionalProperties": false,
       "description": "At least one array must be present and non-empty — a finding that cannot locate itself in the standards landscape is unshippable.",
       "properties": {
-        "owaspAsi": { "$ref": "#/$defs/refList" },
-        "owaspMcp": { "$ref": "#/$defs/refList" },
-        "cosaiOasis": { "$ref": "#/$defs/refList" },
-        "euAiAct": { "$ref": "#/$defs/refList" },
-        "nist": { "$ref": "#/$defs/refList" },
-        "mcpField": { "$ref": "#/$defs/refList" }
+        "owaspAsi": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^ASI(0[1-9]|10):2026$",
+            "description": "OWASP Top 10 for Agentic Applications (2026) identifier, e.g. ASI02:2026."
+          }
+        },
+        "owaspMcp": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^MCP(0[1-9]|10):2025$",
+            "description": "OWASP MCP Top 10 (beta, 2025 edition) identifier, e.g. MCP02:2025. The year suffix pins which edition the claim was made against."
+          }
+        },
+        "cosaiOasis": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^MCP-T([1-9]|1[0-2])$",
+            "description": "CoSAI/OASIS MCP Security taxonomy (v1, Jan 2026) category identifier, e.g. MCP-T9."
+          }
+        },
+        "euAiAct": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^Art\\.\\d{1,3}$",
+            "description": "EU AI Act article reference, e.g. Art.14."
+          }
+        },
+        "nist": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^AI-RMF:(GOVERN|MAP|MEASURE|MANAGE)$",
+            "description": "NIST AI RMF function reference, e.g. AI-RMF:MEASURE."
+          }
+        },
+        "mcpField": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "enum": ["readOnlyHint", "destructiveHint", "idempotentHint", "openWorldHint"],
+            "description": "The MCP ToolAnnotations field this rule observes."
+          }
+        }
       },
       "anyOf": [
         { "required": ["owaspAsi"] },
@@ -47,11 +94,6 @@
         { "required": ["nist"] },
         { "required": ["mcpField"] }
       ]
-    },
-    "refList": {
-      "type": "array",
-      "minItems": 1,
-      "items": { "type": "string", "minLength": 1 }
     }
   }
 }
