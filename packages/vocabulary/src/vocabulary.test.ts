@@ -16,6 +16,7 @@ import {
   MCP_MAPPING_VERSION,
   VOCABULARY,
   VOCABULARY_VERSION,
+  type VocabularyEntry,
   destructivenessLevelSchema,
   externalReachLevelSchema,
   idempotencyLevelSchema,
@@ -181,6 +182,107 @@ describe('MCP-hint mapping', () => {
       note: 'invalid: a verdict with no hint to be honest about',
     };
     expect(mcpMappingRowSchema.safeParse(phantom).success).toBe(false);
+  });
+});
+
+// Data-layer guards: one test per fixture scenario, each naming a representative tool.
+describe('ratification fixtures — data-layer guards', () => {
+  const byId = new Map(VOCABULARY.entries.map((e) => [e.id, e]));
+
+  const getEntry = (id: string): VocabularyEntry => {
+    const e = byId.get(id);
+    if (!e) throw new Error(`entry not found in vocabulary: ${id}`);
+    return e;
+  };
+
+  const verbMatch = (id: string): readonly string[] => {
+    const e = getEntry(id);
+    if (e.signal.kind !== 'name-verb') throw new Error(`${id} is not a name-verb entry`);
+    return e.signal.match;
+  };
+
+  const paramNames = (id: string): readonly string[] => {
+    const e = getEntry(id);
+    if (e.signal.kind !== 'schema-shape') throw new Error(`${id} is not a schema-shape entry`);
+    return (e.signal.match as { paramNameMatches?: string[] }).paramNameMatches ?? [];
+  };
+
+  it('search_web(query): query absent from freeform-code-input — launch-critical FP guard', () => {
+    expect(paramNames('shape.freeform-code-input')).not.toContain('query');
+  });
+
+  it('copy_file(source,destination): to/destination/address absent from every paramNameMatches', () => {
+    for (const entry of VOCABULARY.entries) {
+      if (entry.signal.kind !== 'schema-shape') continue;
+      const pn = (entry.signal.match as { paramNameMatches?: string[] }).paramNameMatches ?? [];
+      expect(pn, `entry ${entry.id}`).not.toContain('to');
+      expect(pn, `entry ${entry.id}`).not.toContain('destination');
+      expect(pn, `entry ${entry.id}`).not.toContain('address');
+    }
+  });
+
+  it('send_email(to): verb.send covers open-world at high weight — dropped param names cost nothing', () => {
+    const e = getEntry('verb.send');
+    expect(e.contributes.externalReach?.level).toBe('open-world');
+    expect(e.contributes.externalReach?.weight).toBe('high');
+  });
+
+  it('create_contact(email): shape.destination-param-name holds email at medium — accepted FP cost', () => {
+    expect(paramNames('shape.destination-param-name')).toContain('email');
+    expect(getEntry('shape.destination-param-name').contributes.externalReach?.weight).toBe('medium');
+  });
+
+  it('run_shell_command(command)+destructiveHint:false: freeform-code-input matches command at medium', () => {
+    expect(paramNames('shape.freeform-code-input')).toContain('command');
+    expect(getEntry('shape.freeform-code-input').contributes.destructiveness?.weight).toBe('medium');
+  });
+
+  it('submit_verification(code): code is in freeform-code-input watch list', () => {
+    expect(paramNames('shape.freeform-code-input')).toContain('code');
+  });
+
+  it('pay_invoice: verb.payment claims irreversible at high weight and non-idempotent', () => {
+    const e = getEntry('verb.payment');
+    expect(e.contributes.reversibility?.level).toBe('irreversible');
+    expect(e.contributes.reversibility?.weight).toBe('high');
+    expect(e.contributes.idempotency?.level).toBe('non-idempotent');
+    expect(e.citation).toBeTruthy();
+  });
+
+  it('transfer_file: verb.transfer matches only bare transfer — medium-weight, no high-confidence irreversibility', () => {
+    const e = getEntry('verb.transfer');
+    expect([...verbMatch('verb.transfer')]).toEqual(['transfer']);
+    expect(e.contributes.reversibility?.weight).not.toBe('high');
+    expect(e.confidence).toBe('medium');
+  });
+
+  it('deactivate_user: deactivate is in verb.mutate, not verb.delete', () => {
+    expect(verbMatch('verb.mutate')).toContain('deactivate');
+    expect(verbMatch('verb.delete')).not.toContain('deactivate');
+  });
+
+  it('cancel_job: cancel is in verb.mutate, not verb.delete', () => {
+    expect(verbMatch('verb.mutate')).toContain('cancel');
+    expect(verbMatch('verb.delete')).not.toContain('cancel');
+  });
+
+  it('find_and_delete: verb.delete is deleting/high; verb.read is read-only/high — composer must not let read suppress delete', () => {
+    const del = getEntry('verb.delete');
+    const read = getEntry('verb.read');
+    expect(verbMatch('verb.delete')).toContain('delete');
+    expect(del.contributes.destructiveness?.level).toBe('deleting');
+    expect(del.contributes.destructiveness?.weight).toBe('high');
+    expect(verbMatch('verb.read')).toContain('find');
+    expect(read.contributes.destructiveness?.level).toBe('read-only');
+    expect(read.contributes.destructiveness?.weight).toBe('high');
+  });
+
+  it('query exclusion is recorded in limitations', () => {
+    expect((VOCABULARY.limitations ?? []).join(' ').toLowerCase()).toContain('query');
+  });
+
+  it('negation blindness is documented in limitations', () => {
+    expect((VOCABULARY.limitations ?? []).join(' ').toLowerCase()).toContain('negat');
   });
 });
 
