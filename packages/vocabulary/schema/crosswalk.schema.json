@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://formael.dev/schemas/action-risk-vocabulary/crosswalk.schema.json",
+  "title": "actlint standards & regulatory crosswalk",
+  "description": "Maps each stable RuleId to the external frameworks it is relevant to (OWASP ASI, OWASP MCP Top 10, CoSAI/OASIS, EU AI Act, NIST) and the MCP annotation field it concerns. Pure data: it carries no mechanism. Standards references are relevant, not prescriptive — a finding is never a compliance verdict. Every RuleId the engine can emit must have a non-empty entry here; that completeness is a contract test in packages/core.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "map"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": {
+      "type": "string",
+      "description": "Semver of the crosswalk dataset itself — an independent line from the engine and vocabulary versions.",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "note": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The 'relevant, not prescriptive' caveat, stated in the data so it travels with it."
+    },
+    "map": {
+      "type": "object",
+      "description": "RuleId -> the standards it is relevant to. Keys are stable, kebab-case RuleIds.",
+      "minProperties": 1,
+      "propertyNames": { "pattern": "^[a-z][a-z0-9-]*$" },
+      "additionalProperties": { "$ref": "#/$defs/standardsRef" }
+    }
+  },
+  "$defs": {
+    "standardsRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "At least one array must be present and non-empty — a finding that cannot locate itself in the standards landscape is unshippable.",
+      "properties": {
+        "owaspAsi": { "$ref": "#/$defs/refList" },
+        "owaspMcp": { "$ref": "#/$defs/refList" },
+        "cosaiOasis": { "$ref": "#/$defs/refList" },
+        "euAiAct": { "$ref": "#/$defs/refList" },
+        "nist": { "$ref": "#/$defs/refList" },
+        "mcpField": { "$ref": "#/$defs/refList" }
+      },
+      "anyOf": [
+        { "required": ["owaspAsi"] },
+        { "required": ["owaspMcp"] },
+        { "required": ["cosaiOasis"] },
+        { "required": ["euAiAct"] },
+        { "required": ["nist"] },
+        { "required": ["mcpField"] }
+      ]
+    },
+    "refList": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}

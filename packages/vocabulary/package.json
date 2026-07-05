@@ -12,8 +12,12 @@
     },
     "./schema/vocabulary.schema.json": "./schema/vocabulary.schema.json",
     "./schema/mcp-mapping.schema.json": "./schema/mcp-mapping.schema.json",
+    "./schema/crosswalk.schema.json": "./schema/crosswalk.schema.json",
+    "./schema/severity-policy.schema.json": "./schema/severity-policy.schema.json",
     "./data/vocabulary.json": "./data/vocabulary.json",
-    "./data/mcp-mapping.json": "./data/mcp-mapping.json"
+    "./data/mcp-mapping.json": "./data/mcp-mapping.json",
+    "./data/crosswalk.json": "./data/crosswalk.json",
+    "./data/severity-policy.json": "./data/severity-policy.json"
   },
   "files": ["dist", "schema", "data", "docs"],
   "scripts": {

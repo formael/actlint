@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://formael.dev/schemas/action-risk-vocabulary/severity-policy.schema.json",
+  "title": "actlint severity policy",
+  "description": "The published, reviewable policy that turns a verdict, a rule class, and a confidence into a severity. Pure data: severity is computed by the engine from this table, never hand-assigned per finding, so 'why is this critical?' is always answerable from the policy. A change here is a reviewable data diff.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "byVerdict", "ruleClass", "ruleFloor", "confidenceAdjust"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": {
+      "type": "string",
+      "description": "Semver of the severity policy — versioned alongside the crosswalk.",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "byVerdict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["under-declared", "undeclared", "over-declared", "consistent"],
+      "description": "The base severity for a verdict-bearing (honesty) finding. under-declared is critical: an explicit false claim that removes a spec-default safety prompt is the most actionable finding the tool emits.",
+      "properties": {
+        "under-declared": { "$ref": "#/$defs/severity" },
+        "undeclared": { "$ref": "#/$defs/severity" },
+        "over-declared": { "$ref": "#/$defs/severity" },
+        "consistent": { "$ref": "#/$defs/severity" }
+      }
+    },
+    "ruleClass": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["advisory"],
+      "description": "Severity floor by rule class. Advisory rules have no honesty verdict; they get their own floor and are never gating by default.",
+      "properties": {
+        "advisory": { "$ref": "#/$defs/severity" }
+      }
+    },
+    "ruleFloor": {
+      "type": "object",
+      "description": "Per-RuleId severity floors, applied after confidence adjustment. Keys are stable, kebab-case RuleIds.",
+      "propertyNames": { "pattern": "^[a-z][a-z0-9-]*$" },
+      "additionalProperties": { "$ref": "#/$defs/severity" }
+    },
+    "confidenceAdjust": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["uncertain", "low", "medium", "high"],
+      "description": "How many rungs to step an honesty finding's severity DOWN the ladder for a given confidence. Negative steps down; never suppresses. This is how 'uncertain is a first-class result' avoids both crying wolf and hiding a real risk.",
+      "properties": {
+        "uncertain": { "type": "integer" },
+        "low": { "type": "integer" },
+        "medium": { "type": "integer" },
+        "high": { "type": "integer" }
+      }
+    }
+  },
+  "$defs": {
+    "severity": {
+      "enum": ["info", "low", "medium", "high", "critical"]
+    }
+  }
+}

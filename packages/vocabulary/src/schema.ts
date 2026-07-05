@@ -182,6 +182,92 @@ export const mcpMappingSchema = z
   .strict();
 export type McpMapping = z.infer<typeof mcpMappingSchema>;
 
+// --- Classification vocabularies: severity and verdict ----------------------------------------
+//
+// These enums are re-declared to match the engine's `Verdict` and `Severity` exactly. As the base
+// layer this package cannot import them from core; the crosswalk/severity tests pin the two lists
+// together, exactly as the dimension levels are pinned.
+
+export const verdictSchema = z.enum(['consistent', 'under-declared', 'over-declared', 'undeclared']);
+export type VerdictName = z.infer<typeof verdictSchema>;
+
+export const severitySchema = z.enum(['info', 'low', 'medium', 'high', 'critical']);
+export type SeverityName = z.infer<typeof severitySchema>;
+
+// Stable, kebab-case RuleId keys. The same lexical shape the engine's branded RuleId enforces;
+// the engine owns the closed *set*, this only constrains the *shape* of a crosswalk/floor key.
+const ruleIdKeySchema = z.string().regex(/^[a-z][a-z0-9-]*$/, {
+  message: 'a RuleId key must be lowercase, kebab-case (e.g. write-as-readonly)',
+});
+
+// --- The standards & regulatory crosswalk -----------------------------------------------------
+
+// One RuleId's mapping to the external frameworks it is relevant to. At least one array must be
+// present and non-empty: a finding that cannot locate itself in the standards landscape is
+// unshippable (the engine's makeFinding refuses it, and a completeness test re-asserts it).
+const refListSchema = z.array(z.string().min(1)).min(1);
+
+export const standardsRefSchema = z
+  .object({
+    owaspAsi: refListSchema.optional(),
+    owaspMcp: refListSchema.optional(),
+    cosaiOasis: refListSchema.optional(),
+    euAiAct: refListSchema.optional(),
+    nist: refListSchema.optional(),
+    mcpField: refListSchema.optional(),
+  })
+  .strict()
+  .refine(
+    (ref) =>
+      [ref.owaspAsi, ref.owaspMcp, ref.cosaiOasis, ref.euAiAct, ref.nist, ref.mcpField].some(
+        (arr) => arr !== undefined && arr.length > 0,
+      ),
+    { message: 'a crosswalk entry must cite at least one external standard or MCP field' },
+  );
+export type StandardsRef = z.infer<typeof standardsRefSchema>;
+
+export const crosswalkSchema = z
+  .object({
+    $schema: z.string().optional(),
+    version: z
+      .string()
+      .regex(/^\d+\.\d+\.\d+$/, { message: 'version must be plain semver (MAJOR.MINOR.PATCH)' }),
+    note: z.string().min(1).optional(),
+    map: z.record(ruleIdKeySchema, standardsRefSchema),
+  })
+  .strict();
+export type Crosswalk = z.infer<typeof crosswalkSchema>;
+
+// --- The severity policy ----------------------------------------------------------------------
+
+export const severityPolicySchema = z
+  .object({
+    $schema: z.string().optional(),
+    version: z
+      .string()
+      .regex(/^\d+\.\d+\.\d+$/, { message: 'version must be plain semver (MAJOR.MINOR.PATCH)' }),
+    byVerdict: z
+      .object({
+        'under-declared': severitySchema,
+        undeclared: severitySchema,
+        'over-declared': severitySchema,
+        consistent: severitySchema,
+      })
+      .strict(),
+    ruleClass: z.object({ advisory: severitySchema }).strict(),
+    ruleFloor: z.record(ruleIdKeySchema, severitySchema),
+    confidenceAdjust: z
+      .object({
+        uncertain: z.number().int(),
+        low: z.number().int(),
+        medium: z.number().int(),
+        high: z.number().int(),
+      })
+      .strict(),
+  })
+  .strict();
+export type SeverityPolicy = z.infer<typeof severityPolicySchema>;
+
 // --- Validators (the package's only functions) ------------------------------------------------
 
 /** Validate an unknown value as a vocabulary document. Throws on a malformed shape. */
@@ -192,4 +278,14 @@ export function parseVocabulary(data: unknown): Vocabulary {
 /** Validate an unknown value as an MCP-hint mapping document. Throws on a malformed shape. */
 export function parseMcpMapping(data: unknown): McpMapping {
   return mcpMappingSchema.parse(data);
+}
+
+/** Validate an unknown value as a standards crosswalk document. Throws on a malformed shape. */
+export function parseCrosswalk(data: unknown): Crosswalk {
+  return crosswalkSchema.parse(data);
+}
+
+/** Validate an unknown value as a severity policy document. Throws on a malformed shape. */
+export function parseSeverityPolicy(data: unknown): SeverityPolicy {
+  return severityPolicySchema.parse(data);
 }

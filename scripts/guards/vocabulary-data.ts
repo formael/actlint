@@ -17,6 +17,8 @@ export const VOCABULARY_ROOT = 'packages/vocabulary/src';
 export const ALLOWED_EXPORTED_FUNCTIONS: ReadonlySet<string> = new Set([
   'parseVocabulary',
   'parseMcpMapping',
+  'parseCrosswalk',
+  'parseSeverityPolicy',
 ]);
 
 // The base data layer depends on nothing internal; an @formael/* import would be a back-edge.

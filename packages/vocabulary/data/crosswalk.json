@@ -1,0 +1,69 @@
+{
+  "$schema": "../schema/crosswalk.schema.json",
+  "version": "0.1.0",
+  "note": "Standards mappings are relevant, not prescriptive. A finding is not a compliance verdict; these references locate a finding in the external landscape so a Builder, a Guardian, and an auditor can read the same result. EU AI Act articles apply only where the deployer's system is high-risk under the Act and are transparency/oversight references, never asserted violations.",
+  "map": {
+    "write-as-readonly": {
+      "owaspAsi": ["ASI02:2026", "ASI03:2026"],
+      "owaspMcp": ["MCP02"],
+      "cosaiOasis": ["operational-visibility"],
+      "euAiAct": ["Art.12", "Art.14", "Art.15"],
+      "nist": ["AI-RMF:MEASURE"],
+      "mcpField": ["readOnlyHint"]
+    },
+    "destructive-unflagged": {
+      "owaspAsi": ["ASI02:2026"],
+      "owaspMcp": ["MCP02"],
+      "cosaiOasis": ["operational-visibility"],
+      "euAiAct": ["Art.14", "Art.15"],
+      "nist": ["AI-RMF:MEASURE"],
+      "mcpField": ["destructiveHint"]
+    },
+    "external-reach-undeclared": {
+      "owaspAsi": ["ASI02:2026"],
+      "owaspMcp": ["MCP02"],
+      "cosaiOasis": ["operational-visibility"],
+      "euAiAct": ["Art.12", "Art.14", "Art.26"],
+      "nist": ["AI-RMF:MAP"],
+      "mcpField": ["openWorldHint"]
+    },
+    "destructive-absent": {
+      "owaspAsi": ["ASI02:2026"],
+      "owaspMcp": ["MCP02"],
+      "euAiAct": ["Art.13"],
+      "nist": ["AI-RMF:MAP"],
+      "mcpField": ["destructiveHint"]
+    },
+    "reach-absent": {
+      "owaspAsi": ["ASI02:2026"],
+      "owaspMcp": ["MCP02"],
+      "euAiAct": ["Art.13"],
+      "nist": ["AI-RMF:MAP"],
+      "mcpField": ["openWorldHint"]
+    },
+    "irreversible-unflagged": {
+      "owaspAsi": ["ASI02:2026"],
+      "cosaiOasis": ["operational-visibility"],
+      "euAiAct": ["Art.14"],
+      "nist": ["AI-RMF:MEASURE"]
+    },
+    "over-declared-risk": {
+      "owaspAsi": ["ASI02:2026"],
+      "owaspMcp": ["MCP02"],
+      "nist": ["AI-RMF:MEASURE"],
+      "mcpField": ["readOnlyHint", "destructiveHint", "openWorldHint"]
+    },
+    "freeform-input-as-code": {
+      "owaspAsi": ["ASI01:2026"],
+      "owaspMcp": ["MCP01"],
+      "euAiAct": ["Art.15"],
+      "nist": ["AI-RMF:MANAGE"]
+    },
+    "no-scope-constraint": {
+      "owaspAsi": ["ASI04:2026"],
+      "owaspMcp": ["MCP01"],
+      "euAiAct": ["Art.15"],
+      "nist": ["AI-RMF:MANAGE"]
+    }
+  }
+}

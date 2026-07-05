@@ -62,8 +62,8 @@ export {
 export type { DeclaredHint, DeclaredProfile, EffectiveDeclaredValue, McpHintDefault } from './declared.ts';
 
 // Findings (the canonical output)
-export { verdictSchema, severitySchema, standardsRefSchema } from './finding.ts';
-export type { Verdict, Severity, StandardsRef, Finding } from './finding.ts';
+export { verdictSchema, severitySchema, ruleClassSchema, standardsRefSchema } from './finding.ts';
+export type { Verdict, Severity, RuleClass, StandardsRef, Finding } from './finding.ts';
 
 // Outcome / error model (pure core never throws for control flow)
 export { ok, err, assertNever, errorCodeSchema, actlintErrorSchema } from './outcome.ts';
@@ -79,3 +79,21 @@ export {
   schemaShapeSignals,
 } from './derive/index.ts';
 export type { Contribution, DerivationResult, PrimaryDimension } from './derive/index.ts';
+
+// Classification (derived vs declared -> Verdict -> Finding, via the makeFinding gate)
+export {
+  classify,
+  advisories,
+  makeFinding,
+  classifyTool,
+  classifyManifest,
+  computeSeverity,
+  lookupStandards,
+  missingCrosswalkEntries,
+  RULE,
+  ALL_RULE_IDS,
+  HONESTY_RULES,
+  ADVISORY_RULES,
+  ruleClassOf,
+} from './classify/index.ts';
+export type { MakeFindingInput, RawFinding } from './classify/index.ts';

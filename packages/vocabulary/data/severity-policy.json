@@ -1,0 +1,23 @@
+{
+  "$schema": "../schema/severity-policy.schema.json",
+  "version": "0.1.0",
+  "byVerdict": {
+    "under-declared": "critical",
+    "undeclared": "low",
+    "over-declared": "low",
+    "consistent": "info"
+  },
+  "ruleClass": {
+    "advisory": "medium"
+  },
+  "ruleFloor": {
+    "freeform-input-as-code": "medium",
+    "no-scope-constraint": "medium"
+  },
+  "confidenceAdjust": {
+    "uncertain": -2,
+    "low": -1,
+    "medium": 0,
+    "high": 0
+  }
+}
