@@ -20,14 +20,11 @@
 
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
+    "noEmit": true,
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
-
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true
+    "skipLibCheck": true
   }
 }
