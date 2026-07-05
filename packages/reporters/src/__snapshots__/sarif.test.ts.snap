@@ -1,0 +1,472 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`sarifReporter (SARIF 2.1.0) > renders a spotless server 1`] = `
+"{
+  "version": "2.1.0",
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "actlint",
+          "version": "0.1.0",
+          "rules": []
+        }
+      },
+      "originalUriBaseIds": {
+        "SERVER": {
+          "uri": "https://example.com/.well-known/mcp"
+        }
+      },
+      "results": []
+    }
+  ]
+}
+"
+`;
+
+exports[`sarifReporter (SARIF 2.1.0) > renders the mixed server the same way every time 1`] = `
+"{
+  "version": "2.1.0",
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "actlint",
+          "version": "0.1.0",
+          "rules": [
+            {
+              "id": "write-as-readonly",
+              "name": "write-as-readonly",
+              "properties": {
+                "ruleClass": "honesty",
+                "tags": [
+                  "honesty",
+                  "OWASP-ASI:ASI02:2026",
+                  "OWASP-ASI:ASI03:2026",
+                  "OWASP-MCP:MCP02:2025",
+                  "CoSAI:MCP-T9",
+                  "EU-AI-Act:Art.14",
+                  "EU-AI-Act:Art.15",
+                  "NIST:AI-RMF:MEASURE",
+                  "mcp-field:readOnlyHint"
+                ]
+              }
+            },
+            {
+              "id": "external-reach-undeclared",
+              "name": "external-reach-undeclared",
+              "properties": {
+                "ruleClass": "honesty",
+                "tags": [
+                  "honesty",
+                  "OWASP-ASI:ASI02:2026",
+                  "OWASP-MCP:MCP02:2025",
+                  "CoSAI:MCP-T9",
+                  "EU-AI-Act:Art.14",
+                  "EU-AI-Act:Art.15",
+                  "EU-AI-Act:Art.26",
+                  "NIST:AI-RMF:MEASURE",
+                  "mcp-field:openWorldHint"
+                ]
+              }
+            },
+            {
+              "id": "destructive-absent",
+              "name": "destructive-absent",
+              "properties": {
+                "ruleClass": "honesty",
+                "tags": [
+                  "honesty",
+                  "OWASP-ASI:ASI02:2026",
+                  "OWASP-MCP:MCP02:2025",
+                  "EU-AI-Act:Art.13",
+                  "NIST:AI-RMF:MAP",
+                  "mcp-field:destructiveHint"
+                ]
+              }
+            },
+            {
+              "id": "over-declared-risk",
+              "name": "over-declared-risk",
+              "properties": {
+                "ruleClass": "honesty",
+                "tags": [
+                  "honesty",
+                  "OWASP-ASI:ASI02:2026",
+                  "OWASP-MCP:MCP02:2025",
+                  "NIST:AI-RMF:MEASURE",
+                  "mcp-field:readOnlyHint",
+                  "mcp-field:destructiveHint",
+                  "mcp-field:openWorldHint"
+                ]
+              }
+            },
+            {
+              "id": "freeform-input-as-code",
+              "name": "freeform-input-as-code",
+              "properties": {
+                "ruleClass": "advisory",
+                "tags": [
+                  "advisory",
+                  "OWASP-ASI:ASI05:2026",
+                  "OWASP-MCP:MCP05:2025",
+                  "CoSAI:MCP-T3",
+                  "EU-AI-Act:Art.15",
+                  "NIST:AI-RMF:MANAGE"
+                ]
+              }
+            },
+            {
+              "id": "no-scope-constraint",
+              "name": "no-scope-constraint",
+              "properties": {
+                "ruleClass": "advisory",
+                "tags": [
+                  "advisory",
+                  "OWASP-ASI:ASI02:2026",
+                  "OWASP-MCP:MCP02:2025",
+                  "CoSAI:MCP-T3",
+                  "EU-AI-Act:Art.15",
+                  "NIST:AI-RMF:MANAGE"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "originalUriBaseIds": {
+        "SERVER": {
+          "uri": "https://example.com/.well-known/mcp"
+        }
+      },
+      "results": [
+        {
+          "ruleId": "write-as-readonly",
+          "level": "error",
+          "message": {
+            "text": "The tool declares readOnlyHint: true, but its action is derived as deleting (from the signal verb.delete). A read-only declaration on a tool that writes suppresses the confirmation a spec-conformant client would otherwise show."
+          },
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "name": "delete_repository",
+                  "kind": "resource"
+                }
+              ]
+            }
+          ],
+          "partialFingerprints": {
+            "actlint/toolRule": "delete_repository::write-as-readonly"
+          },
+          "properties": {
+            "toolName": "delete_repository",
+            "verdict": "under-declared",
+            "severity": "critical",
+            "confidence": "high",
+            "ruleClass": "honesty",
+            "standards": {
+              "owaspAsi": [
+                "ASI02:2026",
+                "ASI03:2026"
+              ],
+              "owaspMcp": [
+                "MCP02:2025"
+              ],
+              "cosaiOasis": [
+                "MCP-T9"
+              ],
+              "euAiAct": [
+                "Art.14",
+                "Art.15"
+              ],
+              "nist": [
+                "AI-RMF:MEASURE"
+              ],
+              "mcpField": [
+                "readOnlyHint"
+              ]
+            },
+            "tags": [
+              "OWASP-ASI:ASI02:2026",
+              "OWASP-ASI:ASI03:2026",
+              "OWASP-MCP:MCP02:2025",
+              "CoSAI:MCP-T9",
+              "EU-AI-Act:Art.14",
+              "EU-AI-Act:Art.15",
+              "NIST:AI-RMF:MEASURE",
+              "mcp-field:readOnlyHint"
+            ]
+          }
+        },
+        {
+          "ruleId": "external-reach-undeclared",
+          "level": "warning",
+          "message": {
+            "text": "The tool declares openWorldHint: false, but its reach is derived as open-world (from the signal verb.send). Denying open-world reach on a tool that contacts an external boundary understates where its effects land. This reading is uncertain."
+          },
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "name": "send_message",
+                  "kind": "resource"
+                }
+              ]
+            }
+          ],
+          "partialFingerprints": {
+            "actlint/toolRule": "send_message::external-reach-undeclared"
+          },
+          "properties": {
+            "toolName": "send_message",
+            "verdict": "under-declared",
+            "severity": "medium",
+            "confidence": "uncertain",
+            "ruleClass": "honesty",
+            "standards": {
+              "owaspAsi": [
+                "ASI02:2026"
+              ],
+              "owaspMcp": [
+                "MCP02:2025"
+              ],
+              "cosaiOasis": [
+                "MCP-T9"
+              ],
+              "euAiAct": [
+                "Art.14",
+                "Art.15",
+                "Art.26"
+              ],
+              "nist": [
+                "AI-RMF:MEASURE"
+              ],
+              "mcpField": [
+                "openWorldHint"
+              ]
+            },
+            "tags": [
+              "OWASP-ASI:ASI02:2026",
+              "OWASP-MCP:MCP02:2025",
+              "CoSAI:MCP-T9",
+              "EU-AI-Act:Art.14",
+              "EU-AI-Act:Art.15",
+              "EU-AI-Act:Art.26",
+              "NIST:AI-RMF:MEASURE",
+              "mcp-field:openWorldHint"
+            ]
+          }
+        },
+        {
+          "ruleId": "destructive-absent",
+          "level": "note",
+          "message": {
+            "text": "The action is derived as mutating (from the signal verb.mutate), and the tool declares neither readOnlyHint nor destructiveHint. A spec-conformant client still prompts here, so this is a nudge to declare the destructive nature explicitly rather than rely on defaults."
+          },
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "name": "update_record",
+                  "kind": "resource"
+                }
+              ]
+            }
+          ],
+          "partialFingerprints": {
+            "actlint/toolRule": "update_record::destructive-absent"
+          },
+          "properties": {
+            "toolName": "update_record",
+            "verdict": "undeclared",
+            "severity": "low",
+            "confidence": "high",
+            "ruleClass": "honesty",
+            "standards": {
+              "owaspAsi": [
+                "ASI02:2026"
+              ],
+              "owaspMcp": [
+                "MCP02:2025"
+              ],
+              "euAiAct": [
+                "Art.13"
+              ],
+              "nist": [
+                "AI-RMF:MAP"
+              ],
+              "mcpField": [
+                "destructiveHint"
+              ]
+            },
+            "tags": [
+              "OWASP-ASI:ASI02:2026",
+              "OWASP-MCP:MCP02:2025",
+              "EU-AI-Act:Art.13",
+              "NIST:AI-RMF:MAP",
+              "mcp-field:destructiveHint"
+            ]
+          }
+        },
+        {
+          "ruleId": "over-declared-risk",
+          "level": "note",
+          "message": {
+            "text": "The tool declares more risk than its action is derived to carry (destructiveness read-only, reach local). Over-declaration is honest but costs alarm fatigue; the annotation could be tightened to match the tool."
+          },
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "name": "list_items",
+                  "kind": "resource"
+                }
+              ]
+            }
+          ],
+          "partialFingerprints": {
+            "actlint/toolRule": "list_items::over-declared-risk"
+          },
+          "properties": {
+            "toolName": "list_items",
+            "verdict": "over-declared",
+            "severity": "low",
+            "confidence": "high",
+            "ruleClass": "honesty",
+            "standards": {
+              "owaspAsi": [
+                "ASI02:2026"
+              ],
+              "owaspMcp": [
+                "MCP02:2025"
+              ],
+              "nist": [
+                "AI-RMF:MEASURE"
+              ],
+              "mcpField": [
+                "readOnlyHint",
+                "destructiveHint",
+                "openWorldHint"
+              ]
+            },
+            "tags": [
+              "OWASP-ASI:ASI02:2026",
+              "OWASP-MCP:MCP02:2025",
+              "NIST:AI-RMF:MEASURE",
+              "mcp-field:readOnlyHint",
+              "mcp-field:destructiveHint",
+              "mcp-field:openWorldHint"
+            ]
+          }
+        },
+        {
+          "ruleId": "freeform-input-as-code",
+          "level": "warning",
+          "message": {
+            "text": "The input schema accepts an unconstrained free-form parameter interpreted as code (from the signal shape.freeform-code-input). There is no MCP hint for this; it is a capability-hygiene note that the parameter lets a caller drive arbitrary behavior."
+          },
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "name": "run_task",
+                  "kind": "resource"
+                }
+              ]
+            }
+          ],
+          "partialFingerprints": {
+            "actlint/toolRule": "run_task::freeform-input-as-code"
+          },
+          "properties": {
+            "toolName": "run_task",
+            "verdict": "consistent",
+            "severity": "medium",
+            "confidence": "medium",
+            "ruleClass": "advisory",
+            "standards": {
+              "owaspAsi": [
+                "ASI05:2026"
+              ],
+              "owaspMcp": [
+                "MCP05:2025"
+              ],
+              "cosaiOasis": [
+                "MCP-T3"
+              ],
+              "euAiAct": [
+                "Art.15"
+              ],
+              "nist": [
+                "AI-RMF:MANAGE"
+              ]
+            },
+            "tags": [
+              "OWASP-ASI:ASI05:2026",
+              "OWASP-MCP:MCP05:2025",
+              "CoSAI:MCP-T3",
+              "EU-AI-Act:Art.15",
+              "NIST:AI-RMF:MANAGE"
+            ]
+          }
+        },
+        {
+          "ruleId": "no-scope-constraint",
+          "level": "warning",
+          "message": {
+            "text": "This is a sensitive action (destructiveness deleting, reach open-world) whose input schema carries no narrowing constraint — no enum, pattern, format, or limit bounds its parameters. A tighter schema would scope what the tool can be asked to do."
+          },
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "name": "purge_cache",
+                  "kind": "resource"
+                }
+              ]
+            }
+          ],
+          "partialFingerprints": {
+            "actlint/toolRule": "purge_cache::no-scope-constraint"
+          },
+          "properties": {
+            "toolName": "purge_cache",
+            "verdict": "consistent",
+            "severity": "medium",
+            "confidence": "uncertain",
+            "ruleClass": "advisory",
+            "standards": {
+              "owaspAsi": [
+                "ASI02:2026"
+              ],
+              "owaspMcp": [
+                "MCP02:2025"
+              ],
+              "cosaiOasis": [
+                "MCP-T3"
+              ],
+              "euAiAct": [
+                "Art.15"
+              ],
+              "nist": [
+                "AI-RMF:MANAGE"
+              ]
+            },
+            "tags": [
+              "OWASP-ASI:ASI02:2026",
+              "OWASP-MCP:MCP02:2025",
+              "CoSAI:MCP-T3",
+              "EU-AI-Act:Art.15",
+              "NIST:AI-RMF:MANAGE"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
+"
+`;

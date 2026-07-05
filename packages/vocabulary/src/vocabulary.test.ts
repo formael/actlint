@@ -10,10 +10,13 @@
 
 import { describe, expect, it } from 'vitest';
 
+import gradePolicySchemaJson from '../schema/grade-policy.schema.json' with { type: 'json' };
 import vocabularySchemaJson from '../schema/vocabulary.schema.json' with { type: 'json' };
 import {
   CROSSWALK,
   CROSSWALK_VERSION,
+  GRADE_POLICY,
+  GRADE_POLICY_VERSION,
   MCP_MAPPING,
   MCP_MAPPING_VERSION,
   SEVERITY_POLICY,
@@ -24,9 +27,11 @@ import {
   crosswalkSchema,
   destructivenessLevelSchema,
   externalReachLevelSchema,
+  gradePolicySchema,
   idempotencyLevelSchema,
   mcpMappingRowSchema,
   reversibilityLevelSchema,
+  serverGradeSchema,
   severityPolicySchema,
   standardsRefSchema,
   vocabularyConfidenceSchema,
@@ -371,6 +376,54 @@ describe('severity policy', () => {
 
   it('the whole policy satisfies its top-level schema', () => {
     expect(severityPolicySchema.safeParse(SEVERITY_POLICY).success).toBe(true);
+  });
+});
+
+describe('honesty-grade policy', () => {
+  it('is a versioned dataset', () => {
+    expect(GRADE_POLICY_VERSION).toMatch(/^\d+\.\d+\.\d+$/);
+  });
+
+  it('reads honesty, not safety, in its own note (kept as data for reviewers)', () => {
+    expect((GRADE_POLICY.note ?? '').toLowerCase()).toContain('honesty');
+  });
+
+  it('encodes the asymmetry as weights: consistent ≫ undeclared ≈ over-declared ≫ under-declared', () => {
+    const w = GRADE_POLICY.weights;
+    expect(w.consistent).toBe(1);
+    expect(w.consistent).toBeGreaterThan(w.undeclared);
+    expect(w.undeclared).toBeGreaterThanOrEqual(w['over-declared']);
+    expect(w['over-declared']).toBeGreaterThan(w['under-declared']);
+  });
+
+  it('bands descend by score and bottom out at 0 so every score lands somewhere', () => {
+    const scores = GRADE_POLICY.bands.map((b) => b.minScore);
+    const sortedDesc = [...scores].sort((a, b) => b - a);
+    expect(scores).toEqual(sortedDesc);
+    expect(scores.at(-1)).toBe(0);
+  });
+
+  it('an all-consistent (score 1.0) server lands in the top band A', () => {
+    expect(GRADE_POLICY.bands[0]?.grade).toBe('A');
+    expect(GRADE_POLICY.bands[0]?.minScore).toBeLessThanOrEqual(1);
+  });
+
+  it('caps a critical under-declaration no better than its any-under-declared cap', () => {
+    const order = serverGradeSchema.options;
+    const idx = (g: string): number => order.indexOf(g as (typeof order)[number]);
+    expect(idx(GRADE_POLICY.caps.criticalUnderDeclared)).toBeGreaterThanOrEqual(
+      idx(GRADE_POLICY.caps.anyUnderDeclared),
+    );
+  });
+
+  it('the whole policy satisfies its top-level schema', () => {
+    expect(gradePolicySchema.safeParse(GRADE_POLICY).success).toBe(true);
+  });
+
+  it('the published JSON Schema and the Zod grade enum agree', () => {
+    const jsonEnum =
+      (gradePolicySchemaJson as { $defs: { grade: { enum: readonly string[] } } }).$defs.grade.enum ?? [];
+    expect([...jsonEnum].sort()).toEqual([...serverGradeSchema.options].sort());
   });
 });
 

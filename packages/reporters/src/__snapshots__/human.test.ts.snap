@@ -1,0 +1,73 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`humanReporter (the scorecard) > renders a spotless server 1`] = `
+"  actlint  ▸  https://example.com/.well-known/mcp               honesty grade: A
+  ──────────────────────────────────────────────────────────────────────────────
+  5 tools scanned · 0 under-declared · 0 undeclared · 0 over-declared
+  ──────────────────────────────────────────────────────────────────────────────
+  5 of 5 tools consistent.
+  Full report: --json
+"
+`;
+
+exports[`humanReporter (the scorecard) > renders the mixed server the same way every time (no-color) 1`] = `
+"  actlint  ▸  https://example.com/.well-known/mcp               honesty grade: C
+  ──────────────────────────────────────────────────────────────────────────────
+  10 tools scanned · 2 under-declared · 1 undeclared · 1 over-declared
+
+  ✖ CRIT  delete_repository  write-as-readonly
+      The tool declares readOnlyHint: true, but its action is derived as deleting (from the signal verb.delete). A read-only declaration on a tool that writes suppresses the confirmation a spec-conformant client would otherwise show.
+      ↳ OWASP ASI02:2026, ASI03:2026 · OWASP MCP02:2025 · CoSAI MCP-T9 · EU AI Act Art.14, Art.15 · NIST AI-RMF:MEASURE · MCP field readOnlyHint
+  ▲ MED?  send_message  external-reach-undeclared
+      The tool declares openWorldHint: false, but its reach is derived as open-world (from the signal verb.send). Denying open-world reach on a tool that contacts an external boundary understates where its effects land. This reading is uncertain.
+      ↳ OWASP ASI02:2026 · OWASP MCP02:2025 · CoSAI MCP-T9 · EU AI Act Art.14, Art.15, Art.26 · NIST AI-RMF:MEASURE · MCP field openWorldHint
+  · LOW   update_record  destructive-absent
+      The action is derived as mutating (from the signal verb.mutate), and the tool declares neither readOnlyHint nor destructiveHint. A spec-conformant client still prompts here, so this is a nudge to declare the destructive nature explicitly rather than rely on defaults.
+      ↳ OWASP ASI02:2026 · OWASP MCP02:2025 · EU AI Act Art.13 · NIST AI-RMF:MAP · MCP field destructiveHint
+  · LOW   list_items  over-declared-risk
+      The tool declares more risk than its action is derived to carry (destructiveness read-only, reach local). Over-declaration is honest but costs alarm fatigue; the annotation could be tightened to match the tool.
+      ↳ OWASP ASI02:2026 · OWASP MCP02:2025 · NIST AI-RMF:MEASURE · MCP field readOnlyHint, destructiveHint, openWorldHint
+
+  advisories — capability hygiene, not honesty verdicts
+  ◐ ADV?  purge_cache  no-scope-constraint
+      This is a sensitive action (destructiveness deleting, reach open-world) whose input schema carries no narrowing constraint — no enum, pattern, format, or limit bounds its parameters. A tighter schema would scope what the tool can be asked to do.
+      ↳ OWASP ASI02:2026 · OWASP MCP02:2025 · CoSAI MCP-T3 · EU AI Act Art.15 · NIST AI-RMF:MANAGE
+  ◐ ADV   run_task  freeform-input-as-code
+      The input schema accepts an unconstrained free-form parameter interpreted as code (from the signal shape.freeform-code-input). There is no MCP hint for this; it is a capability-hygiene note that the parameter lets a caller drive arbitrary behavior.
+      ↳ OWASP ASI05:2026 · OWASP MCP05:2025 · CoSAI MCP-T3 · EU AI Act Art.15 · NIST AI-RMF:MANAGE
+  ──────────────────────────────────────────────────────────────────────────────
+  6 of 10 tools consistent.
+  Full report: --json
+"
+`;
+
+exports[`humanReporter (the scorecard) > renders the mixed server with colour when asked 1`] = `
+"  actlint  ▸  https://example.com/.well-known/mcp               honesty grade: [33mC[0m
+  ──────────────────────────────────────────────────────────────────────────────
+  10 tools scanned · 2 under-declared · 1 undeclared · 1 over-declared
+
+  ✖ [31mCRIT [0m delete_repository  write-as-readonly
+      The tool declares readOnlyHint: true, but its action is derived as deleting (from the signal verb.delete). A read-only declaration on a tool that writes suppresses the confirmation a spec-conformant client would otherwise show.
+      ↳ [2mOWASP ASI02:2026, ASI03:2026 · OWASP MCP02:2025 · CoSAI MCP-T9 · EU AI Act Art.14, Art.15 · NIST AI-RMF:MEASURE · MCP field readOnlyHint[0m
+  ▲ [33mMED? [0m send_message  external-reach-undeclared
+      The tool declares openWorldHint: false, but its reach is derived as open-world (from the signal verb.send). Denying open-world reach on a tool that contacts an external boundary understates where its effects land. This reading is uncertain.
+      ↳ [2mOWASP ASI02:2026 · OWASP MCP02:2025 · CoSAI MCP-T9 · EU AI Act Art.14, Art.15, Art.26 · NIST AI-RMF:MEASURE · MCP field openWorldHint[0m
+  · [2mLOW  [0m update_record  destructive-absent
+      The action is derived as mutating (from the signal verb.mutate), and the tool declares neither readOnlyHint nor destructiveHint. A spec-conformant client still prompts here, so this is a nudge to declare the destructive nature explicitly rather than rely on defaults.
+      ↳ [2mOWASP ASI02:2026 · OWASP MCP02:2025 · EU AI Act Art.13 · NIST AI-RMF:MAP · MCP field destructiveHint[0m
+  · [2mLOW  [0m list_items  over-declared-risk
+      The tool declares more risk than its action is derived to carry (destructiveness read-only, reach local). Over-declaration is honest but costs alarm fatigue; the annotation could be tightened to match the tool.
+      ↳ [2mOWASP ASI02:2026 · OWASP MCP02:2025 · NIST AI-RMF:MEASURE · MCP field readOnlyHint, destructiveHint, openWorldHint[0m
+
+  [2madvisories — capability hygiene, not honesty verdicts[0m
+  ◐ [36mADV? [0m purge_cache  no-scope-constraint
+      This is a sensitive action (destructiveness deleting, reach open-world) whose input schema carries no narrowing constraint — no enum, pattern, format, or limit bounds its parameters. A tighter schema would scope what the tool can be asked to do.
+      ↳ [2mOWASP ASI02:2026 · OWASP MCP02:2025 · CoSAI MCP-T3 · EU AI Act Art.15 · NIST AI-RMF:MANAGE[0m
+  ◐ [36mADV  [0m run_task  freeform-input-as-code
+      The input schema accepts an unconstrained free-form parameter interpreted as code (from the signal shape.freeform-code-input). There is no MCP hint for this; it is a capability-hygiene note that the parameter lets a caller drive arbitrary behavior.
+      ↳ [2mOWASP ASI05:2026 · OWASP MCP05:2025 · CoSAI MCP-T3 · EU AI Act Art.15 · NIST AI-RMF:MANAGE[0m
+  ──────────────────────────────────────────────────────────────────────────────
+  6 of 10 tools consistent.
+  Full report: --json
+"
+`;

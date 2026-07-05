@@ -19,6 +19,7 @@ export const ALLOWED_EXPORTED_FUNCTIONS: ReadonlySet<string> = new Set([
   'parseMcpMapping',
   'parseCrosswalk',
   'parseSeverityPolicy',
+  'parseGradePolicy',
 ]);
 
 // The base data layer depends on nothing internal; an @formael/* import would be a back-edge.
