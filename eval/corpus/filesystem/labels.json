@@ -1,0 +1,117 @@
+{
+  "server": "filesystem",
+  "labeledAt": "2026-06-15",
+  "notes": "Agent-proposed labels, hand-transcribed from the public reference filesystem server. Pending human ratification. The server advertises no MCP annotations, so every write is at most an `undeclared` nudge (the spec default already assumes mutation). `write_file` is a deliberate recall check: its name carries no verb the v0 lexicon enumerates, so a correct-behaviour label expects a finding the current engine misses.",
+  "tools": [
+    {
+      "name": "read_file",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "documented-behavior",
+        "source": "github.com/modelcontextprotocol/servers/tree/main/src/filesystem — read_file returns file contents without mutation",
+        "accessedAt": "2026-06-15"
+      }
+    },
+    {
+      "name": "write_file",
+      "trueVerdict": "undeclared",
+      "trueRisk": {
+        "destructiveness": "mutating",
+        "reversibility": "recoverable-with-effort",
+        "externalReach": "local"
+      },
+      "expected": [{ "ruleId": "destructive-absent" }],
+      "confidence": "high",
+      "provenance": {
+        "kind": "documented-behavior",
+        "source": "github.com/modelcontextprotocol/servers/tree/main/src/filesystem — write_file overwrites an existing file in place",
+        "accessedAt": "2026-06-15",
+        "notes": "Overwriting a file is a mutating write; the prior contents are lost unless the caller kept a copy."
+      }
+    },
+    {
+      "name": "edit_file",
+      "trueVerdict": "undeclared",
+      "trueRisk": {
+        "destructiveness": "mutating",
+        "reversibility": "recoverable-with-effort",
+        "externalReach": "local"
+      },
+      "expected": [{ "ruleId": "destructive-absent" }],
+      "confidence": "high",
+      "provenance": {
+        "kind": "documented-behavior",
+        "source": "github.com/modelcontextprotocol/servers/tree/main/src/filesystem — edit_file applies line-based edits in place",
+        "accessedAt": "2026-06-15"
+      }
+    },
+    {
+      "name": "create_directory",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "additive", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "documented-behavior",
+        "source": "github.com/modelcontextprotocol/servers/tree/main/src/filesystem — create_directory adds a directory and is idempotent when it already exists",
+        "accessedAt": "2026-06-15",
+        "notes": "Purely additive; creating a directory removes no state."
+      }
+    },
+    {
+      "name": "move_file",
+      "trueVerdict": "undeclared",
+      "trueRisk": {
+        "destructiveness": "mutating",
+        "reversibility": "recoverable-with-effort",
+        "externalReach": "local"
+      },
+      "expected": [{ "ruleId": "destructive-absent" }],
+      "confidence": "high",
+      "provenance": {
+        "kind": "documented-behavior",
+        "source": "github.com/modelcontextprotocol/servers/tree/main/src/filesystem — move_file relocates/renames a path; it fails rather than clobbering an existing destination",
+        "accessedAt": "2026-06-15"
+      }
+    },
+    {
+      "name": "list_directory",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "documented-behavior",
+        "source": "github.com/modelcontextprotocol/servers/tree/main/src/filesystem — list_directory enumerates entries without mutation",
+        "accessedAt": "2026-06-15"
+      }
+    },
+    {
+      "name": "search_files",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "documented-behavior",
+        "source": "github.com/modelcontextprotocol/servers/tree/main/src/filesystem — search_files reads the tree to match a pattern",
+        "accessedAt": "2026-06-15"
+      }
+    },
+    {
+      "name": "get_file_info",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "documented-behavior",
+        "source": "github.com/modelcontextprotocol/servers/tree/main/src/filesystem — get_file_info returns metadata only",
+        "accessedAt": "2026-06-15"
+      }
+    }
+  ]
+}

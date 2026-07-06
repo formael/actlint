@@ -33,6 +33,18 @@ importers:
         specifier: ^2.1.8
         version: 2.1.9(@types/node@22.20.0)
 
+  eval:
+    dependencies:
+      '@formael/action-risk-vocabulary':
+        specifier: workspace:*
+        version: link:../packages/vocabulary
+      '@formael/actlint-core':
+        specifier: workspace:*
+        version: link:../packages/core
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
+
   packages/cli:
     dependencies:
       '@formael/action-risk-vocabulary':

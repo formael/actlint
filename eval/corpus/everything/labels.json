@@ -1,0 +1,44 @@
+{
+  "server": "everything",
+  "labeledAt": "2026-06-15",
+  "notes": "Agent-proposed labels, hand-transcribed from the public reference `everything` test server. Pending human ratification. Every tool is a pure compute or read, so a correct linter stays silent — this server is the no-false-alarm check.",
+  "tools": [
+    {
+      "name": "echo",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "documented-behavior",
+        "source": "github.com/modelcontextprotocol/servers/tree/main/src/everything — echo returns its input unchanged",
+        "accessedAt": "2026-06-15"
+      }
+    },
+    {
+      "name": "add",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "documented-behavior",
+        "source": "github.com/modelcontextprotocol/servers/tree/main/src/everything — add computes a sum with no side effect",
+        "accessedAt": "2026-06-15",
+        "notes": "The `add` verb names creation in general, but this tool is a pure arithmetic compute; silence is correct."
+      }
+    },
+    {
+      "name": "getTinyImage",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "documented-behavior",
+        "source": "github.com/modelcontextprotocol/servers/tree/main/src/everything — getTinyImage returns a fixed test image",
+        "accessedAt": "2026-06-15"
+      }
+    }
+  ]
+}

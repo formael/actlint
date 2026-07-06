@@ -1,0 +1,107 @@
+{
+  "server": "git",
+  "labeledAt": "2026-06-15",
+  "notes": "Agent-proposed labels, hand-transcribed from the public reference git server. Pending human ratification. No MCP annotations are advertised. `git_checkout` is a deliberate precision check: its name collides with the `checkout` payment token in the v0 lexicon, so the engine over-reads it as open-world and irreversible — a false alarm a correct label must record as such. `git_reset` is marked ambiguous because its risk genuinely depends on flags this manifest does not expose.",
+  "tools": [
+    {
+      "name": "git_status",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "documented-behavior",
+        "source": "github.com/modelcontextprotocol/servers/tree/main/src/git — git_status reads the working tree",
+        "accessedAt": "2026-06-15"
+      }
+    },
+    {
+      "name": "git_log",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "documented-behavior",
+        "source": "github.com/modelcontextprotocol/servers/tree/main/src/git — git_log reads commit history",
+        "accessedAt": "2026-06-15"
+      }
+    },
+    {
+      "name": "git_add",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "additive", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "medium",
+      "provenance": {
+        "kind": "documented-behavior",
+        "source": "github.com/modelcontextprotocol/servers/tree/main/src/git — git_add stages contents; the index change is trivially reversible with git_reset",
+        "accessedAt": "2026-06-15",
+        "notes": "Staging adds to the index without discarding state; treated as additive and reversible."
+      }
+    },
+    {
+      "name": "git_commit",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "additive",
+        "reversibility": "recoverable-with-effort",
+        "externalReach": "local"
+      },
+      "expected": [],
+      "confidence": "medium",
+      "provenance": {
+        "kind": "documented-behavior",
+        "source": "github.com/modelcontextprotocol/servers/tree/main/src/git — git_commit records a new commit; history is amendable/revertible",
+        "accessedAt": "2026-06-15",
+        "notes": "A commit adds a node to history rather than destroying state."
+      }
+    },
+    {
+      "name": "git_checkout",
+      "trueVerdict": "undeclared",
+      "trueRisk": {
+        "destructiveness": "mutating",
+        "reversibility": "recoverable-with-effort",
+        "externalReach": "local"
+      },
+      "expected": [],
+      "ambiguous": true,
+      "confidence": "medium",
+      "provenance": {
+        "kind": "behavioral-inference",
+        "source": "reasoning from name + description: checkout switches branches locally and can, with a pathspec, discard uncommitted changes",
+        "notes": "Genuinely ambiguous: a plain branch switch is reversible and local, while `checkout -- <path>` discards working-tree edits. It is neither open-world nor a payment; the engine's `checkout` token collision makes any external-reach/irreversibility finding a false alarm."
+      }
+    },
+    {
+      "name": "git_reset",
+      "trueVerdict": "undeclared",
+      "trueRisk": {
+        "destructiveness": "mutating",
+        "reversibility": "recoverable-with-effort",
+        "externalReach": "local"
+      },
+      "expected": [],
+      "ambiguous": true,
+      "confidence": "low",
+      "provenance": {
+        "kind": "behavioral-inference",
+        "source": "reasoning from name + description: reset unstages by default but --hard discards working-tree changes",
+        "notes": "Risk depends on a mode flag this manifest does not expose; a conservative silence is acceptable, so no specific finding is required."
+      }
+    },
+    {
+      "name": "git_create_branch",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "additive", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "documented-behavior",
+        "source": "github.com/modelcontextprotocol/servers/tree/main/src/git — git_create_branch adds a ref and removes nothing",
+        "accessedAt": "2026-06-15"
+      }
+    }
+  ]
+}

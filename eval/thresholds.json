@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "beta": 0.5,
+  "notes": "Conservative v0.x floors. The seed corpus is small, so per-rule numbers are statistically noisy; only aggregate, micro-averaged floors are gated. minPrecision is the load-bearing false-flag guard and is set with margin below the current measured value so honest engine changes are not blocked by noise, while a genuine precision regression still trips it. Raise these floors as the corpus grows — a change to this file is reviewed, versioned data.",
+  "aggregate": {
+    "minPrecision": 0.65,
+    "minRecall": 0.5,
+    "minFBeta": 0.6
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "source": { "kind": "registry", "serverId": "modelcontextprotocol/git" },
+  "capturedAt": "2026-06-15T00:00:00.000Z",
+  "protocolRevision": "2025-06-18",
+  "tools": [
+    {
+      "name": "git_status",
+      "description": "Shows the working tree status.",
+      "inputSchema": {
+        "type": "object",
+        "properties": { "repo_path": { "type": "string" } },
+        "required": ["repo_path"]
+      },
+      "annotations": { "unknownHints": {} }
+    },
+    {
+      "name": "git_log",
+      "description": "Shows the commit logs.",
+      "inputSchema": {
+        "type": "object",
+        "properties": { "repo_path": { "type": "string" } },
+        "required": ["repo_path"]
+      },
+      "annotations": { "unknownHints": {} }
+    },
+    {
+      "name": "git_add",
+      "description": "Adds file contents to the staging area.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "repo_path": { "type": "string" },
+          "files": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": ["repo_path", "files"]
+      },
+      "annotations": { "unknownHints": {} }
+    },
+    {
+      "name": "git_commit",
+      "description": "Records changes to the repository.",
+      "inputSchema": {
+        "type": "object",
+        "properties": { "repo_path": { "type": "string" }, "message": { "type": "string" } },
+        "required": ["repo_path", "message"]
+      },
+      "annotations": { "unknownHints": {} }
+    },
+    {
+      "name": "git_checkout",
+      "description": "Switches branches or restores working tree files.",
+      "inputSchema": {
+        "type": "object",
+        "properties": { "repo_path": { "type": "string" }, "branch_name": { "type": "string" } },
+        "required": ["repo_path", "branch_name"]
+      },
+      "annotations": { "unknownHints": {} }
+    },
+    {
+      "name": "git_reset",
+      "description": "Unstages all staged changes.",
+      "inputSchema": {
+        "type": "object",
+        "properties": { "repo_path": { "type": "string" } },
+        "required": ["repo_path"]
+      },
+      "annotations": { "unknownHints": {} }
+    },
+    {
+      "name": "git_create_branch",
+      "description": "Creates a new branch from an optional base branch.",
+      "inputSchema": {
+        "type": "object",
+        "properties": { "repo_path": { "type": "string" }, "branch_name": { "type": "string" } },
+        "required": ["repo_path", "branch_name"]
+      },
+      "annotations": { "unknownHints": {} }
+    }
+  ]
+}

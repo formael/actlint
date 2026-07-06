@@ -1,0 +1,90 @@
+{
+  "source": { "kind": "registry", "serverId": "modelcontextprotocol/filesystem" },
+  "capturedAt": "2026-06-15T00:00:00.000Z",
+  "protocolRevision": "2025-06-18",
+  "tools": [
+    {
+      "name": "read_file",
+      "description": "Read the complete contents of a file from the file system.",
+      "inputSchema": {
+        "type": "object",
+        "properties": { "path": { "type": "string" } },
+        "required": ["path"]
+      },
+      "annotations": { "unknownHints": {} }
+    },
+    {
+      "name": "write_file",
+      "description": "Create a new file or completely overwrite an existing file with new content.",
+      "inputSchema": {
+        "type": "object",
+        "properties": { "path": { "type": "string" }, "content": { "type": "string" } },
+        "required": ["path", "content"]
+      },
+      "annotations": { "unknownHints": {} }
+    },
+    {
+      "name": "edit_file",
+      "description": "Make line-based edits to a text file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": { "type": "string" },
+          "edits": { "type": "array", "items": { "type": "object" } }
+        },
+        "required": ["path", "edits"]
+      },
+      "annotations": { "unknownHints": {} }
+    },
+    {
+      "name": "create_directory",
+      "description": "Create a new directory or ensure a directory exists.",
+      "inputSchema": {
+        "type": "object",
+        "properties": { "path": { "type": "string" } },
+        "required": ["path"]
+      },
+      "annotations": { "unknownHints": {} }
+    },
+    {
+      "name": "move_file",
+      "description": "Move or rename a file or directory to a new location.",
+      "inputSchema": {
+        "type": "object",
+        "properties": { "source": { "type": "string" }, "destination": { "type": "string" } },
+        "required": ["source", "destination"]
+      },
+      "annotations": { "unknownHints": {} }
+    },
+    {
+      "name": "list_directory",
+      "description": "Get a detailed listing of all files and directories in a path.",
+      "inputSchema": {
+        "type": "object",
+        "properties": { "path": { "type": "string" } },
+        "required": ["path"]
+      },
+      "annotations": { "unknownHints": {} }
+    },
+    {
+      "name": "search_files",
+      "description": "Recursively search for files and directories matching a pattern.",
+      "inputSchema": {
+        "type": "object",
+        "properties": { "path": { "type": "string" }, "pattern": { "type": "string" } },
+        "required": ["path", "pattern"]
+      },
+      "annotations": { "unknownHints": {} }
+    },
+    {
+      "name": "get_file_info",
+      "description": "Retrieve detailed metadata about a file or directory.",
+      "inputSchema": {
+        "type": "object",
+        "properties": { "path": { "type": "string" } },
+        "required": ["path"]
+      },
+      "annotations": { "unknownHints": {} }
+    }
+  ]
+}

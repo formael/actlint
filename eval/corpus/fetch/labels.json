@@ -1,0 +1,24 @@
+{
+  "server": "fetch",
+  "labeledAt": "2026-06-15",
+  "notes": "Agent-proposed labels, hand-transcribed from the public reference fetch server. Pending human ratification. The tool reads a caller-supplied URL from the open internet but advertises no openWorldHint, so a `reach-absent` nudge to declare it is warranted.",
+  "tools": [
+    {
+      "name": "fetch",
+      "trueVerdict": "undeclared",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "reversibility": "reversible",
+        "externalReach": "open-world"
+      },
+      "expected": [{ "ruleId": "reach-absent" }],
+      "confidence": "high",
+      "provenance": {
+        "kind": "documented-behavior",
+        "source": "github.com/modelcontextprotocol/servers/tree/main/src/fetch — fetch retrieves an arbitrary URL and returns its contents",
+        "accessedAt": "2026-06-15",
+        "notes": "Read-only with respect to the caller's state, but genuinely open-world: it can reach any host the caller names."
+      }
+    }
+  ]
+}

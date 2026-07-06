@@ -1,0 +1,88 @@
+{
+  "server": "memory",
+  "labeledAt": "2026-06-15",
+  "notes": "Agent-proposed labels, hand-transcribed from the public reference knowledge-graph memory server. Pending human ratification. No MCP annotations are advertised, so the delete tools are `undeclared`: the spec default already prompts, but declaring destructiveHint explicitly would be honest.",
+  "tools": [
+    {
+      "name": "create_entities",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "additive", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "documented-behavior",
+        "source": "github.com/modelcontextprotocol/servers/tree/main/src/memory — create_entities appends nodes to the graph",
+        "accessedAt": "2026-06-15"
+      }
+    },
+    {
+      "name": "add_observations",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "additive", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "documented-behavior",
+        "source": "github.com/modelcontextprotocol/servers/tree/main/src/memory — add_observations appends facts to existing entities",
+        "accessedAt": "2026-06-15"
+      }
+    },
+    {
+      "name": "delete_entities",
+      "trueVerdict": "undeclared",
+      "trueRisk": {
+        "destructiveness": "deleting",
+        "reversibility": "irreversible",
+        "externalReach": "local"
+      },
+      "expected": [{ "ruleId": "destructive-absent" }],
+      "confidence": "high",
+      "provenance": {
+        "kind": "documented-behavior",
+        "source": "github.com/modelcontextprotocol/servers/tree/main/src/memory — delete_entities removes nodes and their relations from the in-memory graph",
+        "accessedAt": "2026-06-15",
+        "notes": "Removed nodes are not recoverable through the tool surface."
+      }
+    },
+    {
+      "name": "delete_relations",
+      "trueVerdict": "undeclared",
+      "trueRisk": {
+        "destructiveness": "deleting",
+        "reversibility": "irreversible",
+        "externalReach": "local"
+      },
+      "expected": [{ "ruleId": "destructive-absent" }],
+      "confidence": "high",
+      "provenance": {
+        "kind": "documented-behavior",
+        "source": "github.com/modelcontextprotocol/servers/tree/main/src/memory — delete_relations removes edges from the graph",
+        "accessedAt": "2026-06-15"
+      }
+    },
+    {
+      "name": "read_graph",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "documented-behavior",
+        "source": "github.com/modelcontextprotocol/servers/tree/main/src/memory — read_graph returns the graph without mutation",
+        "accessedAt": "2026-06-15"
+      }
+    },
+    {
+      "name": "search_nodes",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "behavioral-inference",
+        "source": "reasoning from name + schema: a `query` string against a graph is a benign natural-language search, deliberately excluded from the free-form-code lexicon",
+        "notes": "search_nodes reads matching nodes; the `query` parameter names search input, not executable code."
+      }
+    }
+  ]
+}

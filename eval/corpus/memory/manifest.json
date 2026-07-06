@@ -1,0 +1,63 @@
+{
+  "source": { "kind": "registry", "serverId": "modelcontextprotocol/memory" },
+  "capturedAt": "2026-06-15T00:00:00.000Z",
+  "protocolRevision": "2025-06-18",
+  "tools": [
+    {
+      "name": "create_entities",
+      "description": "Create multiple new entities in the knowledge graph.",
+      "inputSchema": {
+        "type": "object",
+        "properties": { "entities": { "type": "array", "items": { "type": "object" } } },
+        "required": ["entities"]
+      },
+      "annotations": { "unknownHints": {} }
+    },
+    {
+      "name": "add_observations",
+      "description": "Add new observations to existing entities in the knowledge graph.",
+      "inputSchema": {
+        "type": "object",
+        "properties": { "observations": { "type": "array", "items": { "type": "object" } } },
+        "required": ["observations"]
+      },
+      "annotations": { "unknownHints": {} }
+    },
+    {
+      "name": "delete_entities",
+      "description": "Delete multiple entities and their associated relations from the knowledge graph.",
+      "inputSchema": {
+        "type": "object",
+        "properties": { "entityNames": { "type": "array", "items": { "type": "string" } } },
+        "required": ["entityNames"]
+      },
+      "annotations": { "unknownHints": {} }
+    },
+    {
+      "name": "delete_relations",
+      "description": "Delete multiple relations from the knowledge graph.",
+      "inputSchema": {
+        "type": "object",
+        "properties": { "relations": { "type": "array", "items": { "type": "object" } } },
+        "required": ["relations"]
+      },
+      "annotations": { "unknownHints": {} }
+    },
+    {
+      "name": "read_graph",
+      "description": "Read the entire knowledge graph.",
+      "inputSchema": { "type": "object", "properties": {} },
+      "annotations": { "unknownHints": {} }
+    },
+    {
+      "name": "search_nodes",
+      "description": "Search for nodes in the knowledge graph based on a query.",
+      "inputSchema": {
+        "type": "object",
+        "properties": { "query": { "type": "string" } },
+        "required": ["query"]
+      },
+      "annotations": { "unknownHints": {} }
+    }
+  ]
+}

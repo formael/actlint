@@ -1,0 +1,36 @@
+{
+  "source": { "kind": "registry", "serverId": "modelcontextprotocol/slack" },
+  "capturedAt": "2026-06-15T00:00:00.000Z",
+  "protocolRevision": "2025-06-18",
+  "tools": [
+    {
+      "name": "slack_list_channels",
+      "description": "List public channels in the workspace.",
+      "inputSchema": {
+        "type": "object",
+        "properties": { "limit": { "type": "integer" } }
+      },
+      "annotations": { "unknownHints": {} }
+    },
+    {
+      "name": "slack_get_channel_history",
+      "description": "Get recent messages from a channel.",
+      "inputSchema": {
+        "type": "object",
+        "properties": { "channel_id": { "type": "string" }, "limit": { "type": "integer" } },
+        "required": ["channel_id"]
+      },
+      "annotations": { "unknownHints": {} }
+    },
+    {
+      "name": "slack_post_message",
+      "description": "Post a new message to a Slack channel.",
+      "inputSchema": {
+        "type": "object",
+        "properties": { "channel_id": { "type": "string" }, "text": { "type": "string" } },
+        "required": ["channel_id", "text"]
+      },
+      "annotations": { "unknownHints": {} }
+    }
+  ]
+}

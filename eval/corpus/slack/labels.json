@@ -1,0 +1,58 @@
+{
+  "server": "slack",
+  "labeledAt": "2026-06-15",
+  "notes": "Agent-proposed labels, hand-transcribed from the public reference Slack server. Pending human ratification. No MCP annotations are advertised. `slack_post_message` reaches an external workspace and cannot be cleanly unsent, so both a `reach-absent` and an `irreversible-unflagged` nudge are warranted.",
+  "tools": [
+    {
+      "name": "slack_list_channels",
+      "trueVerdict": "undeclared",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "reversibility": "reversible",
+        "externalReach": "open-world"
+      },
+      "expected": [{ "ruleId": "reach-absent" }],
+      "confidence": "medium",
+      "provenance": {
+        "kind": "documented-behavior",
+        "source": "github.com/modelcontextprotocol/servers (Slack server) — slack_list_channels reads from the external Slack workspace API",
+        "accessedAt": "2026-06-15",
+        "notes": "Read-only, but it interacts with an external service, so openWorldHint honestly applies. A recall check: the tool takes no destination-shaped parameter, so the v0 engine cannot see the reach from the schema and will miss it."
+      }
+    },
+    {
+      "name": "slack_get_channel_history",
+      "trueVerdict": "undeclared",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "reversibility": "reversible",
+        "externalReach": "open-world"
+      },
+      "expected": [{ "ruleId": "reach-absent" }],
+      "confidence": "medium",
+      "provenance": {
+        "kind": "documented-behavior",
+        "source": "github.com/modelcontextprotocol/servers (Slack server) — slack_get_channel_history reads messages from the external Slack workspace API",
+        "accessedAt": "2026-06-15",
+        "notes": "Read-only, but it interacts with an external service, so openWorldHint honestly applies; undeclared here."
+      }
+    },
+    {
+      "name": "slack_post_message",
+      "trueVerdict": "undeclared",
+      "trueRisk": {
+        "destructiveness": "additive",
+        "reversibility": "irreversible",
+        "externalReach": "open-world"
+      },
+      "expected": [{ "ruleId": "reach-absent" }, { "ruleId": "irreversible-unflagged" }],
+      "confidence": "high",
+      "provenance": {
+        "kind": "documented-behavior",
+        "source": "github.com/modelcontextprotocol/servers (Slack server) — slack_post_message posts a message visible to a channel's members",
+        "accessedAt": "2026-06-15",
+        "notes": "A posted message is externally visible and cannot be reliably unsent; both external reach and irreversibility go undeclared."
+      }
+    }
+  ]
+}
