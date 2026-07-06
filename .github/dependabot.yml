@@ -1,0 +1,31 @@
+# SPDX-FileCopyrightText: 2026 Formael
+# SPDX-License-Identifier: Apache-2.0
+#
+# Automated dependency updates. GitHub Actions are SHA-pinned; Dependabot keeps those pins current
+# (and moves them SHA-to-SHA), which is both a maintenance win and a Scorecard signal. npm updates are
+# grouped to keep the review load low for a deliberately shallow dependency tree.
+
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: "chore(actions)"
+
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    versioning-strategy: increase
+    groups:
+      dev-dependencies:
+        dependency-type: development
+      production-dependencies:
+        dependency-type: production
+    commit-message:
+      prefix: "chore(deps)"

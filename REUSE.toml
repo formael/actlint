@@ -13,6 +13,7 @@ path = [
   "packages/**/package.json",
   "**/tsconfig*.json",
   "biome.json",
+  ".changeset/config.json",
   "pnpm-workspace.yaml",
   "pnpm-lock.yaml",
   ".npmrc",
@@ -24,8 +25,6 @@ SPDX-License-Identifier = "Apache-2.0"
 
 [[annotations]]
 path = [
-  "AGENTS.md",
-  "packages/**/AGENTS.md",
   ".github/ISSUE_TEMPLATE/bug_report.md",
   ".github/ISSUE_TEMPLATE/feature_request.md",
 ]

@@ -24,10 +24,15 @@
     "guards": "pnpm guard:purity && pnpm guard:sdk && pnpm guard:determinism && pnpm guard:vocabulary",
     "eval": "pnpm --filter @formael/actlint-eval run eval",
     "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm guards",
-    "gate": "pnpm build && pnpm check && pnpm eval"
+    "gate": "pnpm build && pnpm check && pnpm eval",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "pnpm build && changeset publish",
+    "check-npm-name": "tsx scripts/check-npm-name.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
+    "@changesets/cli": "^2.29.7",
     "@types/node": "^22.10.2",
     "@vitest/coverage-v8": "^2.1.8",
     "fast-check": "^3.23.1",

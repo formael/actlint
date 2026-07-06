@@ -1,0 +1,189 @@
+# SPDX-FileCopyrightText: 2026 Formael
+# SPDX-License-Identifier: Apache-2.0
+#
+# The release pipeline — actlint practising what it lints. There is no long-lived npm token in this
+# repository: publishing authenticates with npm Trusted Publishing over OIDC (`id-token: write`), which
+# also emits npm provenance automatically. Every release additionally carries a CycloneDX SBOM, an SLSA
+# build-provenance attestation, and keyless cosign signatures. Actions are pinned by full commit SHA.
+#
+# Two entry points:
+#   • push to main       — Changesets opens/updates the "Version Packages" PR, and publishes when that
+#                          PR merges (i.e. when a package version is ahead of the registry).
+#   • workflow_dispatch  — a dry run that builds, packs, and produces the SBOM + attestation + cosign
+#                          signatures WITHOUT publishing, so the provenance chain is verifiable on demand.
+
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Least-privilege by default; each job grants only what it needs.
+permissions: {}
+
+# Never run two releases against the same ref at once, and never cancel one midway.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: version & publish
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # create tags + GitHub Releases
+      pull-requests: write # open the "Version Packages" PR
+      id-token: write # OIDC: npm Trusted Publishing + provenance, keyless cosign
+      attestations: write # SLSA build-provenance attestations
+    steps:
+      - name: Checkout (full history for Changesets)
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+
+      - name: Set up Node 22
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - name: Upgrade npm to a Trusted-Publishing-capable release
+        # Trusted Publishing + `npm publish --provenance` require npm >= 11.5.1; Node 22 bundles npm 10.
+        run: npm install --global npm@latest
+
+      - name: Install (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Create Version PR or publish
+        id: changesets
+        uses: changesets/action@e0145edc7d9d8679003495b11f87bd8ef63c0cba # v1.5.3
+        with:
+          version: pnpm version-packages
+          publish: pnpm release
+          title: "chore: version packages"
+          commit: "chore: version packages"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # No NPM_TOKEN: `npm publish` authenticates via OIDC against the configured trusted publisher.
+          # Provenance is emitted automatically for OIDC publishes; this makes it explicit.
+          NPM_CONFIG_PROVENANCE: "true"
+
+      - name: Pack published tarballs
+        if: steps.changesets.outputs.published == 'true'
+        # Re-create the exact tarballs that were published so they can be signed and attested.
+        # `pnpm pack` (run in each package dir) rewrites the `workspace:` protocol the way publish did.
+        run: |
+          mkdir -p dist-artifacts
+          ( cd packages/cli && pnpm pack --pack-destination "$GITHUB_WORKSPACE/dist-artifacts" )
+          ( cd packages/vocabulary && pnpm pack --pack-destination "$GITHUB_WORKSPACE/dist-artifacts" )
+
+      - name: Generate CycloneDX SBOM
+        if: steps.changesets.outputs.published == 'true'
+        uses: anchore/sbom-action@cee1b8e05ae5b2593a75e197229729eabaa9f8ec # v0.20.2
+        with:
+          path: .
+          format: cyclonedx-json
+          output-file: dist-artifacts/actlint.sbom.cdx.json
+          artifact-name: actlint.sbom.cdx.json
+
+      - name: Attest SLSA build provenance
+        if: steps.changesets.outputs.published == 'true'
+        uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2.4.0
+        with:
+          subject-path: dist-artifacts/*.tgz
+
+      - name: Install cosign
+        if: steps.changesets.outputs.published == 'true'
+        uses: sigstore/cosign-installer@398d4b0eeef1380460a10c8013a76f728fb906ac # v3.9.1
+
+      - name: Sign artifacts (keyless, transparency-logged)
+        if: steps.changesets.outputs.published == 'true'
+        run: |
+          for f in dist-artifacts/*.tgz dist-artifacts/actlint.sbom.cdx.json; do
+            [ -e "$f" ] || continue
+            cosign sign-blob --yes "$f" --bundle "$f.cosign.bundle"
+          done
+
+      - name: Attach SBOM + signatures to the GitHub Releases
+        if: steps.changesets.outputs.published == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Changesets tags each published package as `<name>@<version>`; attach the shared SBOM and
+          # per-artifact cosign bundles to every release it just created.
+          echo '${{ steps.changesets.outputs.publishedPackages }}' \
+            | jq -r '.[] | "\(.name)@\(.version)"' \
+            | while read -r tag; do
+                gh release upload "$tag" dist-artifacts/actlint.sbom.cdx.json dist-artifacts/*.cosign.bundle --clobber || true
+              done
+
+  dry-run:
+    name: provenance dry run
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # keyless cosign + attestation, no publish
+      attestations: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+
+      - name: Set up Node 22
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Pack candidate tarballs
+        run: |
+          mkdir -p dist-artifacts
+          ( cd packages/cli && pnpm pack --pack-destination "$GITHUB_WORKSPACE/dist-artifacts" )
+          ( cd packages/vocabulary && pnpm pack --pack-destination "$GITHUB_WORKSPACE/dist-artifacts" )
+
+      - name: Generate CycloneDX SBOM
+        uses: anchore/sbom-action@cee1b8e05ae5b2593a75e197229729eabaa9f8ec # v0.20.2
+        with:
+          path: .
+          format: cyclonedx-json
+          output-file: dist-artifacts/actlint.sbom.cdx.json
+          artifact-name: actlint.sbom.cdx.json
+
+      - name: Attest SLSA build provenance
+        uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2.4.0
+        with:
+          subject-path: dist-artifacts/*.tgz
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@398d4b0eeef1380460a10c8013a76f728fb906ac # v3.9.1
+
+      - name: Sign artifacts (keyless, transparency-logged)
+        run: |
+          for f in dist-artifacts/*.tgz dist-artifacts/actlint.sbom.cdx.json; do
+            cosign sign-blob --yes "$f" --bundle "$f.cosign.bundle"
+          done
+
+      - name: Upload dry-run provenance bundle
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: actlint-provenance-dry-run
+          path: dist-artifacts/
+          if-no-files-found: error

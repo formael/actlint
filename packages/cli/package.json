@@ -1,9 +1,28 @@
 {
   "name": "actlint",
-  "version": "0.0.0",
-  "private": true,
-  "description": "The `actlint` command — the imperative shell. Orchestrates fetch -> core -> reporters -> exit code. Contains NO scoring logic.",
+  "version": "0.1.0",
+  "description": "A static action-risk linter for MCP servers. Reads a server's advertised tools, derives an honest action-risk profile, compares it against what each tool declares, and reports the gaps as a scorecard, a machine report, and a CI pass/fail signal. It never runs, routes, blocks, or executes anything.",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "linter",
+    "security",
+    "static-analysis",
+    "ai-safety",
+    "action-risk",
+    "ci"
+  ],
   "license": "Apache-2.0",
+  "author": "Formael",
+  "homepage": "https://github.com/formael/actlint#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/formael/actlint.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/formael/actlint/issues"
+  },
   "type": "module",
   "bin": {
     "actlint": "./dist/index.js"
@@ -14,12 +33,22 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": ["dist", "README.md", "LICENSE"],
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "build": "tsup",
     "clean": "rm -rf dist"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0"
+  },
+  "devDependencies": {
     "@formael/action-risk-vocabulary": "workspace:*",
     "@formael/actlint-core": "workspace:*",
     "@formael/actlint-mcp-fetch": "workspace:*",

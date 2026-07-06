@@ -1,0 +1,21 @@
+# CODEOWNERS — the human-absolute gate.
+#
+# A green build is NECESSARY BUT NEVER SUFFICIENT for the surfaces below. They encode the
+# product's judgment and trust: a subtly-wrong DEFINITION of risk is the one bug that discredits
+# the whole tool, and only a human catches it. An agent may propose; a maintainer ratifies.
+#
+# Team handle is a placeholder until the org team exists.
+
+# The action-risk vocabulary and standards crosswalk — reviewed data, not code.
+/packages/vocabulary/                 @formael/actlint-maintainers
+
+# The labeled eval corpus and scorer — the quality number.
+/eval/                                @formael/actlint-maintainers
+
+# Trust surfaces.
+/SECURITY.md                          @formael/actlint-maintainers
+
+# The supply-chain surface — CI, release, and provenance. A workflow edit is a supply-chain event.
+/.github/workflows/                   @formael/actlint-maintainers
+/.github/dependabot.yml               @formael/actlint-maintainers
+/.changeset/config.json               @formael/actlint-maintainers

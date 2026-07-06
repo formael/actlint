@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: 2026 Formael
+# SPDX-License-Identifier: Apache-2.0
+blank_issues_enabled: false
+contact_links:
+  - name: Question or usage help
+    url: https://github.com/formael/actlint/discussions
+    about: Ask in Discussions — please search first.
+  - name: Security vulnerability
+    url: https://github.com/formael/actlint/security/advisories/new
+    about: Report privately. Do NOT open a public issue (see SECURITY.md).
