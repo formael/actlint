@@ -7,8 +7,8 @@
 // the completeness contract (see ./crosswalk.ts). The engine emits no RuleId outside this file.
 
 import type { RuleClass, Verdict } from '../finding.ts';
-import { ruleIdSchema } from '../primitives.ts';
 import type { RuleId } from '../primitives.ts';
+import { ruleIdSchema } from '../primitives.ts';
 
 // Brand a literal RuleId at module load. The literals here are the single source of truth for the
 // closed set; the branding also guarantees each is a well-formed RuleId at startup.

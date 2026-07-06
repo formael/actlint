@@ -10,10 +10,10 @@
 import { readFileSync } from 'node:fs';
 import {
   CROSSWALK_VERSION,
+  parseVocabulary,
   VOCABULARY,
   VOCABULARY_VERSION,
   type Vocabulary,
-  parseVocabulary,
 } from '@formael/action-risk-vocabulary';
 import { type CliError, usageError } from './exit-codes.ts';
 

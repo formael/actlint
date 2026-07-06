@@ -1,10 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Formael
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Weight } from '@formael/action-risk-vocabulary';
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
-
-import type { Weight } from '@formael/action-risk-vocabulary';
 import type { Confidence } from '../dimensions.ts';
 import { compose } from './compose.ts';
 import { concernRank } from './ordinals.ts';

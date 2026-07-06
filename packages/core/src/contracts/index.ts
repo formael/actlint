@@ -7,26 +7,23 @@
 // mcp-fetch MUST import from here and NOWHERE ELSE in core — SDK shapes must never leak into
 // the pure engine. Enforced by scripts/check-sdk-boundary.ts.
 
-// Input boundary: the manifest types mcp-fetch produces
-export type { ToolManifest, ToolDefinition, ManifestSource, JsonSchema } from '../manifest.ts';
-export {
-  toolManifestSchema,
-  toolDefinitionSchema,
-  manifestSourceSchema,
-  jsonSchemaSchema,
-} from '../manifest.ts';
-
 // Declared side: what a tool says about itself — needed to build a ToolManifest
-export type { DeclaredProfile, DeclaredHint } from '../declared.ts';
-export { declaredProfileSchema, declaredHintSchema } from '../declared.ts';
-
+export type { DeclaredHint, DeclaredProfile } from '../declared.ts';
+export { declaredHintSchema, declaredProfileSchema } from '../declared.ts';
+// Input boundary: the manifest types mcp-fetch produces
+export type { JsonSchema, ManifestSource, ToolDefinition, ToolManifest } from '../manifest.ts';
+export {
+  jsonSchemaSchema,
+  manifestSourceSchema,
+  toolDefinitionSchema,
+  toolManifestSchema,
+} from '../manifest.ts';
+// Error model: mcp-fetch returns Outcome<ToolManifest> from toManifest
+export type { ActlintError, ErrorCode, Outcome } from '../outcome.ts';
+export { assertNever, err, errorCodeSchema, ok } from '../outcome.ts';
 // Primitives: Redacted (class export for construction) and IsoTimestamp
 export type { IsoTimestamp } from '../primitives.ts';
-export { Redacted, isoTimestampSchema, redactedSchema } from '../primitives.ts';
-
-// Error model: mcp-fetch returns Outcome<ToolManifest> from toManifest
-export type { Outcome, ActlintError, ErrorCode } from '../outcome.ts';
-export { ok, err, errorCodeSchema, assertNever } from '../outcome.ts';
+export { isoTimestampSchema, Redacted, redactedSchema } from '../primitives.ts';
 
 // ---------------------------------------------------------------------------
 // toManifest — the translation function contract that mcp-fetch must satisfy.

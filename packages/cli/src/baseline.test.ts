@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { VOCABULARY } from '@formael/action-risk-vocabulary';
-import { type Finding, classifyManifest } from '@formael/actlint-core';
+import { classifyManifest, type Finding } from '@formael/actlint-core';
 import { describe, expect, it } from 'vitest';
 import { buildBaseline, fingerprint, partitionByBaseline } from './baseline.ts';
 import { parseStdinManifest } from './ingest-target.ts';

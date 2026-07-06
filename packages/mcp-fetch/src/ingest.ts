@@ -7,11 +7,11 @@
 // `ToolManifest` (or a typed `IngestError`), and nothing downstream knows or cares how it was
 // obtained.
 
-import { assertNever, err } from '@formael/actlint-core/contracts';
 import type { Outcome, ToolManifest } from '@formael/actlint-core/contracts';
+import { assertNever, err } from '@formael/actlint-core/contracts';
 import { readManifestFile } from './capture.ts';
-import { registryNoTools, serverCardDraft } from './errors.ts';
 import type { IngestError } from './errors.ts';
+import { registryNoTools, serverCardDraft } from './errors.ts';
 import { captureLive } from './sources/live.ts';
 import { fetchServerCard } from './sources/server-card.ts';
 import type { IngestOptions, IngestSource } from './types.ts';

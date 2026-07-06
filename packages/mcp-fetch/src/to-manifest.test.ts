@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Formael
 // SPDX-License-Identifier: Apache-2.0
 
-import { Redacted, isoTimestampSchema } from '@formael/actlint-core/contracts';
 import type { ManifestSource } from '@formael/actlint-core/contracts';
+import { isoTimestampSchema, Redacted } from '@formael/actlint-core/contracts';
 import { describe, expect, it } from 'vitest';
 
 import { toManifest } from './to-manifest.ts';

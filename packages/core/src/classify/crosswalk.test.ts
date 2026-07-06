@@ -7,9 +7,8 @@
 // itself in the standards landscape is unshippable.
 
 import { describe, expect, it } from 'vitest';
-
-import { ruleIdSchema } from '../primitives.ts';
 import type { RuleId } from '../primitives.ts';
+import { ruleIdSchema } from '../primitives.ts';
 import { lookupStandards, missingCrosswalkEntries } from './crosswalk.ts';
 import { ALL_RULE_IDS } from './rule-ids.ts';
 
@@ -18,13 +17,12 @@ describe('crosswalk completeness', () => {
     expect(missingCrosswalkEntries()).toEqual([]);
   });
 
-  it.each(ALL_RULE_IDS.map((id) => [id as string, id] as const))(
-    '%s maps to at least one external standard or MCP field',
-    (_label, ruleId) => {
-      const ref = lookupStandards(ruleId);
-      expect(ref).toBeDefined();
-    },
-  );
+  it.each(
+    ALL_RULE_IDS.map((id) => [id as string, id] as const),
+  )('%s maps to at least one external standard or MCP field', (_label, ruleId) => {
+    const ref = lookupStandards(ruleId);
+    expect(ref).toBeDefined();
+  });
 });
 
 describe('crosswalk gaps are caught, not tolerated', () => {

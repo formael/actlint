@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { Redacted, isoTimestampSchema, ruleIdSchema } from './primitives.ts';
+import { isoTimestampSchema, Redacted, ruleIdSchema } from './primitives.ts';
 
 describe('isoTimestampSchema', () => {
   it('accepts a valid UTC datetime', () => {

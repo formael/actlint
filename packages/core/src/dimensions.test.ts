@@ -5,17 +5,17 @@ import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
 
 import {
-  BLAST_RADIUS_ORDER,
-  DESTRUCTIVENESS_ORDER,
-  EXTERNAL_REACH_ORDER,
-  IDEMPOTENCY_ORDER,
-  REVERSIBILITY_ORDER,
   actionRiskProfileSchema,
+  BLAST_RADIUS_ORDER,
   blastRadiusSchema,
   confidenceSchema,
+  DESTRUCTIVENESS_ORDER,
   destructivenessSchema,
+  EXTERNAL_REACH_ORDER,
   externalReachSchema,
+  IDEMPOTENCY_ORDER,
   idempotencySchema,
+  REVERSIBILITY_ORDER,
   reversibilitySchema,
   signalRefSchema,
 } from './dimensions.ts';

@@ -6,8 +6,8 @@
 // heavy CLI framework's conventions. This module is purely syntactic: it turns argv into a typed
 // Command or a usage error. It resolves no config, reads no file, and touches no network.
 
-import { severitySchema } from '@formael/actlint-core';
 import type { Severity } from '@formael/actlint-core';
+import { severitySchema } from '@formael/actlint-core';
 import { type CliError, usageError } from './exit-codes.ts';
 
 export type OutputFormat = 'human' | 'json' | 'sarif';

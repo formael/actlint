@@ -8,11 +8,10 @@
 // behind an anti-corruption boundary. Everything downstream is a pure function of that manifest.
 // It depends on core ONLY via `@formael/actlint-core/contracts`.
 
-export { ingest } from './ingest.ts';
-export { toManifest } from './to-manifest.ts';
 export { readManifestFile, serializeManifest, writeCapture } from './capture.ts';
-export { redactEndpoint, sanitizeUrl } from './redact.ts';
-
-export { DEFAULT_CLIENT_INFO, DEFAULT_TIMEOUT_MS } from './types.ts';
-export type { IngestOptions, IngestSource, LiveSource } from './types.ts';
 export type { IngestError, IngestErrorCode } from './errors.ts';
+export { ingest } from './ingest.ts';
+export { redactEndpoint, sanitizeUrl } from './redact.ts';
+export { toManifest } from './to-manifest.ts';
+export type { IngestOptions, IngestSource, LiveSource } from './types.ts';
+export { DEFAULT_CLIENT_INFO, DEFAULT_TIMEOUT_MS } from './types.ts';

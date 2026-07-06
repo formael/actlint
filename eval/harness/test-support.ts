@@ -10,10 +10,10 @@ import {
   type ActionRiskProfile,
   type Confidence,
   type Finding,
+  makeFinding,
   type RuleId,
   type SignalRef,
   type Verdict,
-  makeFinding,
 } from '@formael/actlint-core';
 import { type ServerLabels, serverLabelsSchema } from './schema.ts';
 import type { ScoredServer } from './score.ts';

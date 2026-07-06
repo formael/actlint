@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { phraseOccurs, tokenSet, tokenize } from './tokenize.ts';
+import { phraseOccurs, tokenize, tokenSet } from './tokenize.ts';
 
 describe('tokenize', () => {
   it('splits snake_case, kebab-case, dots and slashes', () => {

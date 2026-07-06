@@ -5,8 +5,8 @@ import { z } from 'zod';
 
 import type { DeclaredProfile } from './declared.ts';
 import { declaredProfileSchema } from './declared.ts';
-import { isoTimestampSchema, redactedSchema } from './primitives.ts';
 import type { IsoTimestamp, Redacted } from './primitives.ts';
+import { isoTimestampSchema, redactedSchema } from './primitives.ts';
 
 // JsonSchema — opaque, validated JSON Schema object. Treated as data: the derivation engine walks
 // it through a typed, defensive reader. Never `any`; validated by ajv downstream.

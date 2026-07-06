@@ -8,21 +8,20 @@
 // labels on outbound actions, it does not pull the triggers. Every network reality (a refused
 // socket, a hung server) is caught here and returned as a typed `IngestError`.
 
+import type { ManifestSource, Outcome, Redacted, ToolManifest } from '@formael/actlint-core/contracts';
+import { err, ok } from '@formael/actlint-core/contracts';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js';
-
-import { err, ok } from '@formael/actlint-core/contracts';
-import type { ManifestSource, Outcome, Redacted, ToolManifest } from '@formael/actlint-core/contracts';
 import { nowIso } from '../clock.ts';
-import { connectFailed, malformedTools, timedOut } from '../errors.ts';
 import type { IngestError } from '../errors.ts';
-import { TimeoutError, sanitizedDetail, withTimeout } from '../net.ts';
+import { connectFailed, malformedTools, timedOut } from '../errors.ts';
+import { sanitizedDetail, TimeoutError, withTimeout } from '../net.ts';
 import { redactEndpoint } from '../redact.ts';
 import { toManifest } from '../to-manifest.ts';
-import { DEFAULT_CLIENT_INFO, DEFAULT_TIMEOUT_MS } from '../types.ts';
 import type { IngestOptions, LiveSource } from '../types.ts';
+import { DEFAULT_CLIENT_INFO, DEFAULT_TIMEOUT_MS } from '../types.ts';
 
 /** A built transport plus the redacted endpoint used for provenance and error context. */
 interface Wired {

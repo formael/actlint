@@ -8,7 +8,7 @@
 // randomness source inside the pure packages (core, vocabulary, reporters). This is what keeps
 // the purity boundary from eroding one convenient import at a time.
 
-import { type Violation, extractImports, lineAt, listSourceFiles, readSource } from './scan';
+import { extractImports, lineAt, listSourceFiles, readSource, type Violation } from './scan';
 
 /** The pure packages. Nothing here may reach for the world. */
 export const PURE_ROOTS: readonly string[] = [

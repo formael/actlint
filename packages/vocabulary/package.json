@@ -1,8 +1,15 @@
 {
   "name": "@formael/action-risk-vocabulary",
   "version": "0.2.0",
-  "description": "PURE DATA. The action-risk vocabulary, MCP-hint mapping, and standards crosswalk that back actlint — JSON-Schema'd and independently versioned. JSON-Schema'd and independently versioned so any tool can consume it as data, never code.",
-  "keywords": ["mcp", "action-risk", "vocabulary", "owasp", "standards-crosswalk", "actlint"],
+  "description": "PURE DATA. The action-risk vocabulary, MCP-hint mapping, and standards crosswalk that back actlint. JSON-Schema'd and independently versioned so any tool can consume it as data, never code.",
+  "keywords": [
+    "mcp",
+    "action-risk",
+    "vocabulary",
+    "owasp",
+    "standards-crosswalk",
+    "actlint"
+  ],
   "license": "Apache-2.0",
   "author": "Formael",
   "homepage": "https://github.com/formael/actlint/tree/main/packages/vocabulary#readme",
@@ -29,7 +36,13 @@
     "./data/crosswalk.json": "./data/crosswalk.json",
     "./data/severity-policy.json": "./data/severity-policy.json"
   },
-  "files": ["dist", "schema", "data", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "schema",
+    "data",
+    "README.md",
+    "LICENSE"
+  ],
   "engines": {
     "node": ">=22"
   },

@@ -4,9 +4,8 @@
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-
-import { Redacted, isoTimestampSchema } from '@formael/actlint-core/contracts';
 import type { ManifestSource, ToolManifest } from '@formael/actlint-core/contracts';
+import { isoTimestampSchema, Redacted } from '@formael/actlint-core/contracts';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { readManifestFile, serializeManifest, writeCapture } from './capture.ts';

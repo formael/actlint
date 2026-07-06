@@ -1,11 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Formael
 // SPDX-License-Identifier: Apache-2.0
 
-import { describe, expect, it } from 'vitest';
-import { expectTypeOf } from 'vitest';
-
-import { severitySchema, standardsRefSchema, verdictSchema } from './finding.ts';
+import { describe, expect, expectTypeOf, it } from 'vitest';
 import type { Verdict } from './finding.ts';
+import { severitySchema, standardsRefSchema, verdictSchema } from './finding.ts';
 import { assertNever } from './outcome.ts';
 
 describe('verdictSchema', () => {

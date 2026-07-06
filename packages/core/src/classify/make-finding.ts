@@ -10,7 +10,7 @@
 import type { DeclaredProfile } from '../declared.ts';
 import type { ActionRiskProfile, Confidence, SignalRef } from '../dimensions.ts';
 import type { Finding, Verdict } from '../finding.ts';
-import { type Outcome, err, ok } from '../outcome.ts';
+import { err, type Outcome, ok } from '../outcome.ts';
 import type { RuleId } from '../primitives.ts';
 import { lookupStandards } from './crosswalk.ts';
 import { buildRationale } from './rationale.ts';

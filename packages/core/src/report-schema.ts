@@ -15,8 +15,7 @@
 import { z } from 'zod';
 
 import { declaredProfileSchema } from './declared.ts';
-import { confidenceSchema, signalRefSchema } from './dimensions.ts';
-import { actionRiskProfileSchema } from './dimensions.ts';
+import { actionRiskProfileSchema, confidenceSchema, signalRefSchema } from './dimensions.ts';
 import { ruleClassSchema, severitySchema, standardsRefSchema, verdictSchema } from './finding.ts';
 import { serverGradeSchema } from './server-result.ts';
 

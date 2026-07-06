@@ -6,52 +6,24 @@
 // No clock, network, fs, randomness, or model call ever appears here — the banned-import
 // guard (scripts/check-purity.ts) enforces it.
 
-// Primitives
-export { Redacted, isoTimestampSchema, ruleIdSchema, redactedSchema } from './primitives.ts';
-export type { IsoTimestamp, RuleId } from './primitives.ts';
-
-// Dimensions and the derived action-risk profile
+export type { MakeFindingInput, RawFinding } from './classify/index.ts';
+// Classification (derived vs declared -> Verdict -> Finding, via the makeFinding gate)
 export {
-  confidenceSchema,
-  signalRefSchema,
-  reversibilitySchema,
-  destructivenessSchema,
-  externalReachSchema,
-  idempotencySchema,
-  blastRadiusSchema,
-  reversibilityDimensionSchema,
-  destructivenessDimensionSchema,
-  externalReachDimensionSchema,
-  idempotencyDimensionSchema,
-  blastRadiusDimensionSchema,
-  actionRiskProfileSchema,
-  REVERSIBILITY_ORDER,
-  DESTRUCTIVENESS_ORDER,
-  EXTERNAL_REACH_ORDER,
-  IDEMPOTENCY_ORDER,
-  BLAST_RADIUS_ORDER,
-} from './dimensions.ts';
-export type {
-  Confidence,
-  SignalRef,
-  Dimension,
-  Reversibility,
-  Destructiveness,
-  ExternalReach,
-  Idempotency,
-  BlastRadius,
-  ActionRiskProfile,
-} from './dimensions.ts';
-
-// Manifest (input boundary)
-export {
-  jsonSchemaSchema,
-  manifestSourceSchema,
-  toolDefinitionSchema,
-  toolManifestSchema,
-} from './manifest.ts';
-export type { JsonSchema, ManifestSource, ToolDefinition, ToolManifest } from './manifest.ts';
-
+  ADVISORY_RULES,
+  ALL_RULE_IDS,
+  advisories,
+  classify,
+  classifyManifest,
+  classifyTool,
+  computeSeverity,
+  HONESTY_RULES,
+  lookupStandards,
+  makeFinding,
+  missingCrosswalkEntries,
+  RULE,
+  ruleClassOf,
+} from './classify/index.ts';
+export type { DeclaredHint, DeclaredProfile, EffectiveDeclaredValue, McpHintDefault } from './declared.ts';
 // Declared side (what the tool claims)
 export {
   declaredHintSchema,
@@ -59,49 +31,68 @@ export {
   effectiveDeclaredValue,
   MCP_HINT_DEFAULTS,
 } from './declared.ts';
-export type { DeclaredHint, DeclaredProfile, EffectiveDeclaredValue, McpHintDefault } from './declared.ts';
-
-// Findings (the canonical output)
-export { verdictSchema, severitySchema, ruleClassSchema, standardsRefSchema } from './finding.ts';
-export type { Verdict, Severity, RuleClass, StandardsRef, Finding } from './finding.ts';
-
-// Server-level result (what reporters and the CLI consume) and the honesty grade
-export { serverGradeSchema } from './server-result.ts';
-export type { ServerGrade, ServerResult } from './server-result.ts';
-
-// The `--json` report schema — a versioned public API (single source of truth for the payload shape)
-export { reportSchema, REPORT_SCHEMA_VERSION } from './report-schema.ts';
-export type { Report, ReportSummary } from './report-schema.ts';
-
-// Outcome / error model (pure core never throws for control flow)
-export { ok, err, assertNever, errorCodeSchema, actlintErrorSchema } from './outcome.ts';
-export type { Outcome, ActlintError, ErrorCode } from './outcome.ts';
-
+export type { Contribution, DerivationResult, PrimaryDimension } from './derive/index.ts';
 // Derivation engine (ToolDefinition + Vocabulary -> ActionRiskProfile, declaration-blind)
 export {
-  derive,
   compose,
-  scoreBlastRadius,
-  nameSignals,
+  derive,
   descriptionSignals,
+  nameSignals,
   schemaShapeSignals,
+  scoreBlastRadius,
 } from './derive/index.ts';
-export type { Contribution, DerivationResult, PrimaryDimension } from './derive/index.ts';
-
-// Classification (derived vs declared -> Verdict -> Finding, via the makeFinding gate)
+export type {
+  ActionRiskProfile,
+  BlastRadius,
+  Confidence,
+  Destructiveness,
+  Dimension,
+  ExternalReach,
+  Idempotency,
+  Reversibility,
+  SignalRef,
+} from './dimensions.ts';
+// Dimensions and the derived action-risk profile
 export {
-  classify,
-  advisories,
-  makeFinding,
-  classifyTool,
-  classifyManifest,
-  computeSeverity,
-  lookupStandards,
-  missingCrosswalkEntries,
-  RULE,
-  ALL_RULE_IDS,
-  HONESTY_RULES,
-  ADVISORY_RULES,
-  ruleClassOf,
-} from './classify/index.ts';
-export type { MakeFindingInput, RawFinding } from './classify/index.ts';
+  actionRiskProfileSchema,
+  BLAST_RADIUS_ORDER,
+  blastRadiusDimensionSchema,
+  blastRadiusSchema,
+  confidenceSchema,
+  DESTRUCTIVENESS_ORDER,
+  destructivenessDimensionSchema,
+  destructivenessSchema,
+  EXTERNAL_REACH_ORDER,
+  externalReachDimensionSchema,
+  externalReachSchema,
+  IDEMPOTENCY_ORDER,
+  idempotencyDimensionSchema,
+  idempotencySchema,
+  REVERSIBILITY_ORDER,
+  reversibilityDimensionSchema,
+  reversibilitySchema,
+  signalRefSchema,
+} from './dimensions.ts';
+export type { Finding, RuleClass, Severity, StandardsRef, Verdict } from './finding.ts';
+// Findings (the canonical output)
+export { ruleClassSchema, severitySchema, standardsRefSchema, verdictSchema } from './finding.ts';
+export type { JsonSchema, ManifestSource, ToolDefinition, ToolManifest } from './manifest.ts';
+// Manifest (input boundary)
+export {
+  jsonSchemaSchema,
+  manifestSourceSchema,
+  toolDefinitionSchema,
+  toolManifestSchema,
+} from './manifest.ts';
+export type { ActlintError, ErrorCode, Outcome } from './outcome.ts';
+// Outcome / error model (pure core never throws for control flow)
+export { actlintErrorSchema, assertNever, err, errorCodeSchema, ok } from './outcome.ts';
+export type { IsoTimestamp, RuleId } from './primitives.ts';
+// Primitives
+export { isoTimestampSchema, Redacted, redactedSchema, ruleIdSchema } from './primitives.ts';
+export type { Report, ReportSummary } from './report-schema.ts';
+// The `--json` report schema — a versioned public API (single source of truth for the payload shape)
+export { REPORT_SCHEMA_VERSION, reportSchema } from './report-schema.ts';
+export type { ServerGrade, ServerResult } from './server-result.ts';
+// Server-level result (what reporters and the CLI consume) and the honesty grade
+export { serverGradeSchema } from './server-result.ts';
