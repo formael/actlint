@@ -1,0 +1,141 @@
+{
+  "server": "slack",
+  "labeledAt": "2026-07-06",
+  "notes": "Human-ratified labels (2026-07-06). Ground truth established by source-inspection of the reference Slack server (now in modelcontextprotocol/servers-archived) and a live stdio tools/list capture (server 1.0.0, protocol 2024-11-05) on 2026-07-06. This is the FULL captured tool set (8 tools). The server is archived and advertises NO MCP annotations, yet every tool calls the external Slack Web API, so the absent openWorldHint is an honest gap `reach-absent` should surface on all eight; the two message-posting tools additionally leave irreversibility unflagged. This server is the primary recall check: the v0 engine catches reach on the five tools whose schema carries a destination-shaped parameter but MISSES it on slack_list_channels, slack_get_users, and slack_get_user_profile (no such parameter) — recorded here as expected findings the engine fails to emit.",
+  "tools": [
+    {
+      "name": "slack_list_channels",
+      "trueVerdict": "undeclared",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "reversibility": "reversible",
+        "externalReach": "open-world"
+      },
+      "expected": [{ "ruleId": "reach-absent" }],
+      "confidence": "medium",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers-archived, src/slack/index.ts — slack_list_channels calls the Slack conversations.list Web API; no annotations declared",
+        "accessedAt": "2026-07-06",
+        "notes": "Read-only but genuinely external. The schema carries no destination-shaped parameter, so the v0 engine cannot see the reach and misses it — a recall gap this label records."
+      }
+    },
+    {
+      "name": "slack_post_message",
+      "trueVerdict": "undeclared",
+      "trueRisk": {
+        "destructiveness": "additive",
+        "reversibility": "irreversible",
+        "externalReach": "open-world"
+      },
+      "expected": [{ "ruleId": "reach-absent" }, { "ruleId": "irreversible-unflagged" }],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers-archived, src/slack/index.ts — slack_post_message calls chat.postMessage to a channel; no annotations declared",
+        "accessedAt": "2026-07-06",
+        "notes": "A posted message is externally visible and cannot be reliably unsent; both the external reach and the irreversibility go undeclared."
+      }
+    },
+    {
+      "name": "slack_reply_to_thread",
+      "trueVerdict": "undeclared",
+      "trueRisk": {
+        "destructiveness": "additive",
+        "reversibility": "irreversible",
+        "externalReach": "open-world"
+      },
+      "expected": [{ "ruleId": "reach-absent" }, { "ruleId": "irreversible-unflagged" }],
+      "confidence": "medium",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers-archived, src/slack/index.ts — slack_reply_to_thread calls chat.postMessage with a thread_ts; no annotations declared",
+        "accessedAt": "2026-07-06",
+        "notes": "Like posting, a threaded reply is externally visible and not reliably unsent. The v0 engine catches the reach but currently misses the irreversibility — a recall gap this label records."
+      }
+    },
+    {
+      "name": "slack_add_reaction",
+      "trueVerdict": "undeclared",
+      "trueRisk": {
+        "destructiveness": "additive",
+        "reversibility": "reversible",
+        "externalReach": "open-world"
+      },
+      "expected": [{ "ruleId": "reach-absent" }],
+      "confidence": "medium",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers-archived, src/slack/index.ts — slack_add_reaction calls reactions.add on a message; no annotations declared",
+        "accessedAt": "2026-07-06",
+        "notes": "External, but a reaction can be removed, so it is reversible; only the reach is undeclared."
+      }
+    },
+    {
+      "name": "slack_get_channel_history",
+      "trueVerdict": "undeclared",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "reversibility": "reversible",
+        "externalReach": "open-world"
+      },
+      "expected": [{ "ruleId": "reach-absent" }],
+      "confidence": "medium",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers-archived, src/slack/index.ts — slack_get_channel_history calls conversations.history; no annotations declared",
+        "accessedAt": "2026-07-06"
+      }
+    },
+    {
+      "name": "slack_get_thread_replies",
+      "trueVerdict": "undeclared",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "reversibility": "reversible",
+        "externalReach": "open-world"
+      },
+      "expected": [{ "ruleId": "reach-absent" }],
+      "confidence": "medium",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers-archived, src/slack/index.ts — slack_get_thread_replies calls conversations.replies; no annotations declared",
+        "accessedAt": "2026-07-06"
+      }
+    },
+    {
+      "name": "slack_get_users",
+      "trueVerdict": "undeclared",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "reversibility": "reversible",
+        "externalReach": "open-world"
+      },
+      "expected": [{ "ruleId": "reach-absent" }],
+      "confidence": "medium",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers-archived, src/slack/index.ts — slack_get_users calls users.list; no annotations declared",
+        "accessedAt": "2026-07-06",
+        "notes": "External read with no destination-shaped parameter, so the v0 engine misses the reach — a recall gap this label records."
+      }
+    },
+    {
+      "name": "slack_get_user_profile",
+      "trueVerdict": "undeclared",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "reversibility": "reversible",
+        "externalReach": "open-world"
+      },
+      "expected": [{ "ruleId": "reach-absent" }],
+      "confidence": "medium",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers-archived, src/slack/index.ts — slack_get_user_profile calls users.profile.get for a user_id; no annotations declared",
+        "accessedAt": "2026-07-06",
+        "notes": "External read; the user_id is an identifier, not a destination the v0 engine reads as external reach, so the reach is missed — a recall gap this label records."
+      }
+    }
+  ]
+}

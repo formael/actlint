@@ -1,9 +1,10 @@
 // SPDX-FileCopyrightText: 2026 Formael
 // SPDX-License-Identifier: Apache-2.0
 
-// The comparator's executable spec: one golden case per honesty RuleId, the corrected
-// uncertain+explicit-false cell, the hint-interaction dedup, and the property laws (no double-fire;
-// escalating the gap never lowers severity).
+// The comparator's executable spec: one golden case per honesty RuleId, the evidence-gated
+// uncertain+explicit-false cell (silence cannot contradict an honest declaration), the
+// reversible-mutation destructiveness boundary, the hint-interaction dedup, and the property laws
+// (no double-fire; escalating the gap never lowers severity).
 
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
@@ -42,10 +43,10 @@ describe('golden cases — one per honesty rule', () => {
     expect(f.confidence).toBe('high');
   });
 
-  it('destructive-unflagged: a mutating tool that declares destructiveHint:false (under-declared)', () => {
+  it('destructive-unflagged: a deleting tool that declares destructiveHint:false (under-declared)', () => {
     const f = only(
       classify(
-        profile({ destructiveness: dim('mutating', 'high', [sig('verb.mutate')]) }),
+        profile({ destructiveness: dim('deleting', 'high', [sig('verb.delete')]) }),
         declared({ destructive: hint.false }),
       ),
     );
@@ -109,11 +110,13 @@ describe('golden cases — one per honesty rule', () => {
   });
 });
 
-describe('the corrected uncertain + explicit-false cell', () => {
-  it('uncertain destructiveness + destructiveHint:false is a SOFT under-declared (not undeclared)', () => {
+describe('the uncertain + explicit-false cell is gated on evidence, not silence', () => {
+  it('EVIDENCE-backed uncertain destructiveness + destructiveHint:false is a SOFT under-declared', () => {
+    // A signal fired but declined to bound the level (non-empty provenance). A present-and-false hint
+    // is a claim, not an absence, and there is real signal to hedge against — so the soft flag stands.
     const f = only(
       classify(
-        profile({ destructiveness: dim('unknown', 'uncertain') }),
+        profile({ destructiveness: dim('unknown', 'uncertain', [sig('shape.freeform-code-input')]) }),
         declared({ destructive: hint.false }),
       ),
     );
@@ -122,14 +125,64 @@ describe('the corrected uncertain + explicit-false cell', () => {
     expect(f.confidence).toBe('uncertain'); // the softening lives in confidence, carried to severity.
   });
 
-  it('a present-and-false hint is a claim: it never degrades to the absent (undeclared) case', () => {
+  it('SILENCE (no signal fired) cannot contradict an explicit honest declaration', () => {
+    // Empty provenance: the derivation found nothing. Absence of evidence is not evidence of
+    // dishonesty — the declaration stands and no verdict-bearing finding is manufactured. This is the
+    // dominant honest case for a well-annotated local tool, and firing here would ship a finding whose
+    // only reason is "we found nothing" (Invariant 2).
+    expect(
+      classify(
+        profile({ destructiveness: dim('unknown', 'uncertain') }),
+        declared({ destructive: hint.false }),
+      ),
+    ).toHaveLength(0);
+    expect(
+      classify(profile({ externalReach: dim('unknown', 'uncertain') }), declared({ openWorld: hint.false })),
+    ).toHaveLength(0);
+    expect(
+      classify(profile({ destructiveness: dim('unknown', 'uncertain') }), declared({ readOnly: hint.true })),
+    ).toHaveLength(0);
+  });
+
+  it('a present-and-false hint is a claim: an evidenced uncertain never degrades to the absent case', () => {
     const soft = classify(
-      profile({ destructiveness: dim('unknown', 'uncertain') }),
+      profile({ destructiveness: dim('unknown', 'uncertain', [sig('shape.freeform-code-input')]) }),
       declared({ destructive: hint.false }),
     );
-    const absent = classify(profile({ destructiveness: dim('unknown', 'uncertain') }), declared());
+    const absent = classify(
+      profile({ destructiveness: dim('unknown', 'uncertain', [sig('shape.freeform-code-input')]) }),
+      declared(),
+    );
     expect(soft[0]?.verdict).toBe('under-declared');
     expect(absent).toHaveLength(0); // silence about an uncertain risk is not itself a finding.
+  });
+});
+
+describe('reversible in-place mutation is not destructive (destructiveHint semantics)', () => {
+  it('a reversibly-mutating tool declaring destructiveHint:false is consistent (a toggle)', () => {
+    // `toggle`/`set` derive `mutating` but contribute nothing to reversibility, so reversibility is
+    // silent. Flipping a flag back and forth is an in-place update, not an irrecoverable one; the
+    // reference servers annotate their toggles destructiveHint:false and are honest to do so.
+    expect(
+      classify(
+        profile({ destructiveness: dim('mutating', 'high', [sig('verb.mutate')]) }),
+        declared({ destructive: hint.false }),
+      ),
+    ).toHaveLength(0);
+  });
+
+  it('a mutating tool corroborated as irreversible still fires destructive-unflagged', () => {
+    const f = only(
+      classify(
+        profile({
+          destructiveness: dim('mutating', 'high', [sig('verb.mutate')]),
+          reversibility: dim('irreversible', 'medium', [sig('phrase.deletion')]),
+        }),
+        declared({ destructive: hint.false }),
+      ),
+    );
+    expect(f.ruleId).toBe(RULE.destructiveUnflagged);
+    expect(f.verdict).toBe<Verdict>('under-declared');
   });
 });
 

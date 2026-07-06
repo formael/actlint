@@ -1,0 +1,130 @@
+{
+  "server": "memory",
+  "labeledAt": "2026-07-06",
+  "notes": "Human-ratified labels (2026-07-06). Ground truth established by source-inspection of the reference knowledge-graph memory server and a live stdio tools/list capture (server 0.6.3, protocol 2025-06-18) on 2026-07-06. This is the FULL captured tool set (9 tools). Every tool advertises honest MCP annotations, and — importantly — the delete tools declare destructiveHint:true. So the earlier seed's expectation of `destructive-absent` on delete_entities/delete_relations is WRONG against the real server: those deletions are honestly flagged and the correct verdict is `consistent`. The graph is in-process and local, so every openWorldHint:false is honest; the pre-recovery v0 engine flagged `external-reach-undeclared` (uncertain) across all nine tools — false positives pinned here as the `[]` ground truth they contradict, and the recovered engine now stays silent on all nine.",
+  "tools": [
+    {
+      "name": "create_entities",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "additive", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/memory/index.ts — create_entities appends nodes to the graph; declares readOnlyHint:false, destructiveHint:false, openWorldHint:false",
+        "accessedAt": "2026-07-06"
+      }
+    },
+    {
+      "name": "create_relations",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "additive", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/memory/index.ts — create_relations appends edges between entities; declares destructiveHint:false, openWorldHint:false",
+        "accessedAt": "2026-07-06"
+      }
+    },
+    {
+      "name": "add_observations",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "additive", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/memory/index.ts — add_observations appends facts to existing entities; declares destructiveHint:false, openWorldHint:false",
+        "accessedAt": "2026-07-06"
+      }
+    },
+    {
+      "name": "delete_entities",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "deleting",
+        "reversibility": "irreversible",
+        "externalReach": "local"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/memory/index.ts — delete_entities removes nodes and their relations from the in-memory graph; declares destructiveHint:true, idempotentHint:true, openWorldHint:false",
+        "accessedAt": "2026-07-06",
+        "notes": "Removed nodes are not recoverable through the tool surface, but the server honestly declares destructiveHint:true, so the verdict is consistent."
+      }
+    },
+    {
+      "name": "delete_observations",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "deleting",
+        "reversibility": "irreversible",
+        "externalReach": "local"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/memory/index.ts — delete_observations removes specific observations from entities; declares destructiveHint:true, idempotentHint:true, openWorldHint:false",
+        "accessedAt": "2026-07-06"
+      }
+    },
+    {
+      "name": "delete_relations",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "deleting",
+        "reversibility": "irreversible",
+        "externalReach": "local"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/memory/index.ts — delete_relations removes edges from the graph; declares destructiveHint:true, idempotentHint:true, openWorldHint:false",
+        "accessedAt": "2026-07-06"
+      }
+    },
+    {
+      "name": "read_graph",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/memory/index.ts — read_graph returns the graph without mutation; declares readOnlyHint:true, openWorldHint:false",
+        "accessedAt": "2026-07-06"
+      }
+    },
+    {
+      "name": "search_nodes",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/memory/index.ts — search_nodes reads matching nodes for a query string; declares readOnlyHint:true, openWorldHint:false",
+        "accessedAt": "2026-07-06",
+        "notes": "The `query` parameter names search input, not executable code."
+      }
+    },
+    {
+      "name": "open_nodes",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/memory/index.ts — open_nodes returns specific nodes by name without mutation; declares readOnlyHint:true, openWorldHint:false",
+        "accessedAt": "2026-07-06",
+        "notes": "Read-only. The v0 engine flags write-as-readonly and external-reach-undeclared (uncertain) — false positives this label records."
+      }
+    }
+  ]
+}

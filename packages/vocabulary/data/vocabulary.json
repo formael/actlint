@@ -1,7 +1,8 @@
 {
   "$schema": "../schema/vocabulary.schema.json",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "limitations": [
+    "Name-verb lexemes match tokens by exact word, so a noun/verb homograph is a precision hazard: a token that reads as a verb in one domain but a noun in another (e.g. `message`, which names read tools like `get_message` far more often than it names a send action; `checkout`, which is version-control far more often than payment) mis-fires on the commoner reading. Such tokens are screened out in favour of verb-dominant siblings (`send`/`post`/`reply`; `pay`/`charge`/`purchase`) or schema-corroborated entries (a destination-shaped parameter, an amount field). Every lexeme is a liability until the corpus proves it earns its place.",
     "The verb lexicon is English-centric. A tool named with a non-English verb (e.g. `supprimer`, `borrar`) will not match the name-verb signals and may derive as `uncertain`.",
     "The verb lexicon is alias-incomplete. Uncommon spellings and compounded names (e.g. `rm_node`, `nuke`, `yeet`) are not enumerated and may be missed.",
     "Name and description signals are natural language and therefore inherently ambiguous; schema-shape signals are language-independent and are weighted more heavily to compensate.",
@@ -134,7 +135,7 @@
           "share",
           "broadcast",
           "deliver",
-          "message",
+          "reply",
           "tweet"
         ]
       },
@@ -151,7 +152,7 @@
       "id": "verb.payment",
       "signal": {
         "kind": "name-verb",
-        "match": ["pay", "charge", "refund", "wire", "payout", "purchase", "checkout", "withdraw", "deposit"]
+        "match": ["pay", "charge", "refund", "wire", "payout", "purchase", "withdraw", "deposit"]
       },
       "contributes": {
         "reversibility": { "level": "irreversible", "weight": "high" },

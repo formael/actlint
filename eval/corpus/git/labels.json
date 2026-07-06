@@ -1,0 +1,165 @@
+{
+  "server": "git",
+  "labeledAt": "2026-07-06",
+  "notes": "Human-ratified labels (2026-07-06). Ground truth established by source-inspection of the reference git server and a live stdio tools/list capture (server 1.28.1, protocol 2025-06-18) on 2026-07-06. This is the FULL captured tool set (12 tools). Every tool advertises honest MCP annotations: readers declare readOnlyHint:true/openWorldHint:false, and git_reset declares destructiveHint:true. All operations are local to the repo path, so every openWorldHint:false is honest. That makes this server largely a precision check: the pre-recovery v0 engine emitted a wave of `external-reach-undeclared` (uncertain) false positives against the honest openWorldHint:false declarations, plus `write-as-readonly` (uncertain) on the read tools — all pinned as the `[]` they contradict, and the recovered engine now stays silent on them. `git_reset` and `git_checkout` are marked ambiguous: this build of the server exposes no working-tree-discarding flags, but their git semantics genuinely vary. (`git_checkout` had also collided with a `checkout` payment token in the v0 lexicon; that token has since been removed, so the collision no longer fires.)",
+  "tools": [
+    {
+      "name": "git_status",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/git/src/mcp_server_git/server.py — git_status reads the working tree; declares readOnlyHint:true, openWorldHint:false",
+        "accessedAt": "2026-07-06",
+        "notes": "Local read. The v0 engine flags write-as-readonly and external-reach-undeclared (both uncertain) — false positives this label records."
+      }
+    },
+    {
+      "name": "git_diff_unstaged",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/git/src/mcp_server_git/server.py — git_diff_unstaged reads unstaged changes; declares readOnlyHint:true, openWorldHint:false",
+        "accessedAt": "2026-07-06"
+      }
+    },
+    {
+      "name": "git_diff_staged",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/git/src/mcp_server_git/server.py — git_diff_staged reads staged changes; declares readOnlyHint:true, openWorldHint:false",
+        "accessedAt": "2026-07-06"
+      }
+    },
+    {
+      "name": "git_diff",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/git/src/mcp_server_git/server.py — git_diff reads differences against a target; declares readOnlyHint:true, openWorldHint:false",
+        "accessedAt": "2026-07-06"
+      }
+    },
+    {
+      "name": "git_commit",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "additive",
+        "reversibility": "recoverable-with-effort",
+        "externalReach": "local"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/git/src/mcp_server_git/server.py — git_commit records a new commit; declares readOnlyHint:false, destructiveHint:false, openWorldHint:false",
+        "accessedAt": "2026-07-06",
+        "notes": "A commit adds a node to history rather than destroying state, so destructiveHint:false is honest. The v0 engine flags destructive-unflagged and external-reach-undeclared (uncertain) — false positives this label records."
+      }
+    },
+    {
+      "name": "git_add",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "additive", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/git/src/mcp_server_git/server.py — git_add stages file contents; declares readOnlyHint:false, destructiveHint:false, idempotentHint:true, openWorldHint:false",
+        "accessedAt": "2026-07-06"
+      }
+    },
+    {
+      "name": "git_reset",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "additive", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "ambiguous": true,
+      "confidence": "medium",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/git/src/mcp_server_git/server.py — this git_reset only unstages (a mixed reset with no --hard path exposed); declares destructiveHint:true, idempotentHint:true, openWorldHint:false",
+        "accessedAt": "2026-07-06",
+        "notes": "As exposed here, reset unstages without touching the working tree, so it is reversible and local; the server's destructiveHint:true is conservative. Marked ambiguous because git reset semantics genuinely vary. The v0 engine emits only external-reach-undeclared (uncertain), which is excluded on an ambiguous tool."
+      }
+    },
+    {
+      "name": "git_log",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/git/src/mcp_server_git/server.py — git_log reads commit history; declares readOnlyHint:true, openWorldHint:false",
+        "accessedAt": "2026-07-06"
+      }
+    },
+    {
+      "name": "git_create_branch",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "additive", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/git/src/mcp_server_git/server.py — git_create_branch adds a ref and removes nothing; declares readOnlyHint:false, destructiveHint:false, openWorldHint:false",
+        "accessedAt": "2026-07-06"
+      }
+    },
+    {
+      "name": "git_checkout",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "mutating",
+        "reversibility": "recoverable-with-effort",
+        "externalReach": "local"
+      },
+      "expected": [],
+      "ambiguous": true,
+      "confidence": "medium",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/git/src/mcp_server_git/server.py — this git_checkout switches branches only (branch_name required; no pathspec exposed); declares destructiveHint:false, openWorldHint:false",
+        "accessedAt": "2026-07-06",
+        "notes": "A plain branch switch is local and reversible and cannot discard files via this schema, so destructiveHint:false is honest. Marked ambiguous because checkout semantics vary. The tool name collides with the `checkout` payment/irreversibility token in the v0 lexicon, so the engine's external-reach-undeclared and irreversible-unflagged flags here are documented false alarms, not honest catches."
+      }
+    },
+    {
+      "name": "git_show",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/git/src/mcp_server_git/server.py — git_show reads the contents of a commit; declares readOnlyHint:true, openWorldHint:false",
+        "accessedAt": "2026-07-06"
+      }
+    },
+    {
+      "name": "git_branch",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/git/src/mcp_server_git/server.py — git_branch lists branches; declares readOnlyHint:true, openWorldHint:false",
+        "accessedAt": "2026-07-06"
+      }
+    }
+  ]
+}
