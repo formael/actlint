@@ -9,8 +9,8 @@
 import { describe, expect, it } from 'vitest';
 
 import type { Verdict } from '../finding.ts';
-import { ruleIdSchema } from '../primitives.ts';
 import type { RuleId } from '../primitives.ts';
+import { ruleIdSchema } from '../primitives.ts';
 import { makeFinding } from './make-finding.ts';
 import { ADVISORY_RULES, ALL_RULE_IDS, HONESTY_RULES, ruleClassOf } from './rule-ids.ts';
 import { declared, dim, profile, sig } from './test-builders.ts';

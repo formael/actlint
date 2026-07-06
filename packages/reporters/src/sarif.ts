@@ -7,12 +7,12 @@
 // reporters do, so the code-scanning view can never disagree with the scorecard.
 
 import {
+  assertNever,
   type Finding,
   type ManifestSource,
   type ServerResult,
   type Severity,
   type StandardsRef,
-  assertNever,
 } from '@formael/actlint-core';
 
 // SARIF speaks error / warning / note. Map from severity so the level is derived, never authored.

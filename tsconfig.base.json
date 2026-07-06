@@ -8,6 +8,10 @@
     "moduleDetection": "force",
     "types": ["node"],
 
+    // TS 6.0 flags baseUrl as deprecated; tsup's DTS build injects `baseUrl: "."`
+    // unconditionally, so silence the 6.0 deprecation until tsup drops it.
+    "ignoreDeprecations": "6.0",
+
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitReturns": true,

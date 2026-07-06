@@ -12,8 +12,8 @@
 //   over-declared (honest over-caution, alarm fatigue).
 // Absence is NOT falsehood: comparing against the effective value is what encodes that.
 
-import { MCP_HINT_DEFAULTS, effectiveDeclaredValue } from '../declared.ts';
 import type { DeclaredProfile } from '../declared.ts';
+import { effectiveDeclaredValue, MCP_HINT_DEFAULTS } from '../declared.ts';
 import type { ActionRiskProfile, Confidence, Dimension } from '../dimensions.ts';
 import type { RuleId } from '../primitives.ts';
 import type { RawFinding } from './raw-finding.ts';

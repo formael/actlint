@@ -9,16 +9,16 @@
 // unsettled, so this stays behind `--experimental` until the spec stabilizes and is confirmed to
 // carry full tool definitions.
 
-import { err, ok } from '@formael/actlint-core/contracts';
 import type { ManifestSource, Outcome, ToolManifest } from '@formael/actlint-core/contracts';
+import { err, ok } from '@formael/actlint-core/contracts';
 import { nowIso } from '../clock.ts';
-import { connectFailed, malformedTools, timedOut } from '../errors.ts';
 import type { IngestError } from '../errors.ts';
+import { connectFailed, malformedTools, timedOut } from '../errors.ts';
 import { sanitizedDetail } from '../net.ts';
 import { redactEndpoint } from '../redact.ts';
 import { toManifest } from '../to-manifest.ts';
-import { DEFAULT_TIMEOUT_MS } from '../types.ts';
 import type { IngestOptions } from '../types.ts';
+import { DEFAULT_TIMEOUT_MS } from '../types.ts';
 
 // The draft well-known path. Kept in one place so it is trivial to update when the SEP settles.
 const WELL_KNOWN_PATH = '/.well-known/mcp.json';

@@ -6,8 +6,8 @@
 // crosswalk is looked up from the vocabulary data (no drift from a finding's crosswalk). This module
 // only renders; it derives nothing.
 
-import { ALL_RULE_IDS, lookupStandards, ruleClassOf } from '@formael/actlint-core';
 import type { RuleId, StandardsRef } from '@formael/actlint-core';
+import { ALL_RULE_IDS, lookupStandards, ruleClassOf } from '@formael/actlint-core';
 import { type CliError, usageError } from './exit-codes.ts';
 import { RULE_DOCS } from './rule-docs.ts';
 

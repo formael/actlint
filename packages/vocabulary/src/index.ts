@@ -19,16 +19,16 @@ import {
   type Crosswalk,
   type GradePolicy,
   type McpMapping,
-  type SeverityPolicy,
-  type Vocabulary,
   parseCrosswalk,
   parseGradePolicy,
   parseMcpMapping,
   parseSeverityPolicy,
   parseVocabulary,
+  type SeverityPolicy,
+  type Vocabulary,
 } from './schema.ts';
 
-/** The npm package name — the single shared artifact between actlint (open) and the Formael platform. */
+/** The npm package name — the action-risk vocabulary, published as independently versioned data any tool can consume. */
 export const VOCABULARY_PACKAGE = '@formael/action-risk-vocabulary';
 
 /** The validated action-risk vocabulary: the tool's judgment, as evidence-backed data. */

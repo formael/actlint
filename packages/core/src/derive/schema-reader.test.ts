@@ -4,7 +4,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { JsonSchema } from '../manifest.ts';
-import { type SchemaParam, collectParams } from './schema-reader.ts';
+import { collectParams, type SchemaParam } from './schema-reader.ts';
 
 const byName = (params: readonly SchemaParam[], name: string): SchemaParam | undefined =>
   params.find((p) => p.name === name);

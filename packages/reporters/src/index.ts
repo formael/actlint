@@ -14,12 +14,11 @@ export const REPORTERS_PACKAGE = '@formael/actlint-reporters';
 /** A reporter is a pure function from a whole-server result to a rendered string. */
 export type Reporter = (result: ServerResult) => string;
 
-export { humanReporter } from './human.ts';
-export type { HumanReporterOptions } from './human.ts';
-export { jsonReporter } from './json.ts';
-export { sarifReporter } from './sarif.ts';
-
 // The honesty grade and the per-tool summary: deterministic reductions of the finding set, shared
 // by the reporters and available to the CLI when it assembles a ServerResult.
 export { gradeServer } from './grade.ts';
+export type { HumanReporterOptions } from './human.ts';
+export { humanReporter } from './human.ts';
+export { jsonReporter } from './json.ts';
+export { sarifReporter } from './sarif.ts';
 export { summarize, worstVerdictByTool } from './summary.ts';

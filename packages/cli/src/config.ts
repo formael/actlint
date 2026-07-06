@@ -9,8 +9,8 @@
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { severitySchema } from '@formael/actlint-core';
 import type { Severity } from '@formael/actlint-core';
+import { severitySchema } from '@formael/actlint-core';
 import type { OutputFormat, RawTarget, ScanFlags } from './args.ts';
 import { type CliError, usageError } from './exit-codes.ts';
 

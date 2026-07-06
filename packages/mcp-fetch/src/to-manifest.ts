@@ -13,7 +13,6 @@
 //   • Forward-compatible: any annotation field we do not model lands in `unknownHints`, never
 //     dropped — the precondition for downstream conservatism.
 
-import { err, ok } from '@formael/actlint-core/contracts';
 import type {
   DeclaredHint,
   DeclaredProfile,
@@ -25,7 +24,7 @@ import type {
   ToolDefinition,
   ToolManifest,
 } from '@formael/actlint-core/contracts';
-import { toolManifestSchema } from '@formael/actlint-core/contracts';
+import { err, ok, toolManifestSchema } from '@formael/actlint-core/contracts';
 import { nowIso } from './clock.ts';
 
 // The MCP annotation fields actlint models, mapped to their DeclaredProfile keys. Every OTHER

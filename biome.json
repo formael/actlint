@@ -1,16 +1,17 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.2/schema.json",
   "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
   "files": {
-    "ignore": [
-      "**/dist/**",
-      "**/node_modules/**",
-      "**/coverage/**",
-      "**/__fixtures__/**",
-      "packages/core/schema/**"
+    "includes": [
+      "**",
+      "!**/dist",
+      "!**/node_modules",
+      "!**/coverage",
+      "!**/__fixtures__",
+      "!**/packages/core/schema"
     ]
   },
-  "organizeImports": { "enabled": true },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
@@ -24,15 +25,15 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true
+      "preset": "recommended"
     }
   },
   "overrides": [
     {
-      "include": ["packages/vocabulary/**"],
+      "includes": ["**/packages/vocabulary/**"],
       "linter": {
         "rules": {
-          "nursery": {
+          "style": {
             "noRestrictedImports": {
               "level": "error",
               "options": {
@@ -50,10 +51,10 @@
       }
     },
     {
-      "include": ["packages/core/**"],
+      "includes": ["**/packages/core/**"],
       "linter": {
         "rules": {
-          "nursery": {
+          "style": {
             "noRestrictedImports": {
               "level": "error",
               "options": {
@@ -69,10 +70,10 @@
       }
     },
     {
-      "include": ["packages/reporters/**"],
+      "includes": ["**/packages/reporters/**"],
       "linter": {
         "rules": {
-          "nursery": {
+          "style": {
             "noRestrictedImports": {
               "level": "error",
               "options": {
@@ -87,10 +88,10 @@
       }
     },
     {
-      "include": ["packages/mcp-fetch/**"],
+      "includes": ["**/packages/mcp-fetch/**"],
       "linter": {
         "rules": {
-          "nursery": {
+          "style": {
             "noRestrictedImports": {
               "level": "error",
               "options": {

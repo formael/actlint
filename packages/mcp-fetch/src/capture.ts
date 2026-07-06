@@ -11,12 +11,10 @@
 
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
-
-import { err, ok } from '@formael/actlint-core/contracts';
 import type { ManifestSource, Outcome, ToolManifest } from '@formael/actlint-core/contracts';
-import { toolManifestSchema } from '@formael/actlint-core/contracts';
-import { captureFailed, connectFailed, malformedTools } from './errors.ts';
+import { err, ok, toolManifestSchema } from '@formael/actlint-core/contracts';
 import type { IngestError } from './errors.ts';
+import { captureFailed, connectFailed, malformedTools } from './errors.ts';
 
 /** Recursively sort object keys so serialization is canonical and diff-stable. Arrays keep order. */
 function canonicalize(value: unknown): unknown {

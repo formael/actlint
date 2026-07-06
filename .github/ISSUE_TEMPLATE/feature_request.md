@@ -17,10 +17,6 @@ labels: enhancement
 
 <!--
 actlint measures and reports declared-vs-derived honesty. It does not enforce, block, execute, or
-govern (that is the Formael platform). Requests to add enforcement, catalogs, ledgers, vaults, or
-live policy evaluation are out of scope by design.
-
-actlint measures and reports declared-vs-derived honesty. It does not enforce, block, execute, or
 govern. Requests to add enforcement, catalogs, ledgers, vaults, or live policy evaluation are out
 of scope by design — see the README's "Principles" section.
 -->

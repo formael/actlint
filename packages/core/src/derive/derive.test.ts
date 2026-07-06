@@ -12,15 +12,14 @@ import { describe, expect, it } from 'vitest';
 import type { DeclaredHint, DeclaredProfile } from '../declared.ts';
 import { actionRiskProfileSchema } from '../dimensions.ts';
 import type { JsonSchema, ToolDefinition } from '../manifest.ts';
-import { concernRank } from './ordinals.ts';
-import type { DerivationResult } from './types.ts';
-
 import descriptionPhrase from './__fixtures__/description-phrase.json' with { type: 'json' };
 import nameVerb from './__fixtures__/name-verb.json' with { type: 'json' };
 import schemaShape from './__fixtures__/schema-shape.json' with { type: 'json' };
 import silenceAndUnknown from './__fixtures__/silence-and-unknown.json' with { type: 'json' };
 import workedExample from './__fixtures__/worked-example.json' with { type: 'json' };
 import { derive } from './derive.ts';
+import { concernRank } from './ordinals.ts';
+import type { DerivationResult } from './types.ts';
 
 interface FixtureFile {
   readonly family: string;

@@ -10,9 +10,8 @@
 // runs no analysis of its own: classification is core's, rendering is the reporters', grading is the
 // reporters'. It only sequences them and decides which exit code the finished result implies.
 
-import type { Finding, ServerResult } from '@formael/actlint-core';
+import type { Finding, Outcome, ServerResult, ToolManifest } from '@formael/actlint-core';
 import { classifyManifest } from '@formael/actlint-core';
-import type { Outcome, ToolManifest } from '@formael/actlint-core';
 import type { IngestError, IngestOptions, IngestSource } from '@formael/actlint-mcp-fetch';
 import { humanReporter, jsonReporter, sarifReporter } from '@formael/actlint-reporters';
 import type { OutputFormat } from './args.ts';
@@ -22,7 +21,7 @@ import type { ResolvedScan } from './config.ts';
 import { type CliError, EXIT, type ExitCode, exitCodeFor, usageError } from './exit-codes.ts';
 import { gateFails } from './gate.ts';
 import { isStdinManifest, parseStdinManifest, toIngestSource } from './ingest-target.ts';
-import { type Versions, versions as buildVersions } from './version.ts';
+import { versions as buildVersions, type Versions } from './version.ts';
 import { loadVocabulary } from './vocabulary.ts';
 
 /** The effects the shell performs. Injected so the pipeline runs deterministically under test. */

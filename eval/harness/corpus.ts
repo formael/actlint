@@ -10,12 +10,12 @@
 // the labelled tools are exactly the tools in the manifest (no unlabelled tool silently ignored, no
 // label pointing at a tool that no longer exists).
 
-import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { type ToolManifest, toolManifestSchema } from '@formael/actlint-core';
-import { type ServerLabels, parseServerLabels } from './schema.ts';
-import { type Thresholds, parseThresholds } from './threshold.ts';
+import { parseServerLabels, type ServerLabels } from './schema.ts';
+import { parseThresholds, type Thresholds } from './threshold.ts';
 
 const HARNESS_DIR = dirname(fileURLToPath(import.meta.url));
 export const EVAL_ROOT = join(HARNESS_DIR, '..');

@@ -7,8 +7,8 @@
 // read here cannot make a finding non-deterministic. Capture-and-replay pins the value into the
 // manifest, and every downstream run is a pure function of the captured tools alone.
 
-import { isoTimestampSchema } from '@formael/actlint-core/contracts';
 import type { IsoTimestamp } from '@formael/actlint-core/contracts';
+import { isoTimestampSchema } from '@formael/actlint-core/contracts';
 
 /** The current instant as a branded ISO-8601 timestamp, for manifest provenance only. */
 export function nowIso(): IsoTimestamp {

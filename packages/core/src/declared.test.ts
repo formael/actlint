@@ -3,14 +3,13 @@
 
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
-
+import type { DeclaredHint, McpHintDefault } from './declared.ts';
 import {
-  MCP_HINT_DEFAULTS,
   declaredHintSchema,
   declaredProfileSchema,
   effectiveDeclaredValue,
+  MCP_HINT_DEFAULTS,
 } from './declared.ts';
-import type { DeclaredHint, McpHintDefault } from './declared.ts';
 
 describe('declaredHintSchema', () => {
   it('accepts state: true', () => {

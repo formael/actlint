@@ -12,7 +12,7 @@
 import type { SchemaShapeMatch, Vocabulary, VocabularyEntry } from '@formael/action-risk-vocabulary';
 import type { JsonSchema } from '../manifest.ts';
 import type { PrimaryDimension } from './primary-dimension.ts';
-import { type SchemaParam, collectParams } from './schema-reader.ts';
+import { collectParams, type SchemaParam } from './schema-reader.ts';
 import { phraseOccurs, tokenSet } from './tokenize.ts';
 import { type Contribution, toSignalWeight } from './types.ts';
 

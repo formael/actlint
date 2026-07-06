@@ -7,7 +7,7 @@
 // packages/mcp-fetch, the sole impurity — so SDK types never leak past the anti-corruption
 // boundary into the pure engine. Everywhere else, an SDK import is a build failure.
 
-import { type Violation, extractImports, listSourceFiles, readSource } from './scan';
+import { extractImports, listSourceFiles, readSource, type Violation } from './scan';
 
 export const SDK_SPECIFIER_PREFIX = '@modelcontextprotocol/sdk';
 

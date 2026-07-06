@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Formael
 // SPDX-License-Identifier: Apache-2.0
 
-import { type Vocabulary, parseVocabulary } from '@formael/action-risk-vocabulary';
+import { parseVocabulary, type Vocabulary } from '@formael/action-risk-vocabulary';
 import { describe, expect, it } from 'vitest';
 
 import type { JsonSchema } from '../manifest.ts';

@@ -6,7 +6,7 @@
 // calm and concrete: tags and glyphs serve legibility, never severity theatre, and everything
 // degrades cleanly to no-color.
 
-import { type Finding, type ManifestSource, type StandardsRef, assertNever } from '@formael/actlint-core';
+import { assertNever, type Finding, type ManifestSource, type StandardsRef } from '@formael/actlint-core';
 
 // --- Colour (opt-in; the default is plain, deterministic, NO_COLOR-safe output) ----------------
 

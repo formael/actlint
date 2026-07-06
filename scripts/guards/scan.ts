@@ -7,7 +7,7 @@
 // filesystem freely. They are deliberately dependency-free: the guards must run before
 // any package is built.
 
-import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 /** A single guard violation: enough context to locate and understand it. */

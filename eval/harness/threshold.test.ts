@@ -5,7 +5,7 @@ import { RULE } from '@formael/actlint-core';
 import { describe, expect, it } from 'vitest';
 import { scoreCorpus } from './score.ts';
 import { finding, scored, toolLabel } from './test-support.ts';
-import { type Thresholds, evaluateGate, parseThresholds } from './threshold.ts';
+import { evaluateGate, parseThresholds, type Thresholds } from './threshold.ts';
 
 const thresholds: Thresholds = {
   schemaVersion: 1,

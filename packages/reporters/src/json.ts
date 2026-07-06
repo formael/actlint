@@ -6,7 +6,7 @@
 // JSON Schema. This function only renders — it emits the canonical Finding[] plus the metadata the
 // result already carries, in a fixed key order, pretty-printed and deterministic.
 
-import { type Finding, type ManifestSource, type ServerResult, assertNever } from '@formael/actlint-core';
+import { assertNever, type Finding, type ManifestSource, type ServerResult } from '@formael/actlint-core';
 import { summarize } from './summary.ts';
 
 // The source, made JSON-safe. A live endpoint may carry a credential, so it is redacted here (the

@@ -8,7 +8,7 @@
 // is code" separation — the thing that makes the judgment auditable — quietly breaks. This guard
 // refuses any exported function in the package other than the small, named validator surface.
 
-import { type Violation, extractImports, lineAt, listSourceFiles, readSource } from './scan';
+import { extractImports, lineAt, listSourceFiles, readSource, type Violation } from './scan';
 
 export const VOCABULARY_ROOT = 'packages/vocabulary/src';
 

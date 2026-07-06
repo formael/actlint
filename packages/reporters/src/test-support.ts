@@ -14,11 +14,11 @@ import {
   type Dimension,
   type Finding,
   type ManifestSource,
+  makeFinding,
+  ruleIdSchema,
   type ServerResult,
   type SignalRef,
   type Verdict,
-  makeFinding,
-  ruleIdSchema,
 } from '@formael/actlint-core';
 import { gradeServer } from './grade.ts';
 

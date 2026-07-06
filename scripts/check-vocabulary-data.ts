@@ -5,6 +5,6 @@
 // function beyond its validators, or any internal import. Run via `pnpm guard:vocabulary`.
 
 import { reportGuard } from './guards/report';
-import { VOCABULARY_ROOT, checkVocabularyData } from './guards/vocabulary-data';
+import { checkVocabularyData, VOCABULARY_ROOT } from './guards/vocabulary-data';
 
 process.exit(reportGuard('check-vocabulary-data', checkVocabularyData([VOCABULARY_ROOT])));

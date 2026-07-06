@@ -1,11 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Formael
 // SPDX-License-Identifier: Apache-2.0
 
-import { describe, expect, it } from 'vitest';
-import { expectTypeOf } from 'vitest';
-
-import { actlintErrorSchema, assertNever, err, errorCodeSchema, ok } from './outcome.ts';
+import { describe, expect, expectTypeOf, it } from 'vitest';
 import type { ActlintError, ErrorCode, Outcome } from './outcome.ts';
+import { actlintErrorSchema, assertNever, err, errorCodeSchema, ok } from './outcome.ts';
 
 describe('errorCodeSchema', () => {
   it.each([

@@ -5,6 +5,6 @@
 // Run via `pnpm guard:sdk`.
 
 import { reportGuard } from './guards/report';
-import { SDK_FORBIDDEN_ROOTS, checkSdkBoundary } from './guards/sdk-boundary';
+import { checkSdkBoundary, SDK_FORBIDDEN_ROOTS } from './guards/sdk-boundary';
 
 process.exit(reportGuard('check-sdk-boundary', checkSdkBoundary(SDK_FORBIDDEN_ROOTS)));
