@@ -33,7 +33,7 @@ type Verdict =
 async function inspect(name: string): Promise<Verdict> {
   let response: Response;
   try {
-    response = await fetch(`${REGISTRY}/${encodeURIComponent(name).replace('%40', '@')}`, {
+    response = await fetch(`${REGISTRY}/${encodeURIComponent(name).replaceAll('%40', '@')}`, {
       headers: { accept: 'application/json' },
     });
   } catch (error) {
