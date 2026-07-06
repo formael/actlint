@@ -1,0 +1,40 @@
+# SPDX-FileCopyrightText: 2026 Formael
+# SPDX-License-Identifier: Apache-2.0
+#
+# CodeQL static analysis (SAST) for the TypeScript sources, on every PR, on pushes to main, and weekly
+# so newly-published queries reach the existing tree. Actions are pinned by full commit SHA.
+
+name: CodeQL
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 8 * * 1"
+
+permissions: {}
+
+jobs:
+  analyze:
+    name: Analyze (javascript-typescript)
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write # upload results to code scanning
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@181d5eefc20863364f96762470ba6f862bdef56b # v3.29.2
+        with:
+          languages: javascript-typescript
+          # A security tool holds itself to the extended query suite, not the default.
+          queries: security-extended
+
+      - name: Analyze
+        uses: github/codeql-action/analyze@181d5eefc20863364f96762470ba6f862bdef56b # v3.29.2
+        with:
+          category: "/language:javascript-typescript"

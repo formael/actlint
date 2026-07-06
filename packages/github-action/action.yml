@@ -1,0 +1,57 @@
+# SPDX-FileCopyrightText: 2026 Formael
+# SPDX-License-Identifier: Apache-2.0
+#
+# The actlint GitHub Action — a thin wrapper around the `actlint` CLI, and the stickiest CI on-ramp.
+# It runs the published CLI and lets the four-code exit contract flow straight through to the job:
+#   0  clean          → the step passes
+#   1  findings        → the step fails (the honesty gate did its job)
+#   2  usage error     → the step fails (bad inputs)
+#   3  ingestion error → the step fails (could not read the target)
+# It never runs, routes, blocks, or executes the server's tools — it only reads their labels.
+
+name: actlint
+description: Static action-risk linter for MCP servers — checks whether a server's tools are honest about what they do.
+author: Formael
+
+branding:
+  icon: shield
+  color: blue
+
+inputs:
+  args:
+    description: >-
+      Arguments passed verbatim to `actlint`, including the target — e.g.
+      `--card https://example.com/.well-known/mcp --fail-on medium` or `--manifest tools.json`.
+    required: true
+  version:
+    description: The npm version or dist-tag of `actlint` to run.
+    required: false
+    default: latest
+  working-directory:
+    description: Directory to run `actlint` in (for relative `--manifest` / `--baseline` paths).
+    required: false
+    default: .
+
+outputs:
+  exit-code:
+    description: The raw actlint exit code (0 clean, 1 findings, 2 usage, 3 ingestion).
+    value: ${{ steps.actlint.outputs.exit-code }}
+
+runs:
+  using: composite
+  steps:
+    - id: actlint
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      # Inputs are passed through the environment, never interpolated into the script body, so a crafted
+      # input string cannot inject shell. The args are intentionally word-split into CLI arguments.
+      env:
+        ACTLINT_ARGS: ${{ inputs.args }}
+        ACTLINT_VERSION: ${{ inputs.version }}
+      run: |
+        set +e
+        npx --yes "actlint@${ACTLINT_VERSION}" ${ACTLINT_ARGS}
+        code=$?
+        set -e
+        echo "exit-code=${code}" >> "$GITHUB_OUTPUT"
+        exit "${code}"

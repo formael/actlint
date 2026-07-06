@@ -1,0 +1,8 @@
+{
+  "name": "@formael/actlint-github-action",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The actlint GitHub Action — a thin wrapper around the actlint CLI. Distributed by git tag, never published to npm.",
+  "license": "Apache-2.0",
+  "type": "module"
+}

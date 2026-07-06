@@ -5,6 +5,12 @@ SPDX-License-Identifier: Apache-2.0
 
 # actlint
 
+[![CI](https://github.com/formael/actlint/actions/workflows/ci.yml/badge.svg)](https://github.com/formael/actlint/actions/workflows/ci.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/formael/actlint/badge)](https://scorecard.dev/viewer/?uri=github.com/formael/actlint)
+[![npm](https://img.shields.io/npm/v/actlint?logo=npm)](https://www.npmjs.com/package/actlint)
+[![Provenance](https://img.shields.io/badge/npm-provenance-8957e5?logo=npm)](https://docs.npmjs.com/generating-provenance-statements)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
+
 **A static action-risk linter for MCP servers.**
 
 actlint reads an [MCP](https://modelcontextprotocol.io) server's advertised tools — `name`, `description`,
@@ -21,6 +27,27 @@ MCP tools carry advisory honesty hints (`readOnlyHint`, `destructiveHint`, `idem
 Everyone nods at them; nobody verifies them. actlint makes that advisory best-practice **checkable,
 shareable, and CI-enforceable** — turning "is this tool honest about what it does?" from an opinion into a
 reproducible, standards-mapped finding.
+
+## Quickstart
+
+Zero install — point it at a running server, a published server card, or a captured manifest:
+
+```sh
+npx actlint --card https://example.com/.well-known/mcp
+npx actlint --manifest tools.json --fail-on medium
+```
+
+The exit code is the gate: `0` clean, `1` findings at or above the threshold, `2` a usage error, `3` an
+ingestion error. In CI, use the [GitHub Action](./packages/github-action):
+
+```yaml
+- uses: formael/actlint/packages/github-action@<commit-sha> # v0.1.0 — SHA-pinned; see the action README
+  with:
+    args: --card https://example.com/.well-known/mcp --fail-on medium
+```
+
+actlint publishes token-lessly (npm Trusted Publishing over OIDC) with automatic provenance, a CycloneDX
+SBOM, SLSA build provenance, and cosign signatures — it practises the honesty it lints.
 
 ## Principles (the seven invariants)
 
@@ -55,6 +82,8 @@ pnpm check       # the full local gate: typecheck + lint + test + guards
 ```
 
 Individual gates: `pnpm build`, `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm guards`.
+
+**Contributions:** actlint is not accepting external code contributions yet while the v0.x foundations settle. Bug reports and issues are welcome.
 
 ## License
 
