@@ -55,7 +55,7 @@ jobs:
 
       - name: Upgrade npm to a Trusted-Publishing-capable release
         # Trusted Publishing + `npm publish --provenance` require npm >= 11.5.1; Node 22 bundles npm 10.
-        run: npm install --global npm@latest
+        run: npm install --global npm@11.5.1
 
       - name: Install (frozen lockfile)
         run: pnpm install --frozen-lockfile
