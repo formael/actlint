@@ -25,6 +25,30 @@ function raw(ruleId: RuleId, verdict: RawFinding['verdict'], driver: Dimension<s
   return { ruleId, verdict, confidence: driver.confidence, signals: driver.provenance };
 }
 
+// Whether a derived dimension rests on positive evidence. An `unknown` reading has two very
+// different origins: a signal that fired but explicitly declined to bound the level (evidence-backed
+// unknown — non-empty provenance), and silence, where no signal fired at all (empty provenance).
+// Only the former may contradict an explicit honest declaration. Silence is the absence of evidence,
+// and absence of evidence is not evidence of dishonesty: letting it fire a verdict-bearing finding
+// manufactures an accusation out of the linter's own vocabulary gap, and ships a finding whose only
+// "reason" is that nothing was found (Invariant 2). Conservatism still lives where it belongs — the
+// composer derives silence to `unknown`, never to a safe level, and that unknown still appears in the
+// report; the comparator simply refuses to turn it into an alarm.
+function hasEvidence(driver: Dimension<string>): boolean {
+  return driver.provenance.length > 0;
+}
+
+// A mutating tool that denies destructiveness is only under-declared when its irreversibility
+// corroborates that the mutation is not a benign in-place flip. The MCP destructiveHint guards
+// *irrecoverable* updates; a reversible state flip that honestly declares `destructiveHint:false`
+// (a toggle, a settable flag) is consistent, not dishonest. `deleting` is irrecoverable by nature and
+// needs no corroboration; `mutating` does — either a positive irreversibility reading or an
+// evidence-backed unknown one (a signal that argued the reversibility is genuinely in question).
+function mutationIsIrrecoverable(derived: ActionRiskProfile): boolean {
+  const rev = derived.reversibility;
+  return rev.level === 'irreversible' || (rev.level === 'unknown' && hasEvidence(rev));
+}
+
 const WRITE_LEVELS: ReadonlySet<string> = new Set(['additive', 'mutating', 'deleting']);
 const DESTRUCTIVE_WRITE_LEVELS: ReadonlySet<string> = new Set(['mutating', 'deleting']);
 
@@ -47,19 +71,28 @@ function destructivenessFinding(derived: ActionRiskProfile, declared: DeclaredPr
   // 1. An explicit read-only claim. It denies all mutation, so it is the most specific verdict on
   //    this aspect and suppresses destructiveHint entirely.
   if (readOnly === 'explicit-true') {
-    // A write — or a genuinely uncertain reading — contradicts the read-only claim. Uncertain is a
-    // soft under-declaration (the confidence carried through softens the severity, never hides it).
-    if (isWrite || isUnknown) return raw(RULE.writeAsReadonly, 'under-declared', d);
-    return null; // read-only tool that declares read-only: consistent.
+    // A write contradicts the read-only claim outright. An evidence-backed uncertain reading (a
+    // signal that fired but declined to bound the level) is a soft contradiction — the confidence
+    // carried through softens the severity, never hides it. Silence — no signal at all — cannot
+    // contradict an explicit honest claim (see hasEvidence).
+    if (isWrite || (isUnknown && hasEvidence(d))) return raw(RULE.writeAsReadonly, 'under-declared', d);
+    return null; // read-only tool declaring read-only, or one we cannot prove otherwise: consistent.
   }
 
-  // 2. An explicit denial of destructiveness on a tool that mutates or deletes.
+  // 2. An explicit denial of destructiveness on a tool that mutates or deletes. `deleting` is
+  //    irrecoverable by nature and is under-declared outright; `mutating` is only under-declared when
+  //    corroborated as irrecoverable — a reversible in-place flip declaring destructiveHint:false is
+  //    honest, not dishonest (mutationIsIrrecoverable).
   if (destructive === 'explicit-false') {
-    if (isDestructiveWrite) return raw(RULE.destructiveUnflagged, 'under-declared', d);
-    // Uncertain + explicit-false is a soft under-declaration: a present-and-false hint is a claim,
-    // not an absence, and the tool may be dishonest. Distinct from the absent (undeclared) case.
-    if (isUnknown) return raw(RULE.destructiveUnflagged, 'under-declared', d);
-    return null; // read-only or additive tool honestly saying destructiveHint:false.
+    if (level === 'deleting') return raw(RULE.destructiveUnflagged, 'under-declared', d);
+    if (level === 'mutating' && mutationIsIrrecoverable(derived)) {
+      return raw(RULE.destructiveUnflagged, 'under-declared', d);
+    }
+    // An evidence-backed uncertain reading is a soft under-declaration: a present-and-false hint is a
+    // claim, not an absence, and a signal fired that declined to bound the level. Silence is not —
+    // absence of evidence cannot accuse an explicit honest declaration.
+    if (isUnknown && hasEvidence(d)) return raw(RULE.destructiveUnflagged, 'under-declared', d);
+    return null; // read-only, additive, or reversibly-mutating tool honestly saying destructiveHint:false.
   }
 
   // 3. An explicit admission of destructiveness on a tool derived as a pure read: over-caution.
@@ -85,8 +118,12 @@ function reachFinding(derived: ActionRiskProfile, declared: DeclaredProfile): Ra
   const openWorld = effectiveDeclaredValue(declared.openWorld, MCP_HINT_DEFAULTS.openWorld);
 
   if (openWorld === 'explicit-false') {
-    if (isOpen || isUnknown) return raw(RULE.externalReachUndeclared, 'under-declared', r);
-    return null; // local tool honestly saying openWorldHint:false.
+    // Derived open-world contradicts the local claim outright; an evidence-backed uncertain reading
+    // is a soft contradiction. Silence cannot contradict an explicit honest claim (see hasEvidence)
+    // — the commonest case for a local, honestly-annotated tool with no destination-shaped signal.
+    if (isOpen || (isUnknown && hasEvidence(r)))
+      return raw(RULE.externalReachUndeclared, 'under-declared', r);
+    return null; // local tool honestly saying openWorldHint:false, or one we cannot prove reaches out.
   }
   if (openWorld === 'explicit-true') {
     if (isLocal && r.confidence !== 'uncertain') return raw(RULE.overDeclaredRisk, 'over-declared', r);

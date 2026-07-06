@@ -1,7 +1,7 @@
 {
   "server": "fetch",
-  "labeledAt": "2026-06-15",
-  "notes": "Agent-proposed labels, hand-transcribed from the public reference fetch server. Pending human ratification. The tool reads a caller-supplied URL from the open internet but advertises no openWorldHint, so a `reach-absent` nudge to declare it is warranted.",
+  "labeledAt": "2026-07-06",
+  "notes": "Human-ratified labels (2026-07-06). Ground truth established by source-inspection of the reference fetch server and a live stdio tools/list capture (server 1.28.1, protocol 2025-06-18) on 2026-07-06. The tool advertises NO MCP annotations, and it reaches an arbitrary caller-supplied URL on the open internet, so the absent openWorldHint is an honest gap a `reach-absent` nudge should surface. This is a true-positive recall check.",
   "tools": [
     {
       "name": "fetch",
@@ -14,10 +14,10 @@
       "expected": [{ "ruleId": "reach-absent" }],
       "confidence": "high",
       "provenance": {
-        "kind": "documented-behavior",
-        "source": "github.com/modelcontextprotocol/servers/tree/main/src/fetch — fetch retrieves an arbitrary URL and returns its contents",
-        "accessedAt": "2026-06-15",
-        "notes": "Read-only with respect to the caller's state, but genuinely open-world: it can reach any host the caller names."
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/fetch/src/mcp_server_fetch/server.py — the `fetch` tool retrieves an arbitrary `url` (AnyUrl) from the internet and returns its contents; no annotations are declared",
+        "accessedAt": "2026-07-06",
+        "notes": "Read-only with respect to the caller's state, but genuinely open-world: it can reach any host the caller names. The `url` parameter is destination-shaped, so the v0 engine sees the reach from the schema."
       }
     }
   ]

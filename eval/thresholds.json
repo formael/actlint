@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "beta": 0.5,
-  "notes": "Conservative v0.x floors. The seed corpus is small, so per-rule numbers are statistically noisy; only aggregate, micro-averaged floors are gated. minPrecision is the load-bearing false-flag guard and is set with margin below the current measured value so honest engine changes are not blocked by noise, while a genuine precision regression still trips it. Raise these floors as the corpus grows — a change to this file is reviewed, versioned data.",
+  "notes": "Conservative v0.x floors. The seed corpus is small (6 servers / 57 tools), so per-rule numbers are statistically noisy; only aggregate, micro-averaged floors are gated. minPrecision is the load-bearing false-flag guard. Floors are set by the one-false-flag budget: after a change lands and the measured state on the committed corpus is TP/FP, minPrecision is the largest 0.05-multiple <= TP/(TP+FP+1), so the gate tolerates exactly one noise FP at the current positive count before failing. Floors only ratchet up as the corpus grows; a downward move is a ratified exception with a written reason. Current basis (2026-07-06, corpus = 6 servers / 57 tools, measured after the precision-recovery work): 8 TP / 0 FP / 3 FN => precision 100.0%, recall 72.7%, F0.5 93.0%; budget 8/(8+0+1)=88.9% => minPrecision 0.85. Recompute at every corpus expansion.",
   "aggregate": {
-    "minPrecision": 0.65,
-    "minRecall": 0.5,
-    "minFBeta": 0.6
+    "minPrecision": 0.85,
+    "minRecall": 0.55,
+    "minFBeta": 0.75
   }
 }

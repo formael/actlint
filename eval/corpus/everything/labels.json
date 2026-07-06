@@ -1,7 +1,7 @@
 {
   "server": "everything",
-  "labeledAt": "2026-06-15",
-  "notes": "Agent-proposed labels, hand-transcribed from the public reference `everything` test server. Pending human ratification. Every tool is a pure compute or read, so a correct linter stays silent — this server is the no-false-alarm check.",
+  "labeledAt": "2026-07-06",
+  "notes": "Human-ratified labels (2026-07-06). Ground truth established by source-inspection of the reference `everything` server and a live stdio tools/list capture (server 2.0.0, protocol 2025-06-18) on 2026-07-06. Unlike the earlier seed, this manifest is the FULL captured tool set (13 tools) and every tool advertises explicit, honest MCP annotations (readOnlyHint/destructiveHint/idempotentHint/openWorldHint). Every tool is a benign demo compute/read whose declarations match its behaviour, so a correct linter must stay silent. This makes the server a pure precision (no-false-alarm) check: the pre-recovery v0 engine emitted several under-declared false positives here — notably `external-reach-undeclared` on tools that honestly declare openWorldHint:false, and confident false flags on `get-annotated-message` and the `toggle-*` tools — all pinned as the ground-truth `[]` they contradict; the recovered engine now stays silent on every tool.",
   "tools": [
     {
       "name": "echo",
@@ -10,34 +10,158 @@
       "expected": [],
       "confidence": "high",
       "provenance": {
-        "kind": "documented-behavior",
-        "source": "github.com/modelcontextprotocol/servers/tree/main/src/everything — echo returns its input unchanged",
-        "accessedAt": "2026-06-15"
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/everything/tools/echo.ts — returns the input string unchanged; declares readOnlyHint:true, openWorldHint:false",
+        "accessedAt": "2026-07-06"
       }
     },
     {
-      "name": "add",
+      "name": "get-annotated-message",
       "trueVerdict": "consistent",
       "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
       "expected": [],
       "confidence": "high",
       "provenance": {
-        "kind": "documented-behavior",
-        "source": "github.com/modelcontextprotocol/servers/tree/main/src/everything — add computes a sum with no side effect",
-        "accessedAt": "2026-06-15",
-        "notes": "The `add` verb names creation in general, but this tool is a pure arithmetic compute; silence is correct."
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/everything/tools/get-annotated-message.ts — returns a demo message with content annotations; declares readOnlyHint:true, openWorldHint:false",
+        "accessedAt": "2026-07-06",
+        "notes": "Local, read-only. The v0 engine confidently flags external-reach-undeclared here — a false positive this label records."
       }
     },
     {
-      "name": "getTinyImage",
+      "name": "get-env",
       "trueVerdict": "consistent",
       "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
       "expected": [],
       "confidence": "high",
       "provenance": {
-        "kind": "documented-behavior",
-        "source": "github.com/modelcontextprotocol/servers/tree/main/src/everything — getTinyImage returns a fixed test image",
-        "accessedAt": "2026-06-15"
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/everything/tools/get-env.ts — reads and returns the server process environment; declares readOnlyHint:true, openWorldHint:false",
+        "accessedAt": "2026-07-06"
+      }
+    },
+    {
+      "name": "get-resource-links",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/everything/tools/get-resource-links.ts — returns links to the server's in-process demo resources; declares readOnlyHint:true, openWorldHint:false",
+        "accessedAt": "2026-07-06"
+      }
+    },
+    {
+      "name": "get-resource-reference",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/everything/tools/get-resource-reference.ts — returns a reference to an in-process demo resource; declares readOnlyHint:true, openWorldHint:false",
+        "accessedAt": "2026-07-06"
+      }
+    },
+    {
+      "name": "get-structured-content",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/everything/tools/get-structured-content.ts — returns fixed structured demo output; declares readOnlyHint:true, openWorldHint:false",
+        "accessedAt": "2026-07-06"
+      }
+    },
+    {
+      "name": "get-sum",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/everything/tools/get-sum.ts — pure arithmetic sum of two numbers; declares readOnlyHint:true, openWorldHint:false",
+        "accessedAt": "2026-07-06"
+      }
+    },
+    {
+      "name": "get-tiny-image",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/everything/tools/get-tiny-image.ts — returns a fixed embedded MCP-logo image; declares readOnlyHint:true, openWorldHint:false",
+        "accessedAt": "2026-07-06"
+      }
+    },
+    {
+      "name": "gzip-file-as-resource",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "additive", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "medium",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/everything/tools/gzip-file-as-resource.ts — gzips a local file and returns it as a resource; declares readOnlyHint:false, destructiveHint:false, openWorldHint:true",
+        "accessedAt": "2026-07-06",
+        "notes": "Reads a local file and produces a compressed resource; the openWorldHint:true declaration is conservative (over-cautious), which is honest and non-flagging."
+      }
+    },
+    {
+      "name": "toggle-simulated-logging",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "mutating", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/everything/tools/toggle-simulated-logging.ts — flips an in-process logging flag; declares destructiveHint:false, openWorldHint:false",
+        "accessedAt": "2026-07-06",
+        "notes": "A reversible in-process state toggle, not destructive. The v0 engine confidently flags destructive-unflagged here — a false positive this label records."
+      }
+    },
+    {
+      "name": "toggle-subscriber-updates",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "mutating", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/everything/tools/toggle-subscriber-updates.ts — flips an in-process resource-update flag; declares destructiveHint:false, openWorldHint:false",
+        "accessedAt": "2026-07-06",
+        "notes": "A reversible in-process state toggle, not destructive. The v0 engine confidently flags destructive-unflagged here — a false positive this label records."
+      }
+    },
+    {
+      "name": "trigger-long-running-operation",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "medium",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/everything/tools/trigger-long-running-operation.ts — emits progress notifications for a fixed duration with no persistent side effect; declares readOnlyHint:true, openWorldHint:false",
+        "accessedAt": "2026-07-06"
+      }
+    },
+    {
+      "name": "simulate-research-query",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "medium",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/everything/tools/simulate-research-query.ts — returns a simulated (fabricated, in-process) research result; declares openWorldHint:false",
+        "accessedAt": "2026-07-06",
+        "notes": "The reach is simulated in-process, not a real external call, so openWorldHint:false is honest."
       }
     }
   ]

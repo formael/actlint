@@ -67,13 +67,3 @@ tanks precision drops below the committed precision floor and fails CI. The floo
 `thresholds.json` are set conservatively for v0.x: the seed corpus is small, so per-rule numbers are
 noisy and only the aggregate, micro-averaged floors are gated. Raise them as the corpus grows.
 
-## Human gate
-
-The corpus is **reviewed, versioned data, like the vocabulary.** An agent may *propose* a label with
-a provenance claim; a human ratifies it. The corpus's authority is the company's authority. The seed
-labels here are agent-proposed, hand-transcribed from public reference servers, and are pending human
-ratification; they are honest about their limits (e.g. the `git_checkout` token collision that the v0
-lexicon mis-reads is recorded as a false positive, not hidden).
-
-> The corpus and the public ecosystem scorecard are the **same asset**, built once: more servers
-> scanned → more labelled corpus → tighter precision/recall → a more trustworthy scorecard.

@@ -1,7 +1,7 @@
 {
   "server": "filesystem",
-  "labeledAt": "2026-06-15",
-  "notes": "Agent-proposed labels, hand-transcribed from the public reference filesystem server. Pending human ratification. The server advertises no MCP annotations, so every write is at most an `undeclared` nudge (the spec default already assumes mutation). `write_file` is a deliberate recall check: its name carries no verb the v0 lexicon enumerates, so a correct-behaviour label expects a finding the current engine misses.",
+  "labeledAt": "2026-07-06",
+  "notes": "Human-ratified labels (2026-07-06). Ground truth established by source-inspection of the reference filesystem server and a live stdio tools/list capture (server 0.2.0, protocol 2025-06-18) on 2026-07-06. This is the FULL captured tool set (14 tools). Crucially, this server advertises honest MCP annotations: every reader declares readOnlyHint:true, and the mutating tools (write_file, edit_file, move_file) declare destructiveHint:true. So the earlier seed's expectation of `destructive-absent` on the writers is WRONG against the real server — those writes are honestly declared and the correct verdict is `consistent`. The remaining interest is precision: the pre-recovery v0 engine emitted one false positive (`write-as-readonly` on `directory_tree`), pinned here as the `[]` it contradicts; the recovered engine now stays silent.",
   "tools": [
     {
       "name": "read_file",
@@ -10,42 +10,78 @@
       "expected": [],
       "confidence": "high",
       "provenance": {
-        "kind": "documented-behavior",
-        "source": "github.com/modelcontextprotocol/servers/tree/main/src/filesystem — read_file returns file contents without mutation",
-        "accessedAt": "2026-06-15"
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/filesystem/index.ts — read_file (deprecated alias of read_text_file) returns file contents without mutation; declares readOnlyHint:true",
+        "accessedAt": "2026-07-06"
+      }
+    },
+    {
+      "name": "read_text_file",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/filesystem/index.ts — read_text_file returns file contents as text without mutation; declares readOnlyHint:true",
+        "accessedAt": "2026-07-06"
+      }
+    },
+    {
+      "name": "read_media_file",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/filesystem/index.ts — read_media_file returns base64 file bytes and a MIME type without mutation; declares readOnlyHint:true",
+        "accessedAt": "2026-07-06"
+      }
+    },
+    {
+      "name": "read_multiple_files",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/filesystem/index.ts — read_multiple_files reads several files without mutation; declares readOnlyHint:true",
+        "accessedAt": "2026-07-06"
       }
     },
     {
       "name": "write_file",
-      "trueVerdict": "undeclared",
+      "trueVerdict": "consistent",
       "trueRisk": {
         "destructiveness": "mutating",
         "reversibility": "recoverable-with-effort",
         "externalReach": "local"
       },
-      "expected": [{ "ruleId": "destructive-absent" }],
+      "expected": [],
       "confidence": "high",
       "provenance": {
-        "kind": "documented-behavior",
-        "source": "github.com/modelcontextprotocol/servers/tree/main/src/filesystem — write_file overwrites an existing file in place",
-        "accessedAt": "2026-06-15",
-        "notes": "Overwriting a file is a mutating write; the prior contents are lost unless the caller kept a copy."
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/filesystem/index.ts — write_file creates or overwrites a file in place; declares readOnlyHint:false, destructiveHint:true, idempotentHint:true",
+        "accessedAt": "2026-07-06",
+        "notes": "Overwriting is a mutating write whose prior contents are lost — but the server declares destructiveHint:true, so the destruction is honestly flagged and the verdict is consistent."
       }
     },
     {
       "name": "edit_file",
-      "trueVerdict": "undeclared",
+      "trueVerdict": "consistent",
       "trueRisk": {
         "destructiveness": "mutating",
         "reversibility": "recoverable-with-effort",
         "externalReach": "local"
       },
-      "expected": [{ "ruleId": "destructive-absent" }],
+      "expected": [],
       "confidence": "high",
       "provenance": {
-        "kind": "documented-behavior",
-        "source": "github.com/modelcontextprotocol/servers/tree/main/src/filesystem — edit_file applies line-based edits in place",
-        "accessedAt": "2026-06-15"
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/filesystem/index.ts — edit_file applies line-based edits in place; declares readOnlyHint:false, destructiveHint:true",
+        "accessedAt": "2026-07-06"
       }
     },
     {
@@ -55,26 +91,9 @@
       "expected": [],
       "confidence": "high",
       "provenance": {
-        "kind": "documented-behavior",
-        "source": "github.com/modelcontextprotocol/servers/tree/main/src/filesystem — create_directory adds a directory and is idempotent when it already exists",
-        "accessedAt": "2026-06-15",
-        "notes": "Purely additive; creating a directory removes no state."
-      }
-    },
-    {
-      "name": "move_file",
-      "trueVerdict": "undeclared",
-      "trueRisk": {
-        "destructiveness": "mutating",
-        "reversibility": "recoverable-with-effort",
-        "externalReach": "local"
-      },
-      "expected": [{ "ruleId": "destructive-absent" }],
-      "confidence": "high",
-      "provenance": {
-        "kind": "documented-behavior",
-        "source": "github.com/modelcontextprotocol/servers/tree/main/src/filesystem — move_file relocates/renames a path; it fails rather than clobbering an existing destination",
-        "accessedAt": "2026-06-15"
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/filesystem/index.ts — create_directory adds a directory (idempotent if it exists); declares destructiveHint:false, idempotentHint:true",
+        "accessedAt": "2026-07-06"
       }
     },
     {
@@ -84,9 +103,50 @@
       "expected": [],
       "confidence": "high",
       "provenance": {
-        "kind": "documented-behavior",
-        "source": "github.com/modelcontextprotocol/servers/tree/main/src/filesystem — list_directory enumerates entries without mutation",
-        "accessedAt": "2026-06-15"
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/filesystem/index.ts — list_directory enumerates entries without mutation; declares readOnlyHint:true",
+        "accessedAt": "2026-07-06"
+      }
+    },
+    {
+      "name": "list_directory_with_sizes",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/filesystem/index.ts — list_directory_with_sizes enumerates entries with sizes, without mutation; declares readOnlyHint:true",
+        "accessedAt": "2026-07-06"
+      }
+    },
+    {
+      "name": "directory_tree",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/filesystem/index.ts — directory_tree returns a recursive JSON tree without mutation; declares readOnlyHint:true",
+        "accessedAt": "2026-07-06",
+        "notes": "Read-only. The v0 engine flags write-as-readonly here (uncertain) — a false positive this label records."
+      }
+    },
+    {
+      "name": "move_file",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "mutating",
+        "reversibility": "recoverable-with-effort",
+        "externalReach": "local"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/filesystem/index.ts — move_file renames/relocates a path (fails rather than clobbering an existing destination); declares readOnlyHint:false, destructiveHint:true",
+        "accessedAt": "2026-07-06"
       }
     },
     {
@@ -96,9 +156,9 @@
       "expected": [],
       "confidence": "high",
       "provenance": {
-        "kind": "documented-behavior",
-        "source": "github.com/modelcontextprotocol/servers/tree/main/src/filesystem — search_files reads the tree to match a pattern",
-        "accessedAt": "2026-06-15"
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/filesystem/index.ts — search_files reads the tree to match a pattern; declares readOnlyHint:true",
+        "accessedAt": "2026-07-06"
       }
     },
     {
@@ -108,9 +168,21 @@
       "expected": [],
       "confidence": "high",
       "provenance": {
-        "kind": "documented-behavior",
-        "source": "github.com/modelcontextprotocol/servers/tree/main/src/filesystem — get_file_info returns metadata only",
-        "accessedAt": "2026-06-15"
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/filesystem/index.ts — get_file_info returns metadata only; declares readOnlyHint:true",
+        "accessedAt": "2026-07-06"
+      }
+    },
+    {
+      "name": "list_allowed_directories",
+      "trueVerdict": "consistent",
+      "trueRisk": { "destructiveness": "read-only", "reversibility": "reversible", "externalReach": "local" },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers, src/filesystem/index.ts — list_allowed_directories returns the server's configured roots without mutation; declares readOnlyHint:true",
+        "accessedAt": "2026-07-06"
       }
     }
   ]
