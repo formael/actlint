@@ -30,6 +30,11 @@
     "release": "pnpm build && changeset publish",
     "check-npm-name": "tsx scripts/check-npm-name.ts"
   },
+  "pnpm": {
+    "overrides": {
+      "esbuild": ">=0.28.1"
+    }
+  },
   "devDependencies": {
     "@biomejs/biome": "2.5.2",
     "@changesets/cli": "^2.29.7",
