@@ -37,6 +37,30 @@ describe('classifyTool', () => {
     expect(wr?.rationale.length).toBeGreaterThan(0);
   });
 
+  it('flags a write_file that declares readOnlyHint:true as critical write-as-readonly', () => {
+    // The write-family recall case: `write` derives `mutating`, so a read-only declaration on a tool
+    // that overwrites a file is caught as the highest-severity under-declaration — the lie a
+    // spec-conformant client would otherwise trust to skip its confirmation prompt.
+    const out = classifyTool(
+      tool({
+        name: 'write_file',
+        inputSchema: {
+          type: 'object',
+          properties: { path: { type: 'string' }, contents: { type: 'string' } },
+        },
+        annotations: declared({ readOnly: hint.true }),
+      }),
+      VOCABULARY,
+    );
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    const wr = out.value.find((f) => f.ruleId === RULE.writeAsReadonly);
+    expect(wr, 'write_file with readOnlyHint:true must produce a write-as-readonly finding').toBeDefined();
+    expect(wr?.verdict).toBe('under-declared');
+    expect(wr?.severity).toBe('critical');
+    expect(wr?.rationale.length).toBeGreaterThan(0);
+  });
+
   it('surfaces an unconstrained code parameter as an advisory (non-verdict) finding', () => {
     const out = classifyTool(
       tool({

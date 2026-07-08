@@ -185,6 +185,65 @@
       }
     },
     {
+      "name": "write-family",
+      "intent": "write-family verb (write/overwrite/save/upsert) -> mutating, via verb.mutate; a file write overwrites prior contents in place",
+      "tool": {
+        "name": "write_file",
+        "inputSchema": {
+          "type": "object",
+          "properties": {}
+        },
+        "annotations": {
+          "unknownHints": {}
+        }
+      },
+      "expected": {
+        "profile": {
+          "reversibility": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "destructiveness": {
+            "level": "mutating",
+            "confidence": "high",
+            "provenance": [
+              {
+                "id": "verb.mutate",
+                "weight": "definitive"
+              }
+            ]
+          },
+          "externalReach": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "idempotency": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "blastRadius": {
+            "level": "moderate",
+            "confidence": "medium",
+            "provenance": [
+              {
+                "id": "verb.mutate",
+                "weight": "definitive"
+              }
+            ]
+          }
+        },
+        "signals": [
+          {
+            "id": "verb.mutate",
+            "weight": "definitive"
+          }
+        ]
+      }
+    },
+    {
       "name": "delete",
       "intent": "deletion verb -> deleting + irreversible",
       "tool": {
