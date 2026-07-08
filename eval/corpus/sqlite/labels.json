@@ -1,0 +1,104 @@
+{
+  "server": "sqlite",
+  "labeledAt": "2026-07-08",
+  "notes": "Human-ratified labels (2026-07-08). Ground truth established by source-inspection of the reference SQLite server (modelcontextprotocol/servers-archived, src/sqlite/src/mcp_server_sqlite/server.py) and a live stdio tools/list capture (server sqlite 0.1.0, protocol 2025-06-18) on 2026-07-08. The server advertises NO MCP annotations on any tool. read_query runs SELECT, write_query runs INSERT/UPDATE/DELETE, create_table runs CREATE TABLE, list_tables/describe_table read the schema, and append_insight appends to an in-memory memo. This row is a true-positive recall check: write_query is derived mutating from its name and declares no destructiveHint, so the absent hint is an honest gap a destructive-absent nudge should surface. Its siblings are honestly clean (reads and additive creates carry no destructive claim to contradict), so the row also guards precision — a correct linter flags exactly one of the six tools.",
+  "tools": [
+    {
+      "name": "read_query",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "externalReach": "local"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers-archived, src/sqlite/src/mcp_server_sqlite/server.py — read_query executes a SELECT and rejects non-SELECT statements at runtime; no annotations are declared",
+        "accessedAt": "2026-07-08",
+        "notes": "Read-only over local SQLite state; nothing to declare, so the silence is honest."
+      }
+    },
+    {
+      "name": "write_query",
+      "trueVerdict": "undeclared",
+      "trueRisk": {
+        "destructiveness": "deleting",
+        "reversibility": "recoverable-with-effort",
+        "externalReach": "local"
+      },
+      "expected": [{ "ruleId": "destructive-absent" }],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers-archived, src/sqlite/src/mcp_server_sqlite/server.py — write_query executes an arbitrary INSERT, UPDATE, or DELETE (it rejects SELECT), so it can remove rows; no readOnlyHint or destructiveHint is declared",
+        "accessedAt": "2026-07-08",
+        "notes": "The name write derives mutating; the query body may DELETE rows, so the true destructiveness is at least deleting. Either way no destructiveHint is declared, so the honest verdict is undeclared and a destructive-absent nudge is correct. This is the write-family recall case: without the write lexeme the tool would derive unknown and no nudge would fire."
+      }
+    },
+    {
+      "name": "create_table",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "additive",
+        "externalReach": "local"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers-archived, src/sqlite/src/mcp_server_sqlite/server.py — create_table executes a CREATE TABLE statement, adding a new table without changing existing rows; no annotations are declared",
+        "accessedAt": "2026-07-08",
+        "notes": "Additive creation carries no destructive claim to be honest or dishonest about, so the absent destructiveHint is not a finding."
+      }
+    },
+    {
+      "name": "list_tables",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "externalReach": "local"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers-archived, src/sqlite/src/mcp_server_sqlite/server.py — list_tables reads sqlite_master to enumerate tables; no annotations are declared",
+        "accessedAt": "2026-07-08",
+        "notes": "Read-only over local schema; nothing to declare."
+      }
+    },
+    {
+      "name": "describe_table",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "externalReach": "local"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers-archived, src/sqlite/src/mcp_server_sqlite/server.py — describe_table runs PRAGMA table_info to read a table's schema; no annotations are declared",
+        "accessedAt": "2026-07-08",
+        "notes": "Read-only over local schema; nothing to declare."
+      }
+    },
+    {
+      "name": "append_insight",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "additive",
+        "externalReach": "local"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/modelcontextprotocol/servers-archived, src/sqlite/src/mcp_server_sqlite/server.py — append_insight appends a string to an in-memory insights list surfaced through a memo resource; it does not write the database and declares no annotations",
+        "accessedAt": "2026-07-08",
+        "notes": "Additive append to in-server memo state; no destructive claim to contradict, so the silence is honest."
+      }
+    }
+  ]
+}

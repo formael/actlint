@@ -1,0 +1,106 @@
+{
+  "capturedAt": "2026-07-08T00:00:00.000Z",
+  "protocolRevision": "2025-06-18",
+  "source": {
+    "kind": "registry",
+    "serverId": "modelcontextprotocol/sqlite"
+  },
+  "tools": [
+    {
+      "annotations": {
+        "unknownHints": {}
+      },
+      "description": "Execute a SELECT query on the SQLite database",
+      "inputSchema": {
+        "properties": {
+          "query": {
+            "description": "SELECT SQL query to execute",
+            "type": "string"
+          }
+        },
+        "required": ["query"],
+        "type": "object"
+      },
+      "name": "read_query"
+    },
+    {
+      "annotations": {
+        "unknownHints": {}
+      },
+      "description": "Execute an INSERT, UPDATE, or DELETE query on the SQLite database",
+      "inputSchema": {
+        "properties": {
+          "query": {
+            "description": "SQL query to execute",
+            "type": "string"
+          }
+        },
+        "required": ["query"],
+        "type": "object"
+      },
+      "name": "write_query"
+    },
+    {
+      "annotations": {
+        "unknownHints": {}
+      },
+      "description": "Create a new table in the SQLite database",
+      "inputSchema": {
+        "properties": {
+          "query": {
+            "description": "CREATE TABLE SQL statement",
+            "type": "string"
+          }
+        },
+        "required": ["query"],
+        "type": "object"
+      },
+      "name": "create_table"
+    },
+    {
+      "annotations": {
+        "unknownHints": {}
+      },
+      "description": "List all tables in the SQLite database",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_tables"
+    },
+    {
+      "annotations": {
+        "unknownHints": {}
+      },
+      "description": "Get the schema information for a specific table",
+      "inputSchema": {
+        "properties": {
+          "table_name": {
+            "description": "Name of the table to describe",
+            "type": "string"
+          }
+        },
+        "required": ["table_name"],
+        "type": "object"
+      },
+      "name": "describe_table"
+    },
+    {
+      "annotations": {
+        "unknownHints": {}
+      },
+      "description": "Add a business insight to the memo",
+      "inputSchema": {
+        "properties": {
+          "insight": {
+            "description": "Business insight discovered from data analysis",
+            "type": "string"
+          }
+        },
+        "required": ["insight"],
+        "type": "object"
+      },
+      "name": "append_insight"
+    }
+  ]
+}

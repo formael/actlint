@@ -9,7 +9,8 @@ Each file here is the **executable spec** for one signal family: a set of input 
 `DerivationResult` the engine must produce for each. Together with the property tests they *are* the
 acceptance criteria for `derive`.
 
-- `name-verb.json` — the tool name is the sole evidence; one case per verb family.
+- `name-verb.json` — the tool name is the sole evidence; one case per verb family, plus a write-family
+  case pinning that `write`/`overwrite`/`save`/`upsert` names resolve to the mutating family.
 - `description-phrase.json` — prose as low-weight, supporting evidence (and a phrase-only case that
   stays low-confidence).
 - `schema-shape.json` — the typed schema walk: declared formats, destination-shaped names, free-form

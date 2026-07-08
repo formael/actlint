@@ -278,6 +278,16 @@ describe('ratification fixtures — data-layer guards', () => {
     expect(verbMatch('verb.delete')).not.toContain('cancel');
   });
 
+  it('write_file / overwrite_file / save_document / upsert_record: the write family is mutating/high in verb.mutate', () => {
+    const e = getEntry('verb.mutate');
+    for (const verb of ['write', 'overwrite', 'save', 'upsert']) {
+      expect(verbMatch('verb.mutate'), `write-family verb "${verb}"`).toContain(verb);
+    }
+    expect(e.contributes.destructiveness?.level).toBe('mutating');
+    expect(e.contributes.destructiveness?.weight).toBe('high');
+    expect(e.citation, 'a high-weight mutating claim must cite a source').toBeTruthy();
+  });
+
   it('find_and_delete: verb.delete is deleting/high; verb.read is read-only/high — composer must not let read suppress delete', () => {
     const del = getEntry('verb.delete');
     const read = getEntry('verb.read');
