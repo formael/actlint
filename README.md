@@ -21,6 +21,10 @@ report, and a CI pass/fail signal.
 It is a linter in the lineage of `eslint`, `tflint`, and `hadolint`. **It never runs, routes, blocks, or
 executes anything.** It reads the labels on outbound actions and tells you whether they are honest.
 
+<img width="1200" height="700" alt="actlint-demo" src="https://github.com/user-attachments/assets/4ec5e3b7-421e-42d3-ab9c-8f7df76cf0c7" />
+
+see [Usage](#usage) below.
+
 ## Why it exists
 
 MCP tools carry advisory honesty hints — `readOnlyHint`, `destructiveHint`, `idempotentHint`,
