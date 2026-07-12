@@ -19,7 +19,8 @@ acceptance criteria for `derive`.
 - `worked-example.json` — the end-to-end `exec_sql` case; the dishonest `readOnly: true` annotation is
   ignored because derivation is declaration-blind.
 - `silence-and-unknown.json` — no matched signal derives all-`unknown`; blast radius is `unknown`,
-  never a comfortable `contained`.
+  never a comfortable `contained`. Includes the screened reply-content verbs (`generate`, `install`),
+  whose names deliberately resolve to silence rather than a write family.
 
 Each case carries its own `intent`, so a future reader knows whether a diff is a fix or a regression.
 

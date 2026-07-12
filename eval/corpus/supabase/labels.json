@@ -1,0 +1,480 @@
+{
+  "server": "supabase",
+  "labeledAt": "2026-07-12",
+  "notes": "PROPOSED labels, pending human ratification (agent-proposed 2026-07-12; the corpus is CODEOWNERS-gated, versioned data). Ground truth established by source-inspection of @supabase/mcp-server-supabase at github.com/supabase-community/supabase-mcp, tag mcp-server-supabase-v0.8.2 (packages/mcp-server-supabase/src/tools), cross-checked against a live stdio tools/list capture of the published npm package on 2026-07-11. Every tool carries full, honest MCP annotations, so all 29 rows are consistent and the server is a pure precision guard. It exists in the corpus for one row in particular: generate_typescript_types returns generated TypeScript source as reply content while correctly declaring readOnlyHint:true \u2014 the reply-content-vs-world-state case that made write-family verb lexemes for generate/install mis-read read-only tools as writes. A linter that flags any tool on this server is wrong.",
+  "tools": [
+    {
+      "name": "search_docs",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "externalReach": "org-internal"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/supabase-community/supabase-mcp, packages/mcp-server-supabase/src/tools/docs-tools.ts @ mcp-server-supabase-v0.8.2 \u2014 search_docs executes a GraphQL query against the Supabase docs content API and returns the results",
+        "accessedAt": "2026-07-12",
+        "notes": "Read over vendor documentation content; the honest read-only declaration is consistent."
+      }
+    },
+    {
+      "name": "list_organizations",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "externalReach": "org-internal"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/supabase-community/supabase-mcp, packages/mcp-server-supabase/src/tools/account-tools.ts @ mcp-server-supabase-v0.8.2 \u2014 list_organizations lists the user's organizations via the management API",
+        "accessedAt": "2026-07-12",
+        "notes": "Pure read; nothing to contradict."
+      }
+    },
+    {
+      "name": "get_organization",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "externalReach": "org-internal"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/supabase-community/supabase-mcp, packages/mcp-server-supabase/src/tools/account-tools.ts @ mcp-server-supabase-v0.8.2 \u2014 get_organization fetches one organization via the management API",
+        "accessedAt": "2026-07-12",
+        "notes": "Pure read; nothing to contradict."
+      }
+    },
+    {
+      "name": "list_projects",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "externalReach": "org-internal"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/supabase-community/supabase-mcp, packages/mcp-server-supabase/src/tools/account-tools.ts @ mcp-server-supabase-v0.8.2 \u2014 list_projects lists the user's Supabase projects via the management API",
+        "accessedAt": "2026-07-12",
+        "notes": "Pure read; nothing to contradict."
+      }
+    },
+    {
+      "name": "get_project",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "externalReach": "org-internal"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/supabase-community/supabase-mcp, packages/mcp-server-supabase/src/tools/account-tools.ts @ mcp-server-supabase-v0.8.2 \u2014 get_project fetches one project via the management API",
+        "accessedAt": "2026-07-12",
+        "notes": "Pure read; nothing to contradict."
+      }
+    },
+    {
+      "name": "get_cost",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "externalReach": "org-internal"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/supabase-community/supabase-mcp, packages/mcp-server-supabase/src/tools/account-tools.ts @ mcp-server-supabase-v0.8.2 \u2014 get_cost computes the cost of a new project or branch from subscription data; it creates nothing",
+        "accessedAt": "2026-07-12",
+        "notes": "Pure read; nothing to contradict."
+      }
+    },
+    {
+      "name": "confirm_cost",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "externalReach": "local"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/supabase-community/supabase-mcp, packages/mcp-server-supabase/src/tools/account-tools.ts @ mcp-server-supabase-v0.8.2 \u2014 confirm_cost derives a confirmation id by hashing the cost object; it records no state",
+        "accessedAt": "2026-07-12",
+        "notes": "Computes and returns an id in the reply; no state is written anywhere."
+      }
+    },
+    {
+      "name": "create_project",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "additive",
+        "externalReach": "org-internal"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/supabase-community/supabase-mcp, packages/mcp-server-supabase/src/tools/account-tools.ts @ mcp-server-supabase-v0.8.2 \u2014 create_project creates a new Supabase project via the management API",
+        "accessedAt": "2026-07-12",
+        "notes": "Additive creation honestly declared readOnlyHint:false and destructiveHint:false; creating a new project destroys nothing that existed."
+      }
+    },
+    {
+      "name": "pause_project",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "mutating",
+        "reversibility": "reversible",
+        "externalReach": "org-internal"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/supabase-community/supabase-mcp, packages/mcp-server-supabase/src/tools/account-tools.ts @ mcp-server-supabase-v0.8.2 \u2014 pause_project pauses a project via the management API; restore_project reverses it",
+        "accessedAt": "2026-07-12",
+        "notes": "A reversible in-place state flip declaring destructiveHint:false is honest (the restore_project sibling undoes it)."
+      }
+    },
+    {
+      "name": "restore_project",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "mutating",
+        "reversibility": "reversible",
+        "externalReach": "org-internal"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/supabase-community/supabase-mcp, packages/mcp-server-supabase/src/tools/account-tools.ts @ mcp-server-supabase-v0.8.2 \u2014 restore_project restores a paused project via the management API",
+        "accessedAt": "2026-07-12",
+        "notes": "The reverse of pause_project; a reversible state flip honestly declared non-destructive."
+      }
+    },
+    {
+      "name": "list_tables",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "externalReach": "org-internal"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/supabase-community/supabase-mcp, packages/mcp-server-supabase/src/tools/database-operation-tools.ts @ mcp-server-supabase-v0.8.2 \u2014 list_tables runs a catalog SELECT (pg-meta listTablesSql) and returns table metadata",
+        "accessedAt": "2026-07-12",
+        "notes": "Pure read; nothing to contradict."
+      }
+    },
+    {
+      "name": "list_extensions",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "externalReach": "org-internal"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/supabase-community/supabase-mcp, packages/mcp-server-supabase/src/tools/database-operation-tools.ts @ mcp-server-supabase-v0.8.2 \u2014 list_extensions runs a catalog SELECT (pg-meta listExtensionsSql)",
+        "accessedAt": "2026-07-12",
+        "notes": "Pure read; nothing to contradict."
+      }
+    },
+    {
+      "name": "list_migrations",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "externalReach": "org-internal"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/supabase-community/supabase-mcp, packages/mcp-server-supabase/src/tools/database-operation-tools.ts @ mcp-server-supabase-v0.8.2 \u2014 list_migrations lists applied migrations via the platform database operations",
+        "accessedAt": "2026-07-12",
+        "notes": "Pure read; nothing to contradict."
+      }
+    },
+    {
+      "name": "apply_migration",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "deleting",
+        "reversibility": "recoverable-with-effort",
+        "externalReach": "org-internal"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/supabase-community/supabase-mcp, packages/mcp-server-supabase/src/tools/database-operation-tools.ts @ mcp-server-supabase-v0.8.2 \u2014 apply_migration applies an arbitrary SQL migration (DDL) to the database",
+        "accessedAt": "2026-07-12",
+        "notes": "Arbitrary DDL can drop objects, so the true destructiveness is at least deleting; the tool honestly declares readOnlyHint:false and destructiveHint:true, so the declaration is consistent."
+      }
+    },
+    {
+      "name": "execute_sql",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "deleting",
+        "reversibility": "recoverable-with-effort",
+        "externalReach": "org-internal"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/supabase-community/supabase-mcp, packages/mcp-server-supabase/src/tools/database-operation-tools.ts @ mcp-server-supabase-v0.8.2 \u2014 execute_sql executes an arbitrary SQL query against the Postgres database",
+        "accessedAt": "2026-07-12",
+        "notes": "Arbitrary SQL can DELETE or DROP; honestly declared readOnlyHint:false and destructiveHint:true, so the declaration is consistent."
+      }
+    },
+    {
+      "name": "get_logs",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "externalReach": "org-internal"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/supabase-community/supabase-mcp, packages/mcp-server-supabase/src/tools/debugging-tools.ts @ mcp-server-supabase-v0.8.2 \u2014 get_logs fetches service logs via the platform debugging operations",
+        "accessedAt": "2026-07-12",
+        "notes": "Pure read; nothing to contradict."
+      }
+    },
+    {
+      "name": "get_advisors",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "externalReach": "org-internal"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/supabase-community/supabase-mcp, packages/mcp-server-supabase/src/tools/debugging-tools.ts @ mcp-server-supabase-v0.8.2 \u2014 get_advisors fetches advisory notices via the platform debugging operations",
+        "accessedAt": "2026-07-12",
+        "notes": "Pure read; nothing to contradict."
+      }
+    },
+    {
+      "name": "get_project_url",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "externalReach": "org-internal"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/supabase-community/supabase-mcp, packages/mcp-server-supabase/src/tools/development-tools.ts @ mcp-server-supabase-v0.8.2 \u2014 get_project_url returns the project API URL via development.getProjectUrl",
+        "accessedAt": "2026-07-12",
+        "notes": "Pure read; nothing to contradict."
+      }
+    },
+    {
+      "name": "get_publishable_keys",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "externalReach": "org-internal"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/supabase-community/supabase-mcp, packages/mcp-server-supabase/src/tools/development-tools.ts @ mcp-server-supabase-v0.8.2 \u2014 get_publishable_keys returns the publishable API keys via development.getPublishableKeys",
+        "accessedAt": "2026-07-12",
+        "notes": "Pure read (of sensitive material, which annotations do not model); the read-only declaration is honest."
+      }
+    },
+    {
+      "name": "generate_typescript_types",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "externalReach": "org-internal"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/supabase-community/supabase-mcp, packages/mcp-server-supabase/src/tools/development-tools.ts @ mcp-server-supabase-v0.8.2 \u2014 generate_typescript_types returns development.generateTypescriptTypes(project_id) \u2014 generated TypeScript source returned as reply content; the handler writes no state",
+        "accessedAt": "2026-07-12",
+        "notes": "The reply-content regression row: the verb generate names a tool that produces content in the reply, not state in the world. Its readOnlyHint:true is correct, so the honest verdict is consistent \u2014 a write-as-readonly flag here is a linter false positive (the vocabulary screened generate out of the write families for exactly this reason)."
+      }
+    },
+    {
+      "name": "list_edge_functions",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "externalReach": "org-internal"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/supabase-community/supabase-mcp, packages/mcp-server-supabase/src/tools/edge-function-tools.ts @ mcp-server-supabase-v0.8.2 \u2014 list_edge_functions lists Edge Functions via the platform operations",
+        "accessedAt": "2026-07-12",
+        "notes": "Pure read; nothing to contradict."
+      }
+    },
+    {
+      "name": "get_edge_function",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "externalReach": "org-internal"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/supabase-community/supabase-mcp, packages/mcp-server-supabase/src/tools/edge-function-tools.ts @ mcp-server-supabase-v0.8.2 \u2014 get_edge_function retrieves Edge Function file contents",
+        "accessedAt": "2026-07-12",
+        "notes": "Pure read; nothing to contradict."
+      }
+    },
+    {
+      "name": "deploy_edge_function",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "mutating",
+        "reversibility": "recoverable-with-effort",
+        "externalReach": "org-internal"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/supabase-community/supabase-mcp, packages/mcp-server-supabase/src/tools/edge-function-tools.ts @ mcp-server-supabase-v0.8.2 \u2014 deploy_edge_function deploys an Edge Function; if it exists a new version replaces the served one",
+        "accessedAt": "2026-07-12",
+        "notes": "Replacing the served version of an existing function is a mutation; the tool over-cautiously admits destructiveHint:true, which is the safe direction and consistent."
+      }
+    },
+    {
+      "name": "create_branch",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "additive",
+        "externalReach": "org-internal"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/supabase-community/supabase-mcp, packages/mcp-server-supabase/src/tools/branching-tools.ts @ mcp-server-supabase-v0.8.2 \u2014 create_branch creates a development branch (after a confirm_cost id) via the branching operations",
+        "accessedAt": "2026-07-12",
+        "notes": "Additive creation honestly declared readOnlyHint:false, destructiveHint:false."
+      }
+    },
+    {
+      "name": "list_branches",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "externalReach": "org-internal"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/supabase-community/supabase-mcp, packages/mcp-server-supabase/src/tools/branching-tools.ts @ mcp-server-supabase-v0.8.2 \u2014 list_branches lists development branches",
+        "accessedAt": "2026-07-12",
+        "notes": "Pure read; nothing to contradict."
+      }
+    },
+    {
+      "name": "delete_branch",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "deleting",
+        "reversibility": "irreversible",
+        "externalReach": "org-internal"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/supabase-community/supabase-mcp, packages/mcp-server-supabase/src/tools/branching-tools.ts @ mcp-server-supabase-v0.8.2 \u2014 delete_branch deletes a development branch",
+        "accessedAt": "2026-07-12",
+        "notes": "Deletion honestly declared destructiveHint:true; consistent."
+      }
+    },
+    {
+      "name": "merge_branch",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "mutating",
+        "reversibility": "recoverable-with-effort",
+        "externalReach": "org-internal"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/supabase-community/supabase-mcp, packages/mcp-server-supabase/src/tools/branching-tools.ts @ mcp-server-supabase-v0.8.2 \u2014 merge_branch merges branch migrations and edge functions into production",
+        "accessedAt": "2026-07-12",
+        "notes": "Changes production state; honestly declared destructiveHint:true; consistent."
+      }
+    },
+    {
+      "name": "reset_branch",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "deleting",
+        "reversibility": "irreversible",
+        "externalReach": "org-internal"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/supabase-community/supabase-mcp, packages/mcp-server-supabase/src/tools/branching-tools.ts @ mcp-server-supabase-v0.8.2 \u2014 reset_branch resets branch migrations; untracked data or schema changes are lost (per its own description)",
+        "accessedAt": "2026-07-12",
+        "notes": "Loses untracked branch state; honestly declared destructiveHint:true; consistent."
+      }
+    },
+    {
+      "name": "rebase_branch",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "mutating",
+        "reversibility": "recoverable-with-effort",
+        "externalReach": "org-internal"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "source-inspection",
+        "source": "github.com/supabase-community/supabase-mcp, packages/mcp-server-supabase/src/tools/branching-tools.ts @ mcp-server-supabase-v0.8.2 \u2014 rebase_branch replays production migrations onto the branch",
+        "accessedAt": "2026-07-12",
+        "notes": "Changes branch state; honestly declared destructiveHint:true; consistent."
+      }
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "$schema": "../schema/vocabulary.schema.json",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "limitations": [
     "Name-verb lexemes match tokens by exact word, so a noun/verb homograph is a precision hazard: a token that reads as a verb in one domain but a noun in another (e.g. `message`, which names read tools like `get_message` far more often than it names a send action; `checkout`, which is version-control far more often than payment) mis-fires on the commoner reading. Such tokens are screened out in favour of verb-dominant siblings (`send`/`post`/`reply`; `pay`/`charge`/`purchase`) or schema-corroborated entries (a destination-shaped parameter, an amount field). Every lexeme is a liability until the corpus proves it earns its place.",
     "The verb lexicon is English-centric. A tool named with a non-English verb (e.g. `supprimer`, `borrar`) will not match the name-verb signals and may derive as `uncertain`.",
@@ -8,7 +8,8 @@
     "Name and description signals are natural language and therefore inherently ambiguous; schema-shape signals are language-independent and are weighted more heavily to compensate.",
     "This is a v0 seed. Coverage of read/create/mutate/delete/send/transfer families and the two highest-signal schema shapes is deliberate; breadth grows by evidence-backed contribution, not by guessing.",
     "Name-verb and parameter-name signals match exact tokens after case and separator normalization; the data cannot see negation or prefixing. A negated description (\"does not permanently delete\") still matches a deletion phrase — one reason description-phrase weights are low — and a prefixed name (`undelete`) simply fails to match, resolving conservatively to uncertain.",
-    "`query` is deliberately excluded from the free-form-code-input parameter names: it names benign natural-language search input far more often than executable code, and search tools are the most common benign tool class. `sql`, `statement`, `command`, and `script` carry the code-input claim instead."
+    "`query` is deliberately excluded from the free-form-code-input parameter names: it names benign natural-language search input far more often than executable code, and search tools are the most common benign tool class. `sql`, `statement`, `command`, and `script` carry the code-input claim instead.",
+    "A name-verb lexeme cannot see which side of the reply boundary an effect lands on: a verb that dominantly names tools producing content in the reply (`generate`, which names type/link/command generators far more often than state creators; `install`, which in tool names frequently returns installation instructions rather than performing an install) mis-reads a read-only tool as a write. Such reply-content verbs are screened out of the write families; a variant that genuinely writes state in the world remains catchable by its schema shape (a destination or path parameter, free-form code input) or by an unambiguous sibling verb in its name."
   ],
   "entries": [
     {
@@ -42,18 +43,7 @@
       "id": "verb.create",
       "signal": {
         "kind": "name-verb",
-        "match": [
-          "create",
-          "add",
-          "insert",
-          "append",
-          "register",
-          "upload",
-          "new",
-          "generate",
-          "submit",
-          "import"
-        ]
+        "match": ["create", "add", "insert", "append", "register", "upload", "new", "submit", "import"]
       },
       "contributes": {
         "destructiveness": { "level": "additive", "weight": "medium" },
@@ -181,19 +171,7 @@
       "id": "verb.execute",
       "signal": {
         "kind": "name-verb",
-        "match": [
-          "execute",
-          "run",
-          "exec",
-          "eval",
-          "invoke",
-          "spawn",
-          "shell",
-          "compile",
-          "deploy",
-          "apply",
-          "install"
-        ]
+        "match": ["execute", "run", "exec", "eval", "invoke", "spawn", "shell", "compile", "deploy", "apply"]
       },
       "contributes": {
         "destructiveness": { "level": "mutating", "weight": "medium" },

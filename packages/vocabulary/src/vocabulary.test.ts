@@ -299,6 +299,26 @@ describe('ratification fixtures — data-layer guards', () => {
     expect(read.contributes.destructiveness?.weight).toBe('high');
   });
 
+  it('generate_typescript_types / extension_cli_install: reply-content verbs are screened out of every write family', () => {
+    // Measured across the published-server corpus, `generate` and `install` dominantly name tools
+    // that return content in the reply (generated types, links, CLI commands, installation
+    // instructions) while honestly declaring readOnlyHint:true; as write-family lexemes they read
+    // a read-only tool as a write. A state-writing variant stays catchable by its schema shape or
+    // an unambiguous sibling verb.
+    for (const entry of VOCABULARY.entries) {
+      if (entry.signal.kind !== 'name-verb') continue;
+      expect(entry.signal.match, `entry ${entry.id}`).not.toContain('generate');
+      expect(entry.signal.match, `entry ${entry.id}`).not.toContain('install');
+    }
+  });
+
+  it('reply-content-vs-world-state screening is recorded in limitations', () => {
+    const text = (VOCABULARY.limitations ?? []).join(' ').toLowerCase();
+    expect(text).toContain('reply');
+    expect(text).toContain('generate');
+    expect(text).toContain('install');
+  });
+
   it('query exclusion is recorded in limitations', () => {
     expect((VOCABULARY.limitations ?? []).join(' ').toLowerCase()).toContain('query');
   });

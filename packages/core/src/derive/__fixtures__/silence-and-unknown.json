@@ -45,6 +45,94 @@
         },
         "signals": []
       }
+    },
+    {
+      "name": "screened-reply-content-verb-generate",
+      "intent": "generate is screened out of the write families (it dominantly names tools that return generated content in the reply, e.g. types or links) -> silence, all unknown",
+      "tool": {
+        "name": "generate_typescript_types",
+        "inputSchema": {
+          "type": "object",
+          "properties": {}
+        },
+        "annotations": {
+          "unknownHints": {}
+        }
+      },
+      "expected": {
+        "profile": {
+          "reversibility": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "destructiveness": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "externalReach": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "idempotency": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "blastRadius": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          }
+        },
+        "signals": []
+      }
+    },
+    {
+      "name": "screened-reply-content-verb-install",
+      "intent": "install is screened out of the execute family (in tool names it frequently returns installation instructions rather than performing an install) -> silence, all unknown",
+      "tool": {
+        "name": "extension_cli_install",
+        "inputSchema": {
+          "type": "object",
+          "properties": {}
+        },
+        "annotations": {
+          "unknownHints": {}
+        }
+      },
+      "expected": {
+        "profile": {
+          "reversibility": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "destructiveness": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "externalReach": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "idempotency": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "blastRadius": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          }
+        },
+        "signals": []
+      }
     }
   ]
 }
