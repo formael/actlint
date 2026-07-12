@@ -56,8 +56,8 @@ Requires **Node ≥ 22**.
 schema. Reproducing a report needs all four, so you can always say exactly which judgment graded a server:
 
 ```
-actlint        0.1.1
-vocabulary     0.2.0
+actlint        0.1.2
+vocabulary     0.4.0
 crosswalk      0.1.0
 report-schema  1.0.0
 ```

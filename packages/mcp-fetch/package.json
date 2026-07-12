@@ -1,6 +1,6 @@
 {
   "name": "@formael/actlint-mcp-fetch",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "description": "IMPURE. The only network code and the only place the MCP SDK appears. Acquires a server's tools and returns a normalized ToolManifest behind an anti-corruption boundary. Depends on core ONLY via @formael/actlint-core/contracts.",
   "license": "Apache-2.0",

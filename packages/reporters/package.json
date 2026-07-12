@@ -1,6 +1,6 @@
 {
   "name": "@formael/actlint-reporters",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "description": "PURE. (ServerResult) -> string for the human scorecard, JSON, and SARIF. Pure functions over one Finding[]; no I/O, no clock.",
   "license": "Apache-2.0",

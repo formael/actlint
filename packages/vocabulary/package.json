@@ -1,6 +1,6 @@
 {
   "name": "@formael/action-risk-vocabulary",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "PURE DATA. The action-risk vocabulary, MCP-hint mapping, and standards crosswalk that back actlint. JSON-Schema'd and independently versioned so any tool can consume it as data, never code.",
   "keywords": [
     "mcp",
