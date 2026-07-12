@@ -61,6 +61,76 @@ describe('classifyTool', () => {
     expect(wr?.rationale.length).toBeGreaterThan(0);
   });
 
+  it('does not flag a generate-named tool that honestly declares readOnlyHint:true', () => {
+    // The reply-content regression case (shape of Supabase's generate_typescript_types): `generate`
+    // dominantly names tools that return generated content in the reply, so it is screened out of
+    // the write families. With no signal fired, derivation is silence, and silence cannot
+    // contradict an explicit honest declaration.
+    const out = classifyTool(
+      tool({
+        name: 'generate_typescript_types',
+        inputSchema: { type: 'object', properties: { project_id: { type: 'string' } } },
+        annotations: declared({
+          readOnly: hint.true,
+          destructive: hint.false,
+          openWorld: hint.false,
+          idempotent: hint.true,
+        }),
+      }),
+      VOCABULARY,
+    );
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    expect(findingIds(out.value)).not.toContain(RULE.writeAsReadonly as string);
+  });
+
+  it('does not flag a generate-named tool with an empty input schema and honest annotations', () => {
+    // The shape of HubSpot's hubspot-generate-feedback-link: no parameters at all, returns a URL
+    // in the reply, honestly declared read-only. A correct linter emits nothing.
+    const out = classifyTool(
+      tool({
+        name: 'hubspot-generate-feedback-link',
+        inputSchema: { type: 'object', properties: {} },
+        annotations: declared({
+          readOnly: hint.true,
+          destructive: hint.false,
+          openWorld: hint.false,
+          idempotent: hint.true,
+        }),
+      }),
+      VOCABULARY,
+    );
+    expect(out.ok).toBe(true);
+    if (out.ok) expect(out.value).toHaveLength(0);
+  });
+
+  it('does not flag an install-named tool that honestly declares readOnlyHint:true', () => {
+    // The shape of Azure's extension_cli_install, which returns installation *instructions* in the
+    // reply: `install` is screened out of the execute family for the same reply-content reason.
+    const out = classifyTool(
+      tool({
+        name: 'extension_cli_install',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            'auth-method': { type: 'string', enum: ['Credential', 'Key', 'ConnectionString'] },
+            'cli-type': { type: 'string' },
+          },
+        },
+        annotations: declared({
+          readOnly: hint.true,
+          destructive: hint.false,
+          openWorld: hint.false,
+          idempotent: hint.true,
+        }),
+      }),
+      VOCABULARY,
+    );
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    expect(findingIds(out.value)).not.toContain(RULE.writeAsReadonly as string);
+  });
+
   it('surfaces an unconstrained code parameter as an advisory (non-verdict) finding', () => {
     const out = classifyTool(
       tool({
