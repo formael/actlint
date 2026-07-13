@@ -7,10 +7,13 @@
 # build-provenance attestation, and keyless cosign signatures. Actions are pinned by full commit SHA.
 #
 # Two entry points:
-#   • push to main       — Publishes any package whose version is ahead of the registry (via OIDC), then
-#                          tags it and attaches provenance. Version bumps are made by a maintainer in a
-#                          normal reviewed PR (`pnpm changeset version`), never by this workflow: it never
-#                          opens or approves pull requests, so it needs no elevated Actions PR permission.
+#   • push to main       — `changesets/action` picks one of two modes from the state of `main`:
+#                          when unconsumed changesets are present it runs `changeset version` and
+#                          opens/updates a single long-lived "Version Packages" PR (the batched release
+#                          candidate — it accumulates every merged changeset until you choose to ship);
+#                          when none are present it publishes any package whose version is ahead of the
+#                          registry (via OIDC), tags it, and attaches provenance. Merging the Version PR
+#                          is the release trigger. This needs `pull-requests: write` to maintain that PR.
 #   • workflow_dispatch  — a dry run that builds, packs, and produces the SBOM + attestation + cosign
 #                          signatures WITHOUT publishing, so the provenance chain is verifiable on demand.
 
@@ -35,7 +38,8 @@ jobs:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
-      contents: write # create tags + GitHub Releases
+      contents: write # create tags + GitHub Releases; push the changeset-release/main branch
+      pull-requests: write # open/update the batched "Version Packages" PR
       id-token: write # OIDC: npm Trusted Publishing + provenance, keyless cosign
       attestations: write # SLSA build-provenance attestations
     steps:
@@ -64,13 +68,15 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Publish (Changesets → npm via OIDC)
+      - name: Version PR or publish (Changesets → npm via OIDC)
         id: changesets
-        # Publish-only: this workflow never opens or approves pull requests. A maintainer versions
-        # locally (`pnpm changeset version`) in a reviewed PR; on merge, any package whose version is
-        # ahead of the registry is published here and tagged with a GitHub Release.
+        # Dual-mode. When `main` carries unconsumed changesets, this opens/updates the "Version
+        # Packages" PR and does not publish; merging that PR consumes the changesets and, on the next
+        # run, this publishes any package whose version is ahead of the registry and tags a GitHub
+        # Release. The action never approves its own PR — a human reviews and merges it (CODEOWNERS).
         uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
         with:
+          version: pnpm changeset version
           publish: pnpm release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
