@@ -12,11 +12,14 @@
 import type { JsonSchema } from '../manifest.ts';
 
 // A parameter observed in the schema, reduced to exactly what the schema-shape signals ask about:
-// its declared name, its declared string `format` (if any), and whether it is an unconstrained
-// free-form string (a string with no `enum`, `const`, `pattern`, or `format` to bound it).
+// its declared name, its declared string `format` (if any), its declared JSON Schema `type`(s),
+// and whether it is an unconstrained free-form string (a string with no `enum`, `const`, `pattern`,
+// or `format` to bound it). `types` is normalized to an array: a scalar `type` becomes a
+// single-element array, a type union passes through, and an absent or malformed `type` yields `[]`.
 export interface SchemaParam {
   readonly name: string;
   readonly format?: string;
+  readonly types: readonly string[];
   readonly isFreeformString: boolean;
 }
 
@@ -28,11 +31,19 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+// The node's declared JSON Schema type(s), normalized to an array. A scalar `type` becomes a
+// single-element array; a type union keeps its string members (non-string members are dropped);
+// an absent or malformed `type` yields `[]`. Defensive: a hostile schema cannot manufacture a type.
+function declaredTypes(node: Record<string, unknown>): readonly string[] {
+  const type = node.type;
+  if (typeof type === 'string') return [type];
+  if (Array.isArray(type)) return type.filter((t): t is string => typeof t === 'string');
+  return [];
+}
+
 // Does the node declare `type: "string"` (directly or within a type union)?
 function isStringTyped(node: Record<string, unknown>): boolean {
-  const type = node.type;
-  if (type === 'string') return true;
-  return Array.isArray(type) && type.includes('string');
+  return declaredTypes(node).includes('string');
 }
 
 // A string parameter is "constrained" when the schema bounds its value — an enum, a const, a tight
@@ -44,10 +55,11 @@ function isConstrained(node: Record<string, unknown>): boolean {
 }
 
 function describeParam(name: string, node: unknown): SchemaParam {
-  if (!isRecord(node)) return { name, isFreeformString: false };
+  if (!isRecord(node)) return { name, types: [], isFreeformString: false };
   const format = typeof node.format === 'string' ? node.format : undefined;
+  const types = declaredTypes(node);
   const isFreeformString = isStringTyped(node) && !isConstrained(node);
-  return format === undefined ? { name, isFreeformString } : { name, format, isFreeformString };
+  return format === undefined ? { name, types, isFreeformString } : { name, format, types, isFreeformString };
 }
 
 // Subschema-bearing keywords whose value is a single schema.

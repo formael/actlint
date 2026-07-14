@@ -22,6 +22,7 @@ import {
   GRADE_POLICY_VERSION,
   gradePolicySchema,
   idempotencyLevelSchema,
+  jsonSchemaTypeSchema,
   MCP_MAPPING,
   MCP_MAPPING_VERSION,
   mcpMappingRowSchema,
@@ -469,6 +470,7 @@ describe('JSON Schema and Zod mirror agree', () => {
     ['idempotencyLevel', 'idempotency', idempotencyLevelSchema.options],
     ['weight', 'weight', weightSchema.options],
     ['confidence', 'confidence', vocabularyConfidenceSchema.options],
+    ['jsonSchemaType', 'typeMatches', jsonSchemaTypeSchema.options],
   ];
 
   it.each(cases)('the %s enum matches', (defName, _label, zodOptions) => {

@@ -45,6 +45,10 @@
     "idempotencyLevel": {
       "enum": ["idempotent", "non-idempotent", "unknown"]
     },
+    "jsonSchemaType": {
+      "description": "A JSON Schema type name, as a `typeMatches` constraint may name.",
+      "enum": ["array", "object", "string", "number", "integer", "boolean", "null"]
+    },
     "reversibilityContribution": {
       "type": "object",
       "additionalProperties": false,
@@ -133,6 +137,12 @@
           "type": "array",
           "items": { "type": "string", "minLength": 1 },
           "description": "JSON Schema `format` values that mark an external destination (e.g. uri, email)."
+        },
+        "typeMatches": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/jsonSchemaType" },
+          "description": "When present, a matched parameter must also declare one of these JSON Schema types. An untyped parameter never satisfies the constraint."
         },
         "unconstrained": {
           "type": "boolean",

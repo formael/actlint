@@ -77,7 +77,43 @@ describe('collectParams', () => {
     // `properties` that is not an object is ignored rather than crashing the walk.
     expect(collectParams({ properties: 'nonsense' } as unknown as JsonSchema)).toEqual([]);
     expect(collectParams({ properties: { x: null } } as unknown as JsonSchema)).toEqual([
-      { name: 'x', isFreeformString: false },
+      { name: 'x', types: [], isFreeformString: false },
     ]);
+  });
+});
+
+describe('collectParams — declared types', () => {
+  it('normalizes a scalar type to a single-element array', () => {
+    const schema: JsonSchema = { type: 'object', properties: { records: { type: 'array' } } };
+    expect(byName(collectParams(schema), 'records')?.types).toEqual(['array']);
+  });
+
+  it('passes a type union through, keeping only its string members', () => {
+    const schema: JsonSchema = {
+      type: 'object',
+      properties: { value: { type: ['object', 'null'] } },
+    };
+    expect(byName(collectParams(schema), 'value')?.types).toEqual(['object', 'null']);
+  });
+
+  it('yields an empty types array for a parameter with no declared type', () => {
+    const schema: JsonSchema = { type: 'object', properties: { anything: { description: 'x' } } };
+    expect(byName(collectParams(schema), 'anything')?.types).toEqual([]);
+  });
+
+  it('is defensive: a malformed type (number, object) contributes no types', () => {
+    const schema = {
+      type: 'object',
+      properties: {
+        a: { type: 42 },
+        b: { type: { nested: true } },
+        c: { type: [1, 'string', null] },
+      },
+    } as unknown as JsonSchema;
+    const params = collectParams(schema);
+    expect(byName(params, 'a')?.types).toEqual([]);
+    expect(byName(params, 'b')?.types).toEqual([]);
+    // A union keeps only its string members; non-string entries are dropped.
+    expect(byName(params, 'c')?.types).toEqual(['string']);
   });
 });
