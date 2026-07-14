@@ -2,7 +2,7 @@
 
 exports[`jsonReporter (the machine report) > renders a spotless server 1`] = `
 "{
-  "reportSchemaVersion": "1.0.0",
+  "reportSchemaVersion": "1.1.0",
   "tool": "actlint",
   "actlintVersion": "0.1.0",
   "vocabularyVersion": "0.1.0",
@@ -17,7 +17,14 @@ exports[`jsonReporter (the machine report) > renders a spotless server 1`] = `
     "underDeclared": 0,
     "undeclared": 0,
     "overDeclared": 0,
-    "consistent": 5
+    "consistent": 5,
+    "unassessed": 0
+  },
+  "coverage": {
+    "assessedTools": 5,
+    "unassessedTools": 0,
+    "annotatedTools": 5,
+    "unassessedToolNames": []
   },
   "findings": []
 }
@@ -26,7 +33,7 @@ exports[`jsonReporter (the machine report) > renders a spotless server 1`] = `
 
 exports[`jsonReporter (the machine report) > renders the mixed server the same way every time 1`] = `
 "{
-  "reportSchemaVersion": "1.0.0",
+  "reportSchemaVersion": "1.1.0",
   "tool": "actlint",
   "actlintVersion": "0.1.0",
   "vocabularyVersion": "0.1.0",
@@ -41,7 +48,14 @@ exports[`jsonReporter (the machine report) > renders the mixed server the same w
     "underDeclared": 2,
     "undeclared": 1,
     "overDeclared": 1,
-    "consistent": 6
+    "consistent": 6,
+    "unassessed": 0
+  },
+  "coverage": {
+    "assessedTools": 10,
+    "unassessedTools": 0,
+    "annotatedTools": 10,
+    "unassessedToolNames": []
   },
   "findings": [
     {

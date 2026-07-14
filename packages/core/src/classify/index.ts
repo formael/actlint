@@ -7,6 +7,7 @@
 export { advisories } from './advisories.ts';
 export { classify } from './classify.ts';
 export { classifyManifest, classifyTool } from './classify-tool.ts';
+export { assessManifest } from './coverage.ts';
 export { lookupStandards, missingCrosswalkEntries } from './crosswalk.ts';
 export type { MakeFindingInput } from './make-finding.ts';
 export { makeFinding } from './make-finding.ts';

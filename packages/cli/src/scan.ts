@@ -11,7 +11,7 @@
 // reporters'. It only sequences them and decides which exit code the finished result implies.
 
 import type { Finding, Outcome, ServerResult, ToolManifest } from '@formael/actlint-core';
-import { classifyManifest } from '@formael/actlint-core';
+import { assessManifest, classifyManifest } from '@formael/actlint-core';
 import type { IngestError, IngestOptions, IngestSource } from '@formael/actlint-mcp-fetch';
 import { humanReporter, jsonReporter, sarifReporter } from '@formael/actlint-reporters';
 import type { OutputFormat } from './args.ts';
@@ -128,6 +128,9 @@ export async function runScan(resolved: ResolvedScan, ctx: RunContext): Promise<
   }
   const allFindings = classified.value;
   const toolCount = manifest.tools.length;
+  // Coverage is computed over the full finding set, before any baseline: a tool whose finding a
+  // baseline suppresses was still assessed. It is metadata, not a finding, and never gates.
+  const coverage = assessManifest(manifest, loaded.loaded.vocabulary, allFindings);
 
   // --write-baseline records the current findings as accepted and stops. It is a capture action, not
   // a gate run, so it never fails the build.
@@ -164,6 +167,7 @@ export async function runScan(resolved: ResolvedScan, ctx: RunContext): Promise<
     source: manifest.source,
     findings: visibleFindings,
     toolCount,
+    coverage,
     versions: runVersions,
   });
   const report = render(result, resolved.format, wantsColor(resolved, ctx));

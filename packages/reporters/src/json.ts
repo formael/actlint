@@ -54,7 +54,8 @@ export function jsonReporter(result: ServerResult): string {
     crosswalkVersion: result.crosswalkVersion,
     source: renderSource(result.source),
     grade: result.grade,
-    summary: summarize(result.findings, result.toolCount),
+    summary: summarize(result.findings, result.toolCount, result.coverage.unassessedTools),
+    coverage: result.coverage,
     findings: result.findings.map(renderFinding),
   };
   return `${JSON.stringify(report, null, 2)}\n`;

@@ -47,7 +47,7 @@ describe('jsonReporter (the machine report)', () => {
   it('carries the reproducibility metadata (which judgment produced this)', () => {
     const report = JSON.parse(jsonReporter(mixedResult())) as Record<string, unknown>;
     expect(report).toMatchObject({
-      reportSchemaVersion: '1.0.0',
+      reportSchemaVersion: '1.1.0',
       tool: 'actlint',
       vocabularyVersion: '0.1.0',
       crosswalkVersion: '0.1.0',
@@ -62,6 +62,17 @@ describe('jsonReporter (the machine report)', () => {
       undeclared: 1,
       overDeclared: 1,
       consistent: 6,
+      unassessed: 0,
+    });
+  });
+
+  it('carries assessment coverage beside the summary', () => {
+    const report = JSON.parse(jsonReporter(mixedResult())) as { coverage: unknown };
+    expect(report.coverage).toEqual({
+      assessedTools: 10,
+      unassessedTools: 0,
+      annotatedTools: 10,
+      unassessedToolNames: [],
     });
   });
 

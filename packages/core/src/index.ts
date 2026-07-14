@@ -12,6 +12,7 @@ export {
   ADVISORY_RULES,
   ALL_RULE_IDS,
   advisories,
+  assessManifest,
   classify,
   classifyManifest,
   classifyTool,
@@ -93,6 +94,6 @@ export { isoTimestampSchema, Redacted, redactedSchema, ruleIdSchema } from './pr
 export type { Report, ReportSummary } from './report-schema.ts';
 // The `--json` report schema — a versioned public API (single source of truth for the payload shape)
 export { REPORT_SCHEMA_VERSION, reportSchema } from './report-schema.ts';
-export type { ServerGrade, ServerResult } from './server-result.ts';
-// Server-level result (what reporters and the CLI consume) and the honesty grade
-export { serverGradeSchema } from './server-result.ts';
+export type { Coverage, ServerGrade, ServerResult } from './server-result.ts';
+// Server-level result (what reporters and the CLI consume), assessment coverage, and the honesty grade
+export { coverageSchema, serverGradeSchema } from './server-result.ts';

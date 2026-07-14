@@ -15,7 +15,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { EXIT } from './exit-codes.ts';
 import { run } from './run.ts';
 import type { RunContext } from './scan.ts';
-import { CLEAN_MANIFEST, DISHONEST_MANIFEST, UNDECLARED_MANIFEST } from './test-manifests.ts';
+import {
+  CLEAN_MANIFEST,
+  DISHONEST_MANIFEST,
+  SILENT_SERVER_MANIFEST,
+  UNASSESSED_MANIFEST,
+  UNDECLARED_MANIFEST,
+} from './test-manifests.ts';
 
 let workdir: string;
 
@@ -122,6 +128,40 @@ describe('output formats', () => {
   it('renders a stable human scorecard', async () => {
     const result = await run(['--manifest', '-'], ctx({ stdin: DISHONEST_MANIFEST }));
     expect(result.stdout).toMatchSnapshot();
+  });
+});
+
+describe('assessment coverage (silence is not honesty)', () => {
+  it('reports an opaque, signal-free tool as unassessed, not consistent', async () => {
+    const result = await run(['--json', '--manifest', '-'], ctx({ stdin: UNASSESSED_MANIFEST }));
+    expect(result.exitCode).toBe(EXIT.clean);
+    const report = JSON.parse(result.stdout) as {
+      grade: string;
+      summary: { consistent: number; unassessed: number };
+      coverage: { assessedTools: number; unassessedTools: number; unassessedToolNames: string[] };
+    };
+    // Grade is unchanged (an unassessed tool is not punished), but it is no longer counted consistent.
+    expect(report.grade).toBe('A');
+    expect(report.summary.consistent).toBe(0);
+    expect(report.summary.unassessed).toBe(1);
+    expect(report.coverage.unassessedTools).toBe(1);
+    expect(report.coverage.unassessedToolNames).toEqual(['zorp_widget']);
+  });
+
+  it('qualifies the grade in the scorecard when a tool could not be assessed', async () => {
+    const result = await run(['--manifest', '-'], ctx({ stdin: UNASSESSED_MANIFEST }));
+    expect(result.stdout).toContain('(assessed 0 of 1 tool)');
+    expect(result.stdout).toContain('not assessable (no recognized risk signals)');
+    expect(result.stdout).toContain('Not assessable is not verified honest');
+  });
+
+  it('surfaces annotatedTools: 0 for a server that declares no annotations anywhere', async () => {
+    const json = await run(['--json', '--manifest', '-'], ctx({ stdin: SILENT_SERVER_MANIFEST }));
+    const report = JSON.parse(json.stdout) as { coverage: { annotatedTools: number } };
+    expect(report.coverage.annotatedTools).toBe(0);
+
+    const human = await run(['--manifest', '-'], ctx({ stdin: SILENT_SERVER_MANIFEST }));
+    expect(human.stdout).toContain('0 of 2 declare annotations');
   });
 });
 

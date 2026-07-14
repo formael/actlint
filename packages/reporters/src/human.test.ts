@@ -5,7 +5,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { cleanResult, mixedResult } from './fixtures.ts';
+import { cleanResult, mixedResult, silentServerResult, unassessedResult } from './fixtures.ts';
 import { humanReporter } from './human.ts';
 
 const ESC = '';
@@ -21,6 +21,29 @@ describe('humanReporter (the scorecard)', () => {
 
   it('renders a spotless server', () => {
     expect(humanReporter(cleanResult())).toMatchSnapshot();
+  });
+
+  it('renders a server with unassessed tools (qualified grade, not-assessable footer)', () => {
+    expect(humanReporter(unassessedResult())).toMatchSnapshot();
+  });
+
+  it('renders a server that declares no annotations anywhere', () => {
+    expect(humanReporter(silentServerResult())).toMatchSnapshot();
+  });
+
+  it('qualifies the grade and never presents an unassessed tool as consistent', () => {
+    const out = humanReporter(unassessedResult());
+    expect(out).toContain('(assessed 9 of 12 tools)');
+    expect(out).toContain('9 of 12 tools consistent');
+    expect(out).toContain('3 not assessable (no recognized risk signals)');
+    expect(out).toContain('Not assessable is not verified honest');
+  });
+
+  it('surfaces a zero annotation surface without claiming anything unassessed', () => {
+    const out = humanReporter(silentServerResult());
+    expect(out).toContain('0 of 4 declare annotations');
+    expect(out).not.toContain('not assessable');
+    expect(out).not.toContain('(assessed');
   });
 
   it('puts the grade in the headline', () => {

@@ -9,6 +9,7 @@
 import {
   type ActionRiskProfile,
   type Confidence,
+  type Coverage,
   type DeclaredHint,
   type DeclaredProfile,
   type Dimension,
@@ -86,6 +87,7 @@ export function buildFinding(spec: FindingSpec): Finding {
 export interface ServerResultOptions {
   readonly source?: ManifestSource;
   readonly toolCount?: number;
+  readonly coverage?: Coverage;
   readonly actlintVersion?: string;
   readonly vocabularyVersion?: string;
   readonly crosswalkVersion?: string;
@@ -95,17 +97,25 @@ export interface ServerResultOptions {
 /**
  * Assemble a ServerResult the way the shell will: findings in, grade computed by gradeServer, fixed
  * metadata so snapshots are stable. `toolCount` defaults to the number of distinct tools with a
- * finding; pass a larger value to model consistent tools that produced none.
+ * finding; pass a larger value to model consistent tools that produced none. `coverage` defaults to
+ * a fully-assessed, fully-annotated server; override it to exercise the unassessed/silent paths.
  */
 export function serverResult(findings: readonly Finding[], options: ServerResultOptions = {}): ServerResult {
   const distinctTools = new Set(findings.map((f) => f.toolName)).size;
   const toolCount = options.toolCount ?? distinctTools;
+  const coverage: Coverage = options.coverage ?? {
+    assessedTools: toolCount,
+    unassessedTools: 0,
+    annotatedTools: toolCount,
+    unassessedToolNames: [],
+  };
   return {
     source: options.source ?? { kind: 'server-card', url: 'https://example.com/.well-known/mcp' },
     findings,
     toolCount,
     grade: gradeServer(findings, toolCount),
-    reportSchemaVersion: options.reportSchemaVersion ?? '1.0.0',
+    coverage,
+    reportSchemaVersion: options.reportSchemaVersion ?? '1.1.0',
     actlintVersion: options.actlintVersion ?? '0.1.0',
     vocabularyVersion: options.vocabularyVersion ?? '0.1.0',
     crosswalkVersion: options.crosswalkVersion ?? '0.1.0',

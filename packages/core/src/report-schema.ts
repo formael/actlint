@@ -24,7 +24,7 @@ import { serverGradeSchema } from './server-result.ts';
  * versions. A breaking change to the report shape is a MAJOR bump here, tracked separately so an
  * integrator can pin the payload contract without pinning the tool.
  */
-export const REPORT_SCHEMA_VERSION = '1.0.0';
+export const REPORT_SCHEMA_VERSION = '1.1.0';
 
 // The source, as rendered: the live transport's endpoint is redacted to a fixed string so a report
 // never carries a credential-bearing URL.
@@ -36,7 +36,8 @@ const reportSourceSchema = z.discriminatedUnion('kind', [
 ]);
 
 // Per-tool honesty tally. Each scanned tool is counted once, under its worst verdict, so the four
-// buckets plus `consistent` sum to `tools`.
+// buckets plus `consistent` and `unassessed` sum to `tools`. `unassessed` is additive-optional
+// (report-schema 1.1.0): a tool actlint found no verdict-bearing signal for is not `consistent`.
 const reportSummarySchema = z
   .object({
     tools: z.number().int().nonnegative(),
@@ -44,6 +45,18 @@ const reportSummarySchema = z
     undeclared: z.number().int().nonnegative(),
     overDeclared: z.number().int().nonnegative(),
     consistent: z.number().int().nonnegative(),
+    unassessed: z.number().int().nonnegative().optional(),
+  })
+  .strict();
+
+// Assessment coverage (report-schema 1.1.0, additive-optional): how many tools carried a
+// verdict-bearing signal, how many did not, and how many declare an MCP annotation.
+const reportCoverageSchema = z
+  .object({
+    assessedTools: z.number().int().nonnegative(),
+    unassessedTools: z.number().int().nonnegative(),
+    annotatedTools: z.number().int().nonnegative(),
+    unassessedToolNames: z.array(z.string()),
   })
   .strict();
 
@@ -75,6 +88,7 @@ export const reportSchema = z
     source: reportSourceSchema,
     grade: serverGradeSchema,
     summary: reportSummarySchema,
+    coverage: reportCoverageSchema.optional(),
     findings: z.array(reportFindingSchema),
   })
   .strict()

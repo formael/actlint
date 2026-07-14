@@ -18,6 +18,14 @@ exports[`sarifReporter (SARIF 2.1.0) > renders a spotless server 1`] = `
           "uri": "https://example.com/.well-known/mcp"
         }
       },
+      "properties": {
+        "coverage": {
+          "assessedTools": 5,
+          "unassessedTools": 0,
+          "annotatedTools": 5,
+          "unassessedToolNames": []
+        }
+      },
       "results": []
     }
   ]
@@ -139,6 +147,14 @@ exports[`sarifReporter (SARIF 2.1.0) > renders the mixed server the same way eve
       "originalUriBaseIds": {
         "SERVER": {
           "uri": "https://example.com/.well-known/mcp"
+        }
+      },
+      "properties": {
+        "coverage": {
+          "assessedTools": 10,
+          "unassessedTools": 0,
+          "annotatedTools": 10,
+          "unassessedToolNames": []
         }
       },
       "results": [
