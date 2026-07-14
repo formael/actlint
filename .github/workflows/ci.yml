@@ -1,9 +1,8 @@
 # SPDX-FileCopyrightText: 2026 Formael
 # SPDX-License-Identifier: Apache-2.0
 #
-# The PR gate. This is the pull-request contract only; the full release / provenance posture
-# (OIDC publishing, SBOM, SLSA, cosign, OpenSSF Scorecard) is deferred. Actions are pinned by
-# full commit SHA; bumps are automated later via Renovate/Dependabot.
+# The PR gate: build, typecheck, lint, test, guards, eval. Release and Scorecard live in
+# release.yml and scorecard.yml.
 
 name: CI
 
@@ -12,7 +11,6 @@ on:
   push:
     branches: [main]
 
-# Least-privilege by default: no token scopes at the workflow level; each job grants only what it needs.
 permissions: {}
 
 concurrency:

@@ -235,8 +235,9 @@ pnpm check       # the full local gate: typecheck + lint + test + guards
 
 Individual gates: `pnpm build`, `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm guards`.
 
-actlint publishes token-lessly (npm Trusted Publishing over OIDC) with automatic provenance, a CycloneDX
-SBOM, SLSA build provenance, and cosign signatures — it practises the honesty it lints.
+actlint publishes token-lessly (npm Trusted Publishing over OIDC) with Sigstore-logged SLSA provenance
+over every published tarball — verify any install with `npm audit signatures`. It practises the honesty
+it lints.
 
 **Contributions:** actlint is not accepting external code contributions yet while the v0.x foundations
 settle. Bug reports and issues are welcome.

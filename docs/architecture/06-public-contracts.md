@@ -108,7 +108,10 @@ pinning the others.
 ## Distribution
 
 Releases are automated with Changesets. Publishing uses npm Trusted Publishing over OIDC, so no
-long-lived npm token exists anywhere in the project. Every release carries npm provenance, a
-CycloneDX SBOM, an SLSA build-provenance attestation, and keyless cosign signatures. The GitHub
-Action is distributed by git tag and documented for SHA-pinned use. A security tool asks users to
-trust its supply chain, so the release pipeline is built to make that trust verifiable.
+long-lived npm token exists anywhere in the project. Every published package carries npm
+provenance: npm generates a SLSA build-provenance attestation over the exact published tarball,
+logs it in the Sigstore transparency log, and serves it from the registry — verifiable with
+`npm audit signatures`. The npm tarball is the artifact of record; GitHub Releases carry no binary
+assets, so there is exactly one chain of custody to keep honest. The GitHub Action is distributed
+by git tag and documented for SHA-pinned use. A security tool asks users to trust its supply
+chain, so the release pipeline is built to make that trust verifiable.
