@@ -80,10 +80,23 @@ export type Contributes = z.infer<typeof contributesSchema>;
 
 const lexicalMatchSchema = z.array(z.string().min(1)).min(1);
 
+// The JSON Schema type names a `typeMatches` constraint may name.
+export const jsonSchemaTypeSchema = z.enum([
+  'array',
+  'object',
+  'string',
+  'number',
+  'integer',
+  'boolean',
+  'null',
+]);
+export type JsonSchemaType = z.infer<typeof jsonSchemaTypeSchema>;
+
 const schemaShapeMatchSchema = z
   .object({
     paramNameMatches: z.array(z.string().min(1)).optional(),
     stringFormatMatches: z.array(z.string().min(1)).optional(),
+    typeMatches: z.array(jsonSchemaTypeSchema).min(1).optional(),
     unconstrained: z.boolean().optional(),
   })
   .strict()

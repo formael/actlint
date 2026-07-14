@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { parseVocabulary, type Vocabulary } from '@formael/action-risk-vocabulary';
+import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
 
 import type { JsonSchema } from '../manifest.ts';
@@ -59,6 +60,16 @@ const vocab: Vocabulary = parseVocabulary({
       signal: { kind: 'schema-shape', match: { paramNameMatches: ['webhook', 'url'] } },
       contributes: { externalReach: { level: 'open-world', weight: 'medium' } },
       evidence: 'a destination-shaped name reaches outward',
+      confidence: 'medium',
+    },
+    {
+      id: 'shape.write-collection',
+      signal: {
+        kind: 'schema-shape',
+        match: { paramNameMatches: ['update', 'create'], typeMatches: ['array', 'object'] },
+      },
+      contributes: { destructiveness: { level: 'mutating', weight: 'medium' } },
+      evidence: 'a write-named parameter carrying a container of records mutates state',
       confidence: 'medium',
     },
   ],
@@ -127,5 +138,50 @@ describe('schemaShapeSignals', () => {
     // `webhook` matches; `curl_opts` tokenizes to [curl, opts] and never matches `url`.
     expect(ids(schemaShapeSignals(obj({ webhook: { type: 'string' } }), vocab))).toEqual(['shape.dest-name']);
     expect(schemaShapeSignals(obj({ curl_opts: { type: 'string' } }), vocab)).toEqual([]);
+  });
+});
+
+describe('schemaShapeSignals — typeMatches conjunction', () => {
+  it('fires only when both the name and the declared type match', () => {
+    expect(ids(schemaShapeSignals(obj({ update: { type: 'array' } }), vocab))).toEqual([
+      'shape.write-collection',
+    ]);
+    expect(ids(schemaShapeSignals(obj({ create: { type: 'object' } }), vocab))).toEqual([
+      'shape.write-collection',
+    ]);
+  });
+
+  it('does not fire on a name hit whose declared type is not one of typeMatches', () => {
+    // `update: boolean` is a flag, not a collection of records — the constraint filters it out.
+    expect(schemaShapeSignals(obj({ update: { type: 'boolean' } }), vocab)).toEqual([]);
+  });
+
+  it('does not fire on a type hit whose name does not match', () => {
+    // An array-typed parameter with an unrelated name carries no write signal.
+    expect(schemaShapeSignals(obj({ tags: { type: 'array' } }), vocab)).toEqual([]);
+  });
+
+  it('does not fire on an untyped name hit (an untyped param cannot manufacture the signal)', () => {
+    expect(schemaShapeSignals(obj({ update: { description: 'no declared type' } }), vocab)).toEqual([]);
+  });
+
+  // A malformed or hostile schema must not be able to synthesize the type half of the conjunction:
+  // whatever a name-hit parameter declares as its `type`, if it is not one of the required types the
+  // write-collection signal stays silent. Nodes without a valid required type can never fire it.
+  it('is conservative: a name hit whose type is not one of typeMatches never fires (property)', () => {
+    const nonMatchingType = fc.oneof(
+      fc.constant(undefined),
+      fc.constantFrom('string', 'number', 'integer', 'boolean', 'null'),
+      fc.integer(),
+      fc.dictionary(fc.string(), fc.anything()),
+      fc.array(fc.constantFrom('string', 'number', 'boolean')),
+    );
+    fc.assert(
+      fc.property(fc.constantFrom('update', 'create'), nonMatchingType, (name, type) => {
+        const node = type === undefined ? { description: 'x' } : { type };
+        const fired = ids(schemaShapeSignals(obj({ [name]: node }), vocab));
+        expect(fired).not.toContain('shape.write-collection');
+      }),
+    );
   });
 });

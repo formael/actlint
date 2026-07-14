@@ -81,11 +81,25 @@ function paramNameHit(param: SchemaParam, names: readonly string[]): boolean {
   });
 }
 
+// Does a parameter declare one of the required JSON types? A param with no declared type never
+// satisfies the constraint — conservative: an untyped param cannot manufacture the type signal.
+function paramTypeHit(param: SchemaParam, types: readonly string[]): boolean {
+  return param.types.some((declared) => types.includes(declared));
+}
+
 function schemaShapeFires(match: SchemaShapeMatch, params: readonly SchemaParam[]): boolean {
   if (match.paramNameMatches !== undefined) {
     const names = match.paramNameMatches;
     const requireFreeform = match.unconstrained === true;
-    if (params.some((p) => paramNameHit(p, names) && (!requireFreeform || p.isFreeformString))) {
+    const types = match.typeMatches;
+    if (
+      params.some(
+        (p) =>
+          paramNameHit(p, names) &&
+          (!requireFreeform || p.isFreeformString) &&
+          (types === undefined || paramTypeHit(p, types)),
+      )
+    ) {
       return true;
     }
   }
