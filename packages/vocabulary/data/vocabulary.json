@@ -1,6 +1,6 @@
 {
   "$schema": "../schema/vocabulary.schema.json",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "limitations": [
     "Name-verb lexemes match tokens by exact word, so a noun/verb homograph is a precision hazard: a token that reads as a verb in one domain but a noun in another (e.g. `message`, which names read tools like `get_message` far more often than it names a send action; `checkout`, which is version-control far more often than payment) mis-fires on the commoner reading. Such tokens are screened out in favour of verb-dominant siblings (`send`/`post`/`reply`; `pay`/`charge`/`purchase`) or schema-corroborated entries (a destination-shaped parameter, an amount field). Every lexeme is a liability until the corpus proves it earns its place.",
     "The verb lexicon is English-centric. A tool named with a non-English verb (e.g. `supprimer`, `borrar`) will not match the name-verb signals and may derive as `uncertain`.",
@@ -9,7 +9,9 @@
     "This is a v0 seed. Coverage of read/create/mutate/delete/send/transfer families and the two highest-signal schema shapes is deliberate; breadth grows by evidence-backed contribution, not by guessing.",
     "Name-verb and parameter-name signals match exact tokens after case and separator normalization; the data cannot see negation or prefixing. A negated description (\"does not permanently delete\") still matches a deletion phrase — one reason description-phrase weights are low — and a prefixed name (`undelete`) simply fails to match, resolving conservatively to uncertain.",
     "`query` is deliberately excluded from the free-form-code-input parameter names: it names benign natural-language search input far more often than executable code, and search tools are the most common benign tool class. `sql`, `statement`, `command`, and `script` carry the code-input claim instead.",
-    "A name-verb lexeme cannot see which side of the reply boundary an effect lands on: a verb that dominantly names tools producing content in the reply (`generate`, which names type/link/command generators far more often than state creators; `install`, which in tool names frequently returns installation instructions rather than performing an install) mis-reads a read-only tool as a write. Such reply-content verbs are screened out of the write families; a variant that genuinely writes state in the world remains catchable by its schema shape (a destination or path parameter, free-form code input) or by an unambiguous sibling verb in its name."
+    "A name-verb lexeme cannot see which side of the reply boundary an effect lands on: a verb that dominantly names tools producing content in the reply (`generate`, which names type/link/command generators far more often than state creators; `install`, which in tool names frequently returns installation instructions rather than performing an install) mis-reads a read-only tool as a write. Such reply-content verbs are screened out of the write families; a variant that genuinely writes state in the world remains catchable by its schema shape (a destination or path parameter, free-form code input, a write-operation parameter) or by an unambiguous sibling verb in its name.",
+    "Several write-adjacent tokens are deliberately screened out of the write families as noun/verb homographs or ambiguous-direction verbs. `store`, `record`, `snapshot`, and `commit` name a noun at least as often as an action — `get_store`, `get_record`, `get_snapshot`, and `get_commit` are reads — and because matching is by any name token, admitting them would manufacture a mutating derivation inside those reads. `stage` is ambiguous, and `load` reads state as often as it writes it. A tool that genuinely persists or removes state under such a name stays catchable by the language-independent write-operation schema shapes (`shape.write-operation-keys`, `shape.delete-operation-keys`), which rest on the input structure rather than the name.",
+    "The write-operation schema shapes require the matched parameter to be an array — a batch of records to write or targets to remove. A single object is deliberately not enough: a read tool's `filter` or `where` object can be named for a write op (`update`, `set`) yet carry no write, and an object is structurally indistinguishable from such a filter, so admitting it would risk a high-severity false read-only flag on an honest read. An array of records is the unambiguous bulk-write signal; a single-object write under an out-of-vocabulary name resolves conservatively to silence."
   ],
   "entries": [
     {
@@ -43,7 +45,23 @@
       "id": "verb.create",
       "signal": {
         "kind": "name-verb",
-        "match": ["create", "add", "insert", "append", "register", "upload", "new", "submit", "import"]
+        "match": [
+          "create",
+          "add",
+          "insert",
+          "append",
+          "register",
+          "upload",
+          "new",
+          "submit",
+          "import",
+          "provision",
+          "ingest",
+          "seed",
+          "clone",
+          "duplicate",
+          "copy"
+        ]
       },
       "contributes": {
         "destructiveness": { "level": "additive", "weight": "medium" },
@@ -77,7 +95,16 @@
           "write",
           "overwrite",
           "save",
-          "upsert"
+          "upsert",
+          "populate",
+          "sync",
+          "synchronize",
+          "migrate",
+          "persist",
+          "materialize",
+          "rotate",
+          "merge",
+          "restore"
         ]
       },
       "contributes": {
@@ -288,6 +315,37 @@
         "externalReach": { "level": "open-world", "weight": "medium" }
       },
       "evidence": "A parameter named like a communication destination — a URL, webhook, recipient, or channel — suggests the tool can reach outside the local boundary; a bare name is weaker evidence than a declared format.",
+      "confidence": "medium"
+    },
+    {
+      "id": "shape.write-operation-keys",
+      "signal": {
+        "kind": "schema-shape",
+        "match": {
+          "paramNameMatches": ["create", "update", "upsert", "patch", "insert", "replace", "set", "add"],
+          "typeMatches": ["array"]
+        }
+      },
+      "contributes": {
+        "destructiveness": { "level": "mutating", "weight": "medium" }
+      },
+      "evidence": "An input parameter named like a write operation whose value is an array of records is structural evidence that the tool stages or applies changes to state, independent of what the tool is named.",
+      "confidence": "medium"
+    },
+    {
+      "id": "shape.delete-operation-keys",
+      "signal": {
+        "kind": "schema-shape",
+        "match": {
+          "paramNameMatches": ["delete", "remove", "destroy"],
+          "typeMatches": ["array"]
+        }
+      },
+      "contributes": {
+        "destructiveness": { "level": "deleting", "weight": "medium" },
+        "reversibility": { "level": "unknown", "weight": "low" }
+      },
+      "evidence": "An input parameter named like a delete operation whose value is an array of targets is structural evidence the tool can remove state; whether removal is recoverable is not determinable from the shape.",
       "confidence": "medium"
     }
   ]

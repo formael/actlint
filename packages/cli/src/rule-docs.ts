@@ -27,7 +27,7 @@ export const RULE_DOCS: Readonly<Record<string, RuleDoc>> = {
   'write-as-readonly': {
     title: 'Write declared as read-only',
     meaning:
-      'The tool declares readOnlyHint: true, but its name, description, and schema derive an action that writes.',
+      'The tool declares readOnlyHint: true, but its name, description, and schema derive an action that writes. This finding can rest on the input schema alone — a write-operation parameter (an array of records keyed create/update/delete) — independent of the tool’s name.',
     reason:
       'readOnlyHint: true is an explicit claim that a tool cannot change state. A client may skip a confirmation prompt on that claim. If the tool in fact mutates or deletes, the claim removed a safety step that would otherwise have been shown.',
     example: 'A tool named `exec_sql` with a free-form `sql` parameter, annotated readOnlyHint: true.',
@@ -53,7 +53,8 @@ export const RULE_DOCS: Readonly<Record<string, RuleDoc>> = {
   },
   'destructive-absent': {
     title: 'Destructive action, no destructive hint',
-    meaning: 'The tool derives a destructive write and declares no destructiveHint either way.',
+    meaning:
+      'The tool derives a destructive write and declares no destructiveHint either way. The write can be read from the input schema — a write-operation parameter (an array of records) — independent of the tool’s name.',
     reason:
       'This is an informational nudge, not a false claim: the MCP spec default already treats an absent destructiveHint as destructive, so a spec-following client still prompts. Declaring it explicitly makes the tool self-describing.',
     example: 'A tool named `drop_table` with no annotations block.',

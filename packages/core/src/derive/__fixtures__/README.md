@@ -10,12 +10,18 @@ Each file here is the **executable spec** for one signal family: a set of input 
 acceptance criteria for `derive`.
 
 - `name-verb.json` — the tool name is the sole evidence; one case per verb family, plus a write-family
-  case pinning that `write`/`overwrite`/`save`/`upsert` names resolve to the mutating family.
+  case pinning that `write`/`overwrite`/`save`/`upsert` names resolve to the mutating family, and
+  cases pinning a broadened lexeme (`migrate`, `provision`) to its family.
 - `description-phrase.json` — prose as low-weight, supporting evidence (and a phrase-only case that
   stays low-confidence).
 - `schema-shape.json` — the typed schema walk: declared formats, destination-shaped names, free-form
   code input, a **nested** destination found through an object, and a constrained string that is
-  deliberately *not* free-form.
+  deliberately *not* free-form. Also the write-operation shapes: a `create`/`update`
+  array-of-records param derives `mutating` and a `delete` array param derives `deleting` (with
+  reversibility an evidence-backed unknown, never asserted irreversible) independent of the tool's
+  name; a write-op name on a scalar param does **not** fire, and neither does a write-op-named
+  *object* filter — only an array of records is the write signal, because an object is
+  indistinguishable from a read tool's filter.
 - `worked-example.json` — the end-to-end `exec_sql` case; the dishonest `readOnly: true` annotation is
   ignored because derivation is declaration-blind.
 - `silence-and-unknown.json` — no matched signal derives all-`unknown`; blast radius is `unknown`,

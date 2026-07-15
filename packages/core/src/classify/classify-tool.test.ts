@@ -131,6 +131,83 @@ describe('classifyTool', () => {
     expect(findingIds(out.value)).not.toContain(RULE.writeAsReadonly as string);
   });
 
+  it('flags a silent, out-of-vocabulary write tool as destructive-absent from its schema shape', () => {
+    // The verb-recall case: `reconcile` is in no verb family, so the name is silent. The write is
+    // carried entirely by the schema — `create`/`update` operation params typed as collections —
+    // which derives `mutating`. Fully unannotated, the spec default already prompts, so this is the
+    // informational destructive-absent nudge, not an accusation.
+    const out = classifyTool(
+      tool({
+        name: 'reconcile_ledger',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            create: { type: 'array', items: { type: 'object' } },
+            update: { type: 'array', items: { type: 'object' } },
+          },
+        },
+      }),
+      VOCABULARY,
+    );
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    const da = out.value.find((f) => f.ruleId === RULE.destructiveAbsent);
+    expect(
+      da,
+      'a write-shaped schema must derive a destructive write even with an unknown verb',
+    ).toBeDefined();
+    expect(da?.verdict).toBe('undeclared');
+    expect(da?.rationale.length).toBeGreaterThan(0);
+  });
+
+  it('flags an out-of-vocabulary write tool declaring readOnlyHint:true as critical write-as-readonly', () => {
+    // The dangerous residual case: the same write-shaped schema under an unknown verb, now carrying a
+    // false readOnlyHint:true. The schema evidence is what lets the top-severity rule fire where the
+    // name alone would have derived silence and let the false claim through.
+    const out = classifyTool(
+      tool({
+        name: 'reconcile_ledger',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            create: { type: 'array', items: { type: 'object' } },
+            update: { type: 'array', items: { type: 'object' } },
+          },
+        },
+        annotations: declared({ readOnly: hint.true }),
+      }),
+      VOCABULARY,
+    );
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    const wr = out.value.find((f) => f.ruleId === RULE.writeAsReadonly);
+    expect(wr, 'a write-shaped schema under readOnlyHint:true must produce write-as-readonly').toBeDefined();
+    expect(wr?.verdict).toBe('under-declared');
+    expect(wr?.severity).toBe('critical');
+  });
+
+  it('does not flag a read tool whose write-op-named filter is an object, even under readOnlyHint:true', () => {
+    // The benign-conflict gate, closed by construction: a read tool carrying an `update` *object*
+    // filter. The write-op shape requires an array of records, so an object filter never fires; the
+    // tool derives silence, and its honest readOnlyHint:true stays consistent. This is the guard
+    // against the highest-severity false positive — a false write-as-readonly on an honest read.
+    const out = classifyTool(
+      tool({
+        name: 'get_changes',
+        inputSchema: {
+          type: 'object',
+          properties: { update: { type: 'object', properties: { since: { type: 'string' } } } },
+        },
+        annotations: declared({ readOnly: hint.true }),
+      }),
+      VOCABULARY,
+    );
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    expect(findingIds(out.value)).not.toContain(RULE.writeAsReadonly as string);
+    expect(out.value.filter((f) => f.ruleClass === 'honesty')).toHaveLength(0);
+  });
+
   it('surfaces an unconstrained code parameter as an advisory (non-verdict) finding', () => {
     const out = classifyTool(
       tool({
