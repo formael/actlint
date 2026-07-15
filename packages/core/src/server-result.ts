@@ -16,6 +16,21 @@ import type { ManifestSource } from './manifest.ts';
 export const serverGradeSchema = z.enum(['A', 'B', 'C', 'D', 'E', 'F']);
 export type ServerGrade = z.infer<typeof serverGradeSchema>;
 
+// Coverage — how much of a server actlint could actually assess, carried beside the grade so the
+// grade is never mistaken for a clean bill of health. A tool is `unassessed` when no verdict-bearing
+// signal fired for it: silence is not honesty, and a scorecard must say so rather than fold such a
+// tool into `consistent`. `annotatedTools` is the annotation-coverage half — it lets a report state
+// plainly when a server declares no MCP annotations anywhere.
+export const coverageSchema = z
+  .object({
+    assessedTools: z.number().int().nonnegative(),
+    unassessedTools: z.number().int().nonnegative(),
+    annotatedTools: z.number().int().nonnegative(),
+    unassessedToolNames: z.array(z.string()).readonly(),
+  })
+  .readonly();
+export type Coverage = z.infer<typeof coverageSchema>;
+
 // ServerResult — the whole-server view the reporters and CLI consume. The canonical truth is the
 // readonly Finding[]; everything else is metadata or a downstream reduction of it.
 //
@@ -28,6 +43,7 @@ export interface ServerResult {
   readonly findings: readonly Finding[];
   readonly toolCount: number;
   readonly grade: ServerGrade;
+  readonly coverage: Coverage;
   readonly reportSchemaVersion: string;
   readonly actlintVersion: string;
   readonly vocabularyVersion: string;

@@ -90,3 +90,28 @@ export function mixedResult(): ServerResult {
 export function cleanResult(): ServerResult {
   return serverResult([], { toolCount: 5 });
 }
+
+/**
+ * A server where some tools carry no recognized signal: grade A, but three of twelve tools are
+ * unassessed. Exercises the qualified header and the "not assessable" footer — silence must never
+ * render as a clean bill of health.
+ */
+export function unassessedResult(): ServerResult {
+  return serverResult([], {
+    toolCount: 12,
+    coverage: {
+      assessedTools: 9,
+      unassessedTools: 3,
+      annotatedTools: 4,
+      unassessedToolNames: ['opaque_one', 'opaque_three', 'opaque_two'],
+    },
+  });
+}
+
+/** A server that declares no MCP annotation anywhere: every tool assessed, annotatedTools 0. */
+export function silentServerResult(): ServerResult {
+  return serverResult([], {
+    toolCount: 4,
+    coverage: { assessedTools: 4, unassessedTools: 0, annotatedTools: 0, unassessedToolNames: [] },
+  });
+}

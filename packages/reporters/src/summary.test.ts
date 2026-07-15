@@ -16,12 +16,18 @@ describe('summarize (per-tool honesty tally)', () => {
       undeclared: 1,
       overDeclared: 1,
       consistent: 6,
+      unassessed: 0,
     });
   });
 
-  it('the four buckets plus consistent always sum to the tool count', () => {
-    const s = summarize(mixedFindings(), 10);
-    expect(s.underDeclared + s.undeclared + s.overDeclared + s.consistent).toBe(s.tools);
+  it('the five buckets always sum to the tool count', () => {
+    const s = summarize(mixedFindings(), 10, 3);
+    expect(s.underDeclared + s.undeclared + s.overDeclared + s.consistent + (s.unassessed ?? 0)).toBe(
+      s.tools,
+    );
+    // The three unassessed tools come out of the consistent remainder, never a dishonesty bucket.
+    expect(s.consistent).toBe(3);
+    expect(s.unassessed).toBe(3);
   });
 
   it('advisory-only tools count as consistent (a hygiene note is not a verdict)', () => {

@@ -8,7 +8,7 @@
 // A reporter is a PURE function of its ServerResult. Colour is opt-in (the shell decides from
 // NO_COLOR / TTY and passes it); the default is plain output that degrades cleanly to CI logs.
 
-import type { Finding, ServerResult, Severity, Verdict } from '@formael/actlint-core';
+import type { Finding, ReportSummary, ServerResult, Severity, Verdict } from '@formael/actlint-core';
 import { formatStandards, glyph, paint, severityTag, sourceLabel, tagColour } from './format.ts';
 import { summarize } from './summary.ts';
 
@@ -63,9 +63,15 @@ function gradeColour(grade: ServerResult['grade']): 'cyan' | 'yellow' | 'red' {
 
 function headerLine(result: ServerResult, color: boolean): string {
   const left = `actlint  ▸  ${sourceLabel(result.source)}`;
-  const gradeText = `honesty grade: ${paint(result.grade, gradeColour(result.grade), color)}`;
-  // Right-align the grade to the rule width. paint adds invisible bytes, so measure the letter (1 char).
-  const visibleRight = `honesty grade: ${result.grade}`;
+  // When some tools could not be assessed, the grade is qualified so it can never read as a
+  // verified-honest verdict over the whole server.
+  const qualifier =
+    result.coverage.unassessedTools > 0
+      ? `  (assessed ${result.coverage.assessedTools} of ${plural(result.toolCount, 'tool')})`
+      : '';
+  const gradeText = `honesty grade: ${paint(result.grade, gradeColour(result.grade), color)}${qualifier}`;
+  // Right-align to the rule width. paint adds invisible bytes, so measure the plain text.
+  const visibleRight = `honesty grade: ${result.grade}${qualifier}`;
   const gap = Math.max(1, RULE_WIDTH - left.length - visibleRight.length);
   return INDENT + left + ' '.repeat(gap) + gradeText;
 }
@@ -85,7 +91,7 @@ function findingBlock(finding: Finding, color: boolean): readonly string[] {
  */
 export function humanReporter(result: ServerResult, options: HumanReporterOptions = {}): string {
   const color = options.color ?? false;
-  const summary = summarize(result.findings, result.toolCount);
+  const summary = summarize(result.findings, result.toolCount, result.coverage.unassessedTools);
 
   const honesty = result.findings
     .filter((f) => f.ruleClass === 'honesty')
@@ -114,8 +120,38 @@ export function humanReporter(result: ServerResult, options: HumanReporterOption
   }
 
   lines.push(RULE);
-  lines.push(`${INDENT}${summary.consistent} of ${plural(result.toolCount, 'tool')} consistent.`);
+  lines.push(...footerLines(result, summary, color));
   lines.push(`${INDENT}Full report: --json`);
 
   return `${lines.join('\n')}\n`;
+}
+
+// The closing tally. For a fully-assessed server that annotates at least one tool, it is the plain
+// consistent line it has always been. When actlint could not assess every tool, or when a server
+// declares no annotations anywhere, it reports coverage plainly instead — so silence and a blank
+// annotation surface are never read as a clean bill of health.
+function footerLines(result: ServerResult, summary: ReportSummary, color: boolean): readonly string[] {
+  const { toolCount } = result;
+  const { unassessedTools, annotatedTools } = result.coverage;
+  const showCoverage = toolCount > 0 && (unassessedTools > 0 || annotatedTools === 0);
+
+  if (!showCoverage) {
+    return [`${INDENT}${summary.consistent} of ${plural(toolCount, 'tool')} consistent.`];
+  }
+
+  const allUnassessed = unassessedTools === toolCount;
+  const segments: string[] = [];
+  if (!allUnassessed) segments.push(`${summary.consistent} of ${plural(toolCount, 'tool')} consistent`);
+  if (unassessedTools > 0) {
+    segments.push(`${unassessedTools} not assessable (no recognized risk signals)`);
+  }
+  segments.push(`${annotatedTools} of ${toolCount} declare annotations`);
+
+  const lines = [`${INDENT}${segments.join(' · ')}`];
+  if (unassessedTools > 0) {
+    const note =
+      'Not assessable is not verified honest: actlint found no signal it recognizes in these tools.';
+    lines.push(`${INDENT}${paint(note, 'dim', color)}`);
+  }
+  return lines;
 }

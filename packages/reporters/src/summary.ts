@@ -36,9 +36,15 @@ export function worstVerdictByTool(findings: readonly Finding[]): ReadonlyMap<st
 
 /**
  * Reduce a finding set and a tool count to the per-tool summary the scorecard headline, the JSON
- * report, and the grade all read. `consistent` is the remainder, never itself a finding.
+ * report, and the grade all read. `consistent` is the remainder after the three dishonesty buckets
+ * and the `unassessed` tools; the five buckets sum to `tools`.
+ *
+ * `unassessed` is the count of tools actlint found no verdict-bearing signal for (see assessManifest).
+ * It defaults to 0, so the grade — which weighs an unassessed tool as non-dishonest, never punishing
+ * a server for the linter's own recall gap — reads the same summary it always has. The reporters pass
+ * the real count, moving those tools out of `consistent` so silence is never rendered as honesty.
  */
-export function summarize(findings: readonly Finding[], toolCount: number): ReportSummary {
+export function summarize(findings: readonly Finding[], toolCount: number, unassessed = 0): ReportSummary {
   const worst = worstVerdictByTool(findings);
 
   let underDeclared = 0;
@@ -50,6 +56,6 @@ export function summarize(findings: readonly Finding[], toolCount: number): Repo
     else if (verdict === 'over-declared') overDeclared += 1;
   }
 
-  const consistent = Math.max(0, toolCount - underDeclared - undeclared - overDeclared);
-  return { tools: toolCount, underDeclared, undeclared, overDeclared, consistent };
+  const consistent = Math.max(0, toolCount - underDeclared - undeclared - overDeclared - unassessed);
+  return { tools: toolCount, underDeclared, undeclared, overDeclared, consistent, unassessed };
 }

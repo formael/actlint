@@ -1,5 +1,26 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`humanReporter (the scorecard) > renders a server that declares no annotations anywhere 1`] = `
+"  actlint  ▸  https://example.com/.well-known/mcp               honesty grade: A
+  ──────────────────────────────────────────────────────────────────────────────
+  4 tools scanned · 0 under-declared · 0 undeclared · 0 over-declared
+  ──────────────────────────────────────────────────────────────────────────────
+  4 of 4 tools consistent · 0 of 4 declare annotations
+  Full report: --json
+"
+`;
+
+exports[`humanReporter (the scorecard) > renders a server with unassessed tools (qualified grade, not-assessable footer) 1`] = `
+"  actlint  ▸  https://example.com/.well-known/mcp honesty grade: A  (assessed 9 of 12 tools)
+  ──────────────────────────────────────────────────────────────────────────────
+  12 tools scanned · 0 under-declared · 0 undeclared · 0 over-declared
+  ──────────────────────────────────────────────────────────────────────────────
+  9 of 12 tools consistent · 3 not assessable (no recognized risk signals) · 4 of 12 declare annotations
+  Not assessable is not verified honest: actlint found no signal it recognizes in these tools.
+  Full report: --json
+"
+`;
+
 exports[`humanReporter (the scorecard) > renders a spotless server 1`] = `
 "  actlint  ▸  https://example.com/.well-known/mcp               honesty grade: A
   ──────────────────────────────────────────────────────────────────────────────

@@ -115,6 +115,9 @@ export function sarifReporter(result: ServerResult): string {
           },
         },
         ...(uri !== undefined ? { originalUriBaseIds: { SERVER: { uri } } } : {}),
+        // Assessment coverage travels as run-level properties: how much of the server actlint could
+        // judge, so a CI view never reads an unassessed tool as a clean one. Additive, non-breaking.
+        properties: { coverage: result.coverage },
         results: result.findings.map(sarifResult),
       },
     ],

@@ -50,3 +50,41 @@ export const DISHONEST_MANIFEST = JSON.stringify({
     },
   ],
 });
+
+// A tool with an opaque, out-of-vocabulary name and a signal-free schema, declaring no annotations:
+// actlint recognizes nothing, so it derives all-silent and produces no findings. Coverage reports it
+// as unassessed — the case where a grade must not read as a clean bill of health.
+export const UNASSESSED_MANIFEST = JSON.stringify({
+  capturedAt: '2026-01-01T00:00:00.000Z',
+  protocolRevision: '2025-06-18',
+  tools: [
+    {
+      name: 'zorp_widget',
+      description: 'Operate on a widget.',
+      inputSchema: { type: 'object', properties: { handle: { type: 'string' } } },
+      annotations: { unknownHints: {} },
+    },
+  ],
+});
+
+// A multi-tool server whose tools carry recognizable risk signals (so they are assessed) but which
+// declares no MCP annotation anywhere. Coverage reports annotatedTools: 0, so a scorecard states
+// plainly that nothing was declared — an all-consistent read can no longer hide a silent server.
+export const SILENT_SERVER_MANIFEST = JSON.stringify({
+  capturedAt: '2026-01-01T00:00:00.000Z',
+  protocolRevision: '2025-06-18',
+  tools: [
+    {
+      name: 'get_user',
+      description: 'Fetch a user by id.',
+      inputSchema: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] },
+      annotations: { unknownHints: {} },
+    },
+    {
+      name: 'list_items',
+      description: 'List items in a collection.',
+      inputSchema: { type: 'object', properties: { collection: { type: 'string' } } },
+      annotations: { unknownHints: {} },
+    },
+  ],
+});
