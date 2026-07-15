@@ -3,3 +3,15 @@ packages:
   # Impure tooling, never published: the eval corpus + scorer. A workspace member so it can
   # import the pure core the same way the CLI does.
   - "eval"
+
+# pnpm 11 reads only auth/registry from .npmrc; other settings live here.
+engineStrict: true
+autoInstallPeers: true
+
+# Force esbuild off the 0.27.7 that tsup vendors.
+overrides:
+  esbuild: ">=0.28.1"
+
+# pnpm 11 blocks lifecycle scripts by default; esbuild's postinstall fetches its native binary.
+allowBuilds:
+  esbuild: true

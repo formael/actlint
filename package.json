@@ -8,7 +8,7 @@
   "engines": {
     "node": ">=22"
   },
-  "packageManager": "pnpm@9.15.4",
+  "packageManager": "pnpm@11.13.0",
   "scripts": {
     "build": "pnpm -r --filter \"./packages/*\" run build",
     "clean": "pnpm -r --filter \"./packages/*\" run clean",
@@ -29,11 +29,6 @@
     "version-packages": "changeset version",
     "release": "pnpm build && changeset publish",
     "check-npm-name": "tsx scripts/check-npm-name.ts"
-  },
-  "pnpm": {
-    "overrides": {
-      "esbuild": ">=0.28.1"
-    }
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.2",
