@@ -329,6 +329,265 @@
         },
         "signals": []
       }
+    },
+    {
+      "name": "write-operation-keys",
+      "intent": "an out-of-vocabulary name with an array-of-records write param (create[], update[]) -> mutating (medium) from the schema alone",
+      "tool": {
+        "name": "reconcile_ledger",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "create": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            },
+            "update": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "annotations": {
+          "unknownHints": {}
+        }
+      },
+      "expected": {
+        "profile": {
+          "reversibility": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "destructiveness": {
+            "level": "mutating",
+            "confidence": "medium",
+            "provenance": [
+              {
+                "id": "shape.write-operation-keys",
+                "weight": "strong"
+              }
+            ]
+          },
+          "externalReach": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "idempotency": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "blastRadius": {
+            "level": "moderate",
+            "confidence": "low",
+            "provenance": [
+              {
+                "id": "shape.write-operation-keys",
+                "weight": "strong"
+              }
+            ]
+          }
+        },
+        "signals": [
+          {
+            "id": "shape.write-operation-keys",
+            "weight": "strong"
+          }
+        ]
+      }
+    },
+    {
+      "name": "delete-operation-keys",
+      "intent": "a delete param carrying an array of targets (delete[]) -> deleting (medium); reversibility is an evidence-backed unknown, not asserted irreversible",
+      "tool": {
+        "name": "reconcile_ledger",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "delete": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "annotations": {
+          "unknownHints": {}
+        }
+      },
+      "expected": {
+        "profile": {
+          "reversibility": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": [
+              {
+                "id": "shape.delete-operation-keys",
+                "weight": "weak"
+              }
+            ]
+          },
+          "destructiveness": {
+            "level": "deleting",
+            "confidence": "medium",
+            "provenance": [
+              {
+                "id": "shape.delete-operation-keys",
+                "weight": "strong"
+              }
+            ]
+          },
+          "externalReach": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "idempotency": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "blastRadius": {
+            "level": "severe",
+            "confidence": "low",
+            "provenance": [
+              {
+                "id": "shape.delete-operation-keys",
+                "weight": "strong"
+              }
+            ]
+          }
+        },
+        "signals": [
+          {
+            "id": "shape.delete-operation-keys",
+            "weight": "strong"
+          }
+        ]
+      }
+    },
+    {
+      "name": "write-op-key-scalar-does-not-fire",
+      "intent": "a write-op name on a scalar (boolean) param does NOT fire — only an array of records is the write signal",
+      "tool": {
+        "name": "reconcile_ledger",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "update": {
+              "type": "boolean"
+            }
+          }
+        },
+        "annotations": {
+          "unknownHints": {}
+        }
+      },
+      "expected": {
+        "profile": {
+          "reversibility": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "destructiveness": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "externalReach": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "idempotency": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "blastRadius": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          }
+        },
+        "signals": []
+      }
+    },
+    {
+      "name": "write-op-key-object-filter-does-not-fire",
+      "intent": "a read tool with a write-op-named object filter (update: object) does NOT fire — an object is indistinguishable from a filter, so it resolves to silence rather than a false write",
+      "tool": {
+        "name": "get_changes",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "update": {
+              "type": "object",
+              "properties": {
+                "since": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "annotations": {
+          "unknownHints": {}
+        }
+      },
+      "expected": {
+        "profile": {
+          "reversibility": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "destructiveness": {
+            "level": "read-only",
+            "confidence": "high",
+            "provenance": [
+              {
+                "id": "verb.read",
+                "weight": "definitive"
+              }
+            ]
+          },
+          "externalReach": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "idempotency": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "blastRadius": {
+            "level": "contained",
+            "confidence": "medium",
+            "provenance": [
+              {
+                "id": "verb.read",
+                "weight": "definitive"
+              }
+            ]
+          }
+        },
+        "signals": [
+          {
+            "id": "verb.read",
+            "weight": "definitive"
+          }
+        ]
+      }
     }
   ]
 }

@@ -1,0 +1,68 @@
+{
+  "server": "synthetic-writes",
+  "labeledAt": "2026-07-15",
+  "notes": "Synthetic fixtures (not a real server). Authored to exercise the write-operation schema shapes: a state-mutating tool whose name verb is out of vocabulary, carrying its write evidence entirely in the input schema (an array of records keyed by a write op). Ground truth is the construction itself. Includes a deliberate benign case — a read tool whose write-op-named filter is an object, not an array — which must derive silence and stay consistent, pinning the guard against a false read-only flag.",
+  "tools": [
+    {
+      "name": "reconcile_catalog",
+      "trueVerdict": "undeclared",
+      "trueRisk": {
+        "destructiveness": "mutating",
+        "externalReach": "local"
+      },
+      "expected": [{ "ruleId": "destructive-absent" }],
+      "confidence": "high",
+      "provenance": {
+        "kind": "behavioral-inference",
+        "source": "Synthetic fixture: the name verb `reconcile` is out of vocabulary, so the write is carried by the schema — `create` and `update` parameters typed as arrays of records. A tool taking batches of records to insert and amend is mutating; it declares no annotations, so a spec-following client still prompts and the honest finding is the informational destructive-absent nudge.",
+        "notes": "Pins the verb-recall gap: without the write-operation schema shape this tool would derive silence and produce no finding."
+      }
+    },
+    {
+      "name": "stage_catalog_writes",
+      "trueVerdict": "under-declared",
+      "trueRisk": {
+        "destructiveness": "mutating",
+        "externalReach": "local"
+      },
+      "expected": [{ "ruleId": "write-as-readonly" }],
+      "confidence": "high",
+      "provenance": {
+        "kind": "behavioral-inference",
+        "source": "Synthetic fixture: the name verb `stage` is screened out of the write families, so the write is carried by the schema — an `update` array of records. The tool stages writes yet declares readOnlyHint:true, an explicit claim that removes a client's confirmation prompt. The honest verdict is the top-severity write-as-readonly.",
+        "notes": "The dangerous residual case P2/P3 target: a false readOnlyHint:true on an out-of-vocabulary write, caught by schema evidence alone."
+      }
+    },
+    {
+      "name": "expire_records",
+      "trueVerdict": "under-declared",
+      "trueRisk": {
+        "destructiveness": "deleting",
+        "reversibility": "irreversible",
+        "externalReach": "local"
+      },
+      "expected": [{ "ruleId": "destructive-unflagged" }],
+      "confidence": "high",
+      "provenance": {
+        "kind": "behavioral-inference",
+        "source": "Synthetic fixture: the name verb `expire` is out of vocabulary; the delete is carried by the schema — a `delete` array of record ids. Removing records is a destructive write, yet the tool declares destructiveHint:false, suppressing the prompt the spec default would show. The delete shape's evidence-backed unknown reversibility corroborates the contradiction, so destructive-unflagged fires.",
+        "notes": "Pins that the delete-operation shape can contradict an explicit destructiveHint:false without asserting an irreversibility the shape cannot see."
+      }
+    },
+    {
+      "name": "list_catalog_versions",
+      "trueVerdict": "consistent",
+      "trueRisk": {
+        "destructiveness": "read-only",
+        "externalReach": "local"
+      },
+      "expected": [],
+      "confidence": "high",
+      "provenance": {
+        "kind": "behavioral-inference",
+        "source": "Synthetic fixture: a read tool (`list`) whose only parameter is an `update`-named object filter on the last-updated window. The write-operation shape requires an array of records, so an object filter does not fire; the tool derives read-only, its honest readOnlyHint:true is consistent, and no finding is produced.",
+        "notes": "The benign-conflict guard: it must stay consistent. If the write-operation shape were ever loosened to match an object, this tool would flip to a false write-as-readonly and fail the gate."
+      }
+    }
+  ]
+}

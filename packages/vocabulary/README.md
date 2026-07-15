@@ -48,6 +48,20 @@ its own semver line, and each embedded dataset above carries its own `version`. 
 
 Unknown or future inputs always resolve conservatively — never to a benign default.
 
+## Coverage and limitations
+
+The write families cover the common write, create, mutate, and delete verbs, and two language-independent
+schema shapes carry a write claim when the name verb is out of vocabulary: a parameter named like a write
+operation (`create`, `update`, …) or a delete operation (`delete`, `remove`, …) whose value is an **array of
+records**. The array requirement is deliberate — a single object is indistinguishable from a read tool's
+filter, so it resolves to silence rather than risk a false read-only flag.
+
+Coverage grows by evidence, not by guessing: several write-adjacent tokens (`generate`, `install`, `store`,
+`record`, `snapshot`, `commit`, `stage`, `load`) are deliberately screened out as reply-content verbs or
+noun/verb homographs, because matching any name token would make them misfire inside common reads
+(`get_store`, `get_commit`). The vocabulary's own `limitations` field records every such screen and the
+reasoning, so the next reviewer sees the judgment, not a gap.
+
 ## A note on trust
 
 This directory is CODEOWNERS-protected. A subtly-wrong _definition_ of risk is the one bug that discredits

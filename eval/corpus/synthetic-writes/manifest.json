@@ -1,0 +1,91 @@
+{
+  "source": {
+    "kind": "file",
+    "path": "synthetic-writes.json"
+  },
+  "capturedAt": "2026-07-15T00:00:00.000Z",
+  "tools": [
+    {
+      "name": "reconcile_catalog",
+      "description": "Reconciles a catalog against a batch of upstream changes, inserting new entries and amending existing ones.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "create": {
+            "type": "array",
+            "description": "Records to add.",
+            "items": { "type": "object", "properties": { "sku": { "type": "string" } } }
+          },
+          "update": {
+            "type": "array",
+            "description": "Records to amend in place.",
+            "items": { "type": "object", "properties": { "sku": { "type": "string" } } }
+          }
+        }
+      },
+      "annotations": {
+        "unknownHints": {}
+      }
+    },
+    {
+      "name": "stage_catalog_writes",
+      "description": "Stages a batch of catalog updates for the next publish window.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "update": {
+            "type": "array",
+            "description": "Update records to stage.",
+            "items": {
+              "type": "object",
+              "properties": { "sku": { "type": "string" }, "price": { "type": "number" } }
+            }
+          }
+        }
+      },
+      "annotations": {
+        "readOnly": { "state": "true" },
+        "unknownHints": {}
+      }
+    },
+    {
+      "name": "expire_records",
+      "description": "Expires a batch of records by removing them from the active set.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "delete": {
+            "type": "array",
+            "description": "Ids of the records to remove.",
+            "items": { "type": "string" }
+          }
+        }
+      },
+      "annotations": {
+        "destructive": { "state": "false" },
+        "unknownHints": {}
+      }
+    },
+    {
+      "name": "list_catalog_versions",
+      "description": "Lists catalog versions, optionally narrowed by an update-time filter.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "update": {
+            "type": "object",
+            "description": "Filter on the last-updated window.",
+            "properties": {
+              "since": { "type": "string", "format": "date-time" },
+              "until": { "type": "string", "format": "date-time" }
+            }
+          }
+        }
+      },
+      "annotations": {
+        "readOnly": { "state": "true" },
+        "unknownHints": {}
+      }
+    }
+  ]
+}

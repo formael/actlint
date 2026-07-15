@@ -375,6 +375,137 @@
           }
         ]
       }
+    },
+    {
+      "name": "mutate-family-migrate",
+      "intent": "a broadened mutate lexeme (migrate) resolves to the mutating family, high",
+      "tool": {
+        "name": "migrate_schema",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "string"
+            }
+          }
+        },
+        "annotations": {
+          "unknownHints": {}
+        }
+      },
+      "expected": {
+        "profile": {
+          "reversibility": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "destructiveness": {
+            "level": "mutating",
+            "confidence": "high",
+            "provenance": [
+              {
+                "id": "verb.mutate",
+                "weight": "definitive"
+              }
+            ]
+          },
+          "externalReach": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "idempotency": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "blastRadius": {
+            "level": "moderate",
+            "confidence": "medium",
+            "provenance": [
+              {
+                "id": "verb.mutate",
+                "weight": "definitive"
+              }
+            ]
+          }
+        },
+        "signals": [
+          {
+            "id": "verb.mutate",
+            "weight": "definitive"
+          }
+        ]
+      }
+    },
+    {
+      "name": "create-family-provision",
+      "intent": "a broadened create lexeme (provision) resolves to the additive family, medium",
+      "tool": {
+        "name": "provision_tenant",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            }
+          }
+        },
+        "annotations": {
+          "unknownHints": {}
+        }
+      },
+      "expected": {
+        "profile": {
+          "reversibility": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "destructiveness": {
+            "level": "additive",
+            "confidence": "medium",
+            "provenance": [
+              {
+                "id": "verb.create",
+                "weight": "strong"
+              }
+            ]
+          },
+          "externalReach": {
+            "level": "unknown",
+            "confidence": "uncertain",
+            "provenance": []
+          },
+          "idempotency": {
+            "level": "non-idempotent",
+            "confidence": "medium",
+            "provenance": [
+              {
+                "id": "verb.create",
+                "weight": "strong"
+              }
+            ]
+          },
+          "blastRadius": {
+            "level": "moderate",
+            "confidence": "low",
+            "provenance": [
+              {
+                "id": "verb.create",
+                "weight": "strong"
+              }
+            ]
+          }
+        },
+        "signals": [
+          {
+            "id": "verb.create",
+            "weight": "strong"
+          }
+        ]
+      }
     }
   ]
 }
