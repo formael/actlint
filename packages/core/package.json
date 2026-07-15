@@ -1,6 +1,6 @@
 {
   "name": "@formael/actlint-core",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "private": true,
   "description": "PURE. manifest + vocabulary -> profiles -> findings. No I/O, no clock, no randomness, no model. The `./contracts` sub-path is the ONLY surface mcp-fetch may import.",
   "license": "Apache-2.0",

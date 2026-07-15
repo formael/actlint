@@ -1,6 +1,6 @@
 {
   "name": "@formael/actlint-eval",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "description": "IMPURE TOOLING (never published). The labeled eval corpus and its FP-weighted scorer — the quality number that defends the scorecard. Reads the corpus from disk, runs the pure core over it, and gates on precision regressions.",
   "license": "Apache-2.0",
