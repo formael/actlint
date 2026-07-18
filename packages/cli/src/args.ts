@@ -20,6 +20,11 @@ export type RawTarget =
   | { readonly kind: 'registry'; readonly serverId: string }
   | { readonly kind: 'manifest'; readonly path: string };
 
+/** One --env entry as written: a literal assignment, or a name to forward from actlint's environment. */
+export type EnvEntry =
+  | { readonly key: string; readonly kind: 'literal'; readonly value: string }
+  | { readonly key: string; readonly kind: 'forward' };
+
 /** The flags of a scan invocation, exactly as given. Absent overrides are filled by config/defaults. */
 export interface ScanFlags {
   readonly target: RawTarget;
@@ -31,6 +36,7 @@ export interface ScanFlags {
   readonly capturePath?: string;
   readonly vocabularyPath?: string;
   readonly experimental?: boolean;
+  readonly env?: readonly EnvEntry[];
 }
 
 export type Command =
@@ -46,6 +52,23 @@ export type ParseResult =
 type Draft = {
   -readonly [K in keyof ScanFlags]?: ScanFlags[K];
 };
+
+// A POSIX-shaped environment variable name: a letter or underscore, then letters, digits, or
+// underscores. A malformed name is rejected loudly rather than passed to the child.
+const ENV_KEY = /^[A-Za-z_][A-Za-z0-9_]*$/;
+
+// Parse one --env token into an entry. Splits at the first `=`: no `=` is the forward form (take the
+// value from actlint's environment), a present `=` is the literal form and everything after it —
+// further `=` characters and the empty string included — is the value verbatim. A value is never
+// echoed in an error, since a mistyped literal form may carry a secret.
+function parseEnvEntry(token: string): EnvEntry | CliError {
+  const eq = token.indexOf('=');
+  const key = eq === -1 ? token : token.slice(0, eq);
+  if (!ENV_KEY.test(key)) {
+    return usageError(`--env expects KEY or KEY=VALUE with a valid variable name (got '${key}')`);
+  }
+  return eq === -1 ? { key, kind: 'forward' } : { key, kind: 'literal', value: token.slice(eq + 1) };
+}
 
 // A single-target invariant, enforced as tokens are read: setting a second target is a usage error,
 // never a silent last-wins. "Exactly one ingestion source" is the contract (07 §2).
@@ -167,6 +190,22 @@ export function parseArgv(argv: readonly string[]): ParseResult {
         draft.experimental = true;
         break;
 
+      case '--env': {
+        const value = valueFor('--env');
+        if (typeof value !== 'string') return { ok: false, error: value };
+        const entry = parseEnvEntry(value);
+        if (!('key' in entry)) return { ok: false, error: entry };
+        const existing = draft.env ?? [];
+        if (existing.some((e) => e.key === entry.key)) {
+          return {
+            ok: false,
+            error: usageError(`--env ${entry.key} given more than once — each variable may be set once`),
+          };
+        }
+        draft.env = [...existing, entry];
+        break;
+      }
+
       case '--http': {
         const value = valueFor('--http');
         if (typeof value !== 'string') return { ok: false, error: value };
@@ -235,6 +274,9 @@ export function parseArgv(argv: readonly string[]): ParseResult {
       ok: false,
       error: usageError('--write-baseline records a fresh baseline; do not combine it with --baseline'),
     };
+  }
+  if (draft.env !== undefined && draft.env.length > 0 && draft.target.kind !== 'stdio') {
+    return { ok: false, error: usageError('--env only applies when launching a stdio server') };
   }
 
   return { ok: true, command: { kind: 'scan', flags: draft as ScanFlags } };

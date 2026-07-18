@@ -42,6 +42,31 @@ describe('parseArgv — targets', () => {
   });
 });
 
+describe('parseArgv — --env', () => {
+  it('parses a literal assignment', () => {
+    expect(scan(['--env', 'FOO=bar', 'cmd']).env).toEqual([{ key: 'FOO', kind: 'literal', value: 'bar' }]);
+  });
+
+  it('parses a bare name as a forward entry', () => {
+    expect(scan(['--env', 'FOO', 'cmd']).env).toEqual([{ key: 'FOO', kind: 'forward' }]);
+  });
+
+  it('treats an empty value as a valid literal, distinct from unset', () => {
+    expect(scan(['--env', 'FOO=', 'cmd']).env).toEqual([{ key: 'FOO', kind: 'literal', value: '' }]);
+  });
+
+  it('keeps multiple entries in argv order', () => {
+    expect(scan(['--env', 'A=1', '--env', 'B', 'cmd']).env).toEqual([
+      { key: 'A', kind: 'literal', value: '1' },
+      { key: 'B', kind: 'forward' },
+    ]);
+  });
+
+  it('splits at the first = only, so the value may itself contain =', () => {
+    expect(scan(['--env', 'FOO=a=b', 'cmd']).env).toEqual([{ key: 'FOO', kind: 'literal', value: 'a=b' }]);
+  });
+});
+
 describe('parseArgv — commands', () => {
   it('recognizes --version and --help', () => {
     expect(parseArgv(['--version'])).toEqual({ ok: true, command: { kind: 'version' } });
@@ -99,5 +124,23 @@ describe('parseArgv — usage errors', () => {
 
   it('rejects explain without a rule id', () => {
     expect(usage(['explain'])).toMatch(/rule id/);
+  });
+
+  it('rejects an --env key that is not a valid variable name, naming the key not the value', () => {
+    const message = usage(['--env', '1BAD=secret', 'cmd']);
+    expect(message).toMatch(/1BAD/);
+    expect(message).not.toMatch(/secret/);
+  });
+
+  it('rejects the same --env key given twice', () => {
+    expect(usage(['--env', 'FOO=a', '--env', 'FOO=b', 'cmd'])).toMatch(/more than once/);
+  });
+
+  it('rejects --env with a non-stdio target', () => {
+    expect(usage(['--env', 'FOO', '--http', 'https://x/mcp'])).toMatch(/only applies when launching a stdio/);
+  });
+
+  it('rejects --env with no value', () => {
+    expect(usage(['--env'])).toMatch(/requires a value/);
   });
 });

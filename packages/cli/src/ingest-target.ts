@@ -10,19 +10,56 @@
 
 import { type ToolManifest, toolManifestSchema } from '@formael/actlint-core';
 import type { IngestSource } from '@formael/actlint-mcp-fetch';
-import type { RawTarget } from './args.ts';
-import { type CliError, ingestionError } from './exit-codes.ts';
+import type { EnvEntry, RawTarget } from './args.ts';
+import { type CliError, ingestionError, usageError } from './exit-codes.ts';
 
 /** True when the target is the stdin manifest path, which the shell reads directly. */
 export function isStdinManifest(target: RawTarget): boolean {
   return target.kind === 'manifest' && target.path === '-';
 }
 
-/** Map a non-stdin target onto an mcp-fetch IngestSource. Stdin is handled separately, before this. */
-export function toIngestSource(target: RawTarget): IngestSource {
+/**
+ * Resolve --env entries against the shell's injected environment. A forward entry whose key is not
+ * set is a usage error — launching anyway would silently lint a degraded tool surface. Iteration
+ * follows argv order; duplicate keys were already rejected at parse.
+ */
+export function resolveEnv(
+  entries: readonly EnvEntry[],
+  env: Readonly<Record<string, string | undefined>>,
+): { ok: true; value: Readonly<Record<string, string>> } | { ok: false; error: CliError } {
+  const resolved: Record<string, string> = {};
+  for (const entry of entries) {
+    if (entry.kind === 'literal') {
+      resolved[entry.key] = entry.value;
+      continue;
+    }
+    const value = env[entry.key];
+    if (value === undefined) {
+      return {
+        ok: false,
+        error: usageError(`--env ${entry.key}: ${entry.key} is not set in actlint's environment`),
+      };
+    }
+    resolved[entry.key] = value;
+  }
+  return { ok: true, value: resolved };
+}
+
+/**
+ * Map a non-stdin target onto an mcp-fetch IngestSource. Stdin is handled separately, before this.
+ * A resolved stdio environment is threaded onto the stdio arm only; when absent, the source carries
+ * no env and the SDK's default sanitized environment is used unchanged.
+ */
+export function toIngestSource(target: RawTarget, stdioEnv?: Readonly<Record<string, string>>): IngestSource {
   switch (target.kind) {
     case 'stdio':
-      return { kind: 'live', transport: 'stdio', command: target.command, args: target.args };
+      return {
+        kind: 'live',
+        transport: 'stdio',
+        command: target.command,
+        args: target.args,
+        ...(stdioEnv !== undefined ? { env: stdioEnv } : {}),
+      };
     case 'http':
       return { kind: 'live', transport: 'http', url: target.url };
     case 'card':

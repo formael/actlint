@@ -9,12 +9,15 @@
 import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
+import type { Outcome, ToolManifest } from '@formael/actlint-core';
 import { reportSchema } from '@formael/actlint-core';
+import type { IngestError, IngestSource } from '@formael/actlint-mcp-fetch';
 import { ingest, writeCapture } from '@formael/actlint-mcp-fetch';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { EXIT } from './exit-codes.ts';
+import { parseStdinManifest } from './ingest-target.ts';
 import { run } from './run.ts';
-import type { RunContext } from './scan.ts';
+import type { Effects, RunContext } from './scan.ts';
 import {
   CLEAN_MANIFEST,
   DISHONEST_MANIFEST,
@@ -22,6 +25,13 @@ import {
   UNASSESSED_MANIFEST,
   UNDECLARED_MANIFEST,
 } from './test-manifests.ts';
+
+// A ready ToolManifest a fake ingest can hand back without launching anything.
+const CLEAN: ToolManifest = (() => {
+  const parsed = parseStdinManifest(CLEAN_MANIFEST);
+  if (!parsed.ok) throw new Error('fixture manifest failed to parse');
+  return parsed.manifest;
+})();
 
 let workdir: string;
 
@@ -33,6 +43,8 @@ interface CtxOptions {
   readonly stdin?: string;
   readonly cwd?: string;
   readonly env?: Record<string, string | undefined>;
+  /** Override the ingest effect to observe the source or inject a failure without a real process. */
+  readonly ingest?: Effects['ingest'];
 }
 
 function ctx(options: CtxOptions = {}): RunContext {
@@ -41,7 +53,7 @@ function ctx(options: CtxOptions = {}): RunContext {
     env: options.env ?? {},
     colorCapable: false,
     effects: {
-      ingest,
+      ingest: options.ingest ?? ingest,
       writeCapture,
       writeTextFile: async (path, data) => {
         await mkdir(dirname(path), { recursive: true });
@@ -231,6 +243,91 @@ describe('config resolution', () => {
     await writeFile(join(workdir, 'actlint.config.json'), JSON.stringify({ nope: 1 }), 'utf8');
     const result = await run(['--manifest', '-'], ctx({ stdin: CLEAN_MANIFEST }));
     expect(result.exitCode).toBe(EXIT.usage);
+  });
+});
+
+describe('--env forwarding', () => {
+  // A fake ingest that records the source it was handed and returns a clean manifest.
+  function recordingIngest(): { effect: Effects['ingest']; source: () => IngestSource | undefined } {
+    let seen: IngestSource | undefined;
+    const effect: Effects['ingest'] = async (source) => {
+      seen = source;
+      return { ok: true, value: CLEAN } satisfies Outcome<ToolManifest, IngestError>;
+    };
+    return { effect, source: () => seen };
+  }
+
+  it('threads a literal --env onto the stdio source verbatim', async () => {
+    const rec = recordingIngest();
+    const result = await run(['--env', 'FOO=bar', 'some-server'], ctx({ ingest: rec.effect }));
+    expect(result.exitCode).toBe(EXIT.clean);
+    const source = rec.source();
+    expect(source?.kind === 'live' && source.transport === 'stdio' ? source.env : undefined).toEqual({
+      FOO: 'bar',
+    });
+  });
+
+  it('resolves a bare --env from the shell environment without leaking the value', async () => {
+    const rec = recordingIngest();
+    const result = await run(
+      ['--env', 'FOO', 'some-server'],
+      ctx({ ingest: rec.effect, env: { FOO: 'secret' } }),
+    );
+    expect(result.exitCode).toBe(EXIT.clean);
+    const source = rec.source();
+    expect(source?.kind === 'live' && source.transport === 'stdio' ? source.env : undefined).toEqual({
+      FOO: 'secret',
+    });
+    expect(result.stdout).not.toContain('secret');
+    expect(result.stderr).not.toContain('secret');
+  });
+
+  it('fails with a usage error when a bare --env is not set, without touching ingest', async () => {
+    const rec = recordingIngest();
+    const result = await run(['--env', 'FOO', 'some-server'], ctx({ ingest: rec.effect, env: {} }));
+    expect(result.exitCode).toBe(EXIT.usage);
+    expect(result.stderr).toContain('FOO');
+    expect(rec.source()).toBeUndefined();
+  });
+
+  it('hints at --env when a stdio connect fails and none was given', async () => {
+    const failing: Effects['ingest'] = async () => ({
+      ok: false,
+      error: { code: 'connect-failed', message: 'connection failed' },
+    });
+    const result = await run(['some-server'], ctx({ ingest: failing }));
+    expect(result.exitCode).toBe(EXIT.ingestion);
+    expect(result.stderr).toContain('--env');
+  });
+
+  it('suppresses the hint when --env was given', async () => {
+    const failing: Effects['ingest'] = async () => ({
+      ok: false,
+      error: { code: 'connect-failed', message: 'connection failed' },
+    });
+    const result = await run(['--env', 'FOO=bar', 'some-server'], ctx({ ingest: failing }));
+    expect(result.exitCode).toBe(EXIT.ingestion);
+    expect(result.stderr).not.toContain('pass them with --env');
+  });
+
+  it('does not hint on a non-stdio connect failure', async () => {
+    const failing: Effects['ingest'] = async () => ({
+      ok: false,
+      error: { code: 'connect-failed', message: 'connection failed' },
+    });
+    const result = await run(['--http', 'https://x/mcp'], ctx({ ingest: failing }));
+    expect(result.exitCode).toBe(EXIT.ingestion);
+    expect(result.stderr).not.toContain('--env');
+  });
+
+  it('does not hint on a stdio timeout (only connect-failed carries the hint)', async () => {
+    const failing: Effects['ingest'] = async () => ({
+      ok: false,
+      error: { code: 'timeout', message: 'the server did not respond in time' },
+    });
+    const result = await run(['some-server'], ctx({ ingest: failing }));
+    expect(result.exitCode).toBe(EXIT.ingestion);
+    expect(result.stderr).not.toContain('--env');
   });
 });
 
