@@ -67,6 +67,33 @@ describe('parseArgv — --env', () => {
   });
 });
 
+describe('parseArgv — --header', () => {
+  it('parses a header, splitting at the first colon', () => {
+    expect(scan(['--http', 'https://x/mcp', '--header', 'Authorization: Bearer x']).headers).toEqual([
+      { name: 'Authorization', value: 'Bearer x' },
+    ]);
+  });
+
+  it('does not require a space after the colon', () => {
+    expect(scan(['--http', 'https://x/mcp', '--header', 'X-Api-Key:abc']).headers).toEqual([
+      { name: 'X-Api-Key', value: 'abc' },
+    ]);
+  });
+
+  it('splits at the first colon only, so the value may itself contain colons', () => {
+    expect(scan(['--http', 'https://x/mcp', '--header', 'Authorization: Basic a:b:c']).headers).toEqual([
+      { name: 'Authorization', value: 'Basic a:b:c' },
+    ]);
+  });
+
+  it('keeps multiple headers in argv order', () => {
+    expect(scan(['--http', 'https://x/mcp', '--header', 'A: 1', '--header', 'B: 2']).headers).toEqual([
+      { name: 'A', value: '1' },
+      { name: 'B', value: '2' },
+    ]);
+  });
+});
+
 describe('parseArgv — commands', () => {
   it('recognizes --version and --help', () => {
     expect(parseArgv(['--version'])).toEqual({ ok: true, command: { kind: 'version' } });
@@ -142,5 +169,44 @@ describe('parseArgv — usage errors', () => {
 
   it('rejects --env with no value', () => {
     expect(usage(['--env'])).toMatch(/requires a value/);
+  });
+
+  it('rejects a duplicate header name, case-insensitively, echoing no value', () => {
+    const message = usage([
+      '--http',
+      'https://x/mcp',
+      '--header',
+      'Authorization: Bearer a',
+      '--header',
+      'authorization: Bearer SECRET',
+    ]);
+    expect(message).toMatch(/more than once/);
+    expect(message).not.toMatch(/SECRET/);
+  });
+
+  it('rejects a header with no colon, echoing no value', () => {
+    const message = usage(['--http', 'https://x/mcp', '--header', 'Bearer SECRET']);
+    expect(message).toMatch(/Name: value/);
+    expect(message).not.toMatch(/SECRET/);
+  });
+
+  it('rejects a header with an empty or malformed name, echoing no value', () => {
+    expect(usage(['--http', 'https://x/mcp', '--header', ': SECRET'])).not.toMatch(/SECRET/);
+    const badChars = usage(['--http', 'https://x/mcp', '--header', 'bad name: SECRET']);
+    expect(badChars).toMatch(/valid header name/);
+    expect(badChars).not.toMatch(/SECRET/);
+  });
+
+  it('rejects --header with a non-http target', () => {
+    expect(usage(['--header', 'Authorization: Bearer x', 'node', 'srv.js'])).toMatch(
+      /only applies to an --http target/,
+    );
+    expect(usage(['--header', 'Authorization: Bearer x', '--manifest', 'm.json'])).toMatch(
+      /only applies to an --http target/,
+    );
+  });
+
+  it('rejects --header with no value', () => {
+    expect(usage(['--header'])).toMatch(/requires a value/);
   });
 });

@@ -96,22 +96,35 @@ async function acquireManifest(
     stdioEnv = resolvedEnv.value;
   }
 
-  const source = toIngestSource(resolved.target, stdioEnv);
+  const source = toIngestSource(resolved.target, stdioEnv, resolved.headers);
   const options: IngestOptions = resolved.experimental ? { experimental: true } : {};
   const ingested = await ctx.effects.ingest(source, options);
   if (!ingested.ok) {
-    // A launched stdio server gets a minimal environment, not the shell's; when a connect fails and
-    // no --env was given, that is the likeliest cause, so point at it. Suppressed once --env is in
-    // play — the user already knows the mechanism.
-    const hint =
-      resolved.target.kind === 'stdio' &&
-      ingested.error.code === 'connect-failed' &&
-      resolved.env === undefined
-        ? ' (a launched server does not inherit your shell environment; if it needs variables to start, pass them with --env)'
-        : '';
-    return { ok: false, error: { kind: 'ingestion', message: `${ingested.error.message}${hint}` } };
+    return {
+      ok: false,
+      error: {
+        kind: 'ingestion',
+        message: `${ingested.error.message}${ingestHint(ingested.error, resolved)}`,
+      },
+    };
   }
   return { ok: true, value: ingested.value };
+}
+
+// A one-line, actionable suffix for an ingestion failure — the CLI owns flag names, mcp-fetch does
+// not. Only the flag that would have helped is named, and never when it was already supplied.
+function ingestHint(error: IngestError, resolved: ResolvedScan): string {
+  // A launched stdio server gets a minimal environment, not the shell's; a connect failure with no
+  // --env given is most often that. Suppressed once --env is in play — the user knows the mechanism.
+  if (resolved.target.kind === 'stdio' && error.code === 'connect-failed' && resolved.env === undefined) {
+    return ' (a launched server does not inherit your shell environment; if it needs variables to start, pass them with --env)';
+  }
+  // The server demanded authorization and no header was sent. With a header present the honest
+  // message is that the credential was not accepted, so no hint is added.
+  if (error.code === 'auth-required' && resolved.headers === undefined) {
+    return " (pass a token with --header 'Authorization: Bearer …')";
+  }
+  return '';
 }
 
 /**
