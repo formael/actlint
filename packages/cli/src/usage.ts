@@ -19,6 +19,10 @@ Target (exactly one):
   --registry <serverId>     resolve a server from the MCP Registry
   --manifest <path|->       read a previously captured manifest, or '-' for stdin
 
+Stdio server:
+  --env KEY[=VALUE]         pass an environment variable to the launched server; bare KEY
+                            forwards the value from your environment (repeatable)
+
 Output:
   (default)                 human scorecard to stdout
   --json                    machine report (a versioned public API)
@@ -39,4 +43,6 @@ Diagnostics:
   -h, --help                print this message
 
 Options must appear before a stdio <command...>; everything after the command is passed to it.
+A launched stdio server receives a minimal environment, not your shell's; use --env for
+variables it needs.
 actlint reads a server's advertised tools. It never calls them, and it phones home to no one.`;

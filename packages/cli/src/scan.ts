@@ -20,7 +20,7 @@ import { buildBaseline, partitionByBaseline, readBaseline, serializeBaseline } f
 import type { ResolvedScan } from './config.ts';
 import { type CliError, EXIT, type ExitCode, exitCodeFor, usageError } from './exit-codes.ts';
 import { gateFails } from './gate.ts';
-import { isStdinManifest, parseStdinManifest, toIngestSource } from './ingest-target.ts';
+import { isStdinManifest, parseStdinManifest, resolveEnv, toIngestSource } from './ingest-target.ts';
 import { versions as buildVersions, type Versions } from './version.ts';
 import { loadVocabulary } from './vocabulary.ts';
 
@@ -87,12 +87,29 @@ async function acquireManifest(
     return parsed.ok ? { ok: true, value: parsed.manifest } : { ok: false, error: parsed.error };
   }
 
-  const source = toIngestSource(resolved.target);
+  // --env resolves against the injected environment before any connection: a missing forward is a
+  // usage error (exit 2), caught before the network is touched.
+  let stdioEnv: Readonly<Record<string, string>> | undefined;
+  if (resolved.env !== undefined) {
+    const resolvedEnv = resolveEnv(resolved.env, ctx.env);
+    if (!resolvedEnv.ok) return { ok: false, error: resolvedEnv.error };
+    stdioEnv = resolvedEnv.value;
+  }
+
+  const source = toIngestSource(resolved.target, stdioEnv);
   const options: IngestOptions = resolved.experimental ? { experimental: true } : {};
   const ingested = await ctx.effects.ingest(source, options);
   if (!ingested.ok) {
-    // Every messy reality of the edge is already a value here; the shell only relabels it as exit 3.
-    return { ok: false, error: { kind: 'ingestion', message: ingested.error.message } };
+    // A launched stdio server gets a minimal environment, not the shell's; when a connect fails and
+    // no --env was given, that is the likeliest cause, so point at it. Suppressed once --env is in
+    // play — the user already knows the mechanism.
+    const hint =
+      resolved.target.kind === 'stdio' &&
+      ingested.error.code === 'connect-failed' &&
+      resolved.env === undefined
+        ? ' (a launched server does not inherit your shell environment; if it needs variables to start, pass them with --env)'
+        : '';
+    return { ok: false, error: { kind: 'ingestion', message: `${ingested.error.message}${hint}` } };
   }
   return { ok: true, value: ingested.value };
 }

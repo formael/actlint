@@ -11,7 +11,7 @@
 import type { ManifestSource, Outcome, Redacted, ToolManifest } from '@formael/actlint-core/contracts';
 import { err, ok } from '@formael/actlint-core/contracts';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
+import { getDefaultEnvironment, StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js';
 import { nowIso } from '../clock.ts';
@@ -37,6 +37,17 @@ function asTransport(transport: StdioClientTransport | StreamableHTTPClientTrans
   return transport as unknown as Transport;
 }
 
+/**
+ * The child's environment: the SDK's sanitized defaults with the caller's named variables on top.
+ * The SDK treats a supplied `env` as the entire child environment — the defaults (PATH, HOME, …) are
+ * not merged in — so passing only the user's variables would leave the child with no PATH. Merging
+ * over the defaults keeps npx-launched servers working; the caller wins on a collision, so an
+ * explicit override (e.g. `--env PATH=…`) still takes effect.
+ */
+export function childEnv(env: Readonly<Record<string, string>>): Record<string, string> {
+  return { ...getDefaultEnvironment(), ...env };
+}
+
 function wire(source: LiveSource): Wired {
   if (source.transport === 'stdio') {
     const commandLine = [source.command, ...(source.args ?? [])].join(' ').trim();
@@ -44,7 +55,7 @@ function wire(source: LiveSource): Wired {
     const transport = new StdioClientTransport({
       command: source.command,
       ...(source.args !== undefined ? { args: [...source.args] } : {}),
-      ...(source.env !== undefined ? { env: { ...source.env } } : {}),
+      ...(source.env !== undefined ? { env: childEnv(source.env) } : {}),
     });
     return {
       transport: asTransport(transport),
