@@ -106,6 +106,54 @@ actlint --manifest fs.json --sarif -o fs.sarif
 This is also the right shape for CI: capture in a job that has network access, gate in one that doesn't.
 `--manifest` never opens a socket.
 
+### Servers that need environment variables
+
+A launched stdio server receives a minimal, sanitized environment on purpose — not your shell's — and
+actlint forwards only what you name. A server that needs a variable to start will otherwise refuse to
+start (exit `3`), and one that quietly runs with fewer tools when a variable is missing will be linted
+against that reduced surface. Name the variables it needs with `--env`:
+
+```sh
+# Forward a secret from your environment — the value stays out of argv, shell history, and `ps`
+export HUBSPOT_TOKEN=…
+actlint --env HUBSPOT_TOKEN npx -y @hubspot/mcp-server
+
+# Set a non-secret value literally
+actlint --env LOG_LEVEL=debug npx -y some-server
+```
+
+`--env` is repeatable and applies only to a launched stdio server. Prefer the bare `--env KEY` form for
+secrets: a literal `--env KEY=VALUE` puts the value in the command line, where shell history and local
+process listings can see it.
+
+### Authenticated servers
+
+Many hosted servers answer an unauthenticated `tools/list` with `HTTP 401` — they will not enumerate
+their tools without a credential. Pass one as a request header, reading the token from an environment
+variable so it stays out of argv and shell history:
+
+```sh
+export MCP_TOKEN=…
+actlint --http https://mcp.example.com/mcp --header "Authorization: Bearer ${MCP_TOKEN}"
+```
+
+`--header` is repeatable and applies only to an `--http` target. Header values are secrets: actlint never
+writes one to a capture, a report, or an error message.
+
+Reach for the capture pattern here too. The credential is needed only when talking to the server, so
+authenticate once, save the manifest, and gate offline — no token on any later run:
+
+```sh
+# Once, where the credential lives:
+actlint --http https://mcp.example.com/mcp --header "Authorization: Bearer ${MCP_TOKEN}" --capture tools.json
+
+# Every run after, with no credential and byte-identical findings:
+actlint --manifest tools.json --fail-on medium
+```
+
+actlint carries a credential for a single scan; it never keeps one. For a server that only authenticates through an interactive browser flow, mint a token with your existing tooling — your identity provider's CLI, an OAuth helper, or a
+`curl` to the token endpoint — and hand it to `--header`.
+
 ### Output formats
 
 | Flag | Output |

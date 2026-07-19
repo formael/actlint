@@ -1,6 +1,6 @@
 {
   "name": "actlint",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A static action-risk linter for MCP servers. Reads a server's advertised tools, derives an honest action-risk profile, compares it against what each tool declares, and reports the gaps as a scorecard, a machine report, and a CI pass/fail signal. It never runs, routes, blocks, or executes anything.",
   "keywords": [
     "mcp",
