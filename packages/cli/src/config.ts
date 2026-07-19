@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { Severity } from '@formael/actlint-core';
 import { severitySchema } from '@formael/actlint-core';
-import type { EnvEntry, OutputFormat, RawTarget, ScanFlags } from './args.ts';
+import type { EnvEntry, HeaderEntry, OutputFormat, RawTarget, ScanFlags } from './args.ts';
 import { type CliError, usageError } from './exit-codes.ts';
 
 /** The declarative config file. Only these keys are honored; an unknown key is a loud error. */
@@ -121,12 +121,14 @@ export interface ResolvedScan {
   readonly vocabularyPath?: string;
   readonly experimental: boolean;
   readonly env?: readonly EnvEntry[];
+  readonly headers?: readonly HeaderEntry[];
 }
 
 /**
  * Resolve flags over a config file over the defaults. Per field the order is flags ◄ config ◄
- * default; target, output, capture, write-baseline, experimental, and env are flag-only (they
- * describe a single invocation, not a persistent policy).
+ * default; target, output, capture, write-baseline, experimental, env, and headers are flag-only
+ * (they describe a single invocation, not a persistent policy — and a header value is a secret that
+ * must never live in a config file).
  */
 export function resolveScan(flags: ScanFlags, config: FileConfig): ResolvedScan {
   const baselinePath = flags.baselinePath ?? config.baseline;
@@ -142,6 +144,7 @@ export function resolveScan(flags: ScanFlags, config: FileConfig): ResolvedScan 
     vocabularyPath?: string;
     experimental: boolean;
     env?: readonly EnvEntry[];
+    headers?: readonly HeaderEntry[];
   } = {
     target: flags.target,
     format: flags.format ?? config.format ?? DEFAULT_FORMAT,
@@ -154,5 +157,6 @@ export function resolveScan(flags: ScanFlags, config: FileConfig): ResolvedScan 
   if (flags.capturePath !== undefined) resolved.capturePath = flags.capturePath;
   if (vocabularyPath !== undefined) resolved.vocabularyPath = vocabularyPath;
   if (flags.env !== undefined) resolved.env = flags.env;
+  if (flags.headers !== undefined) resolved.headers = flags.headers;
   return resolved;
 }

@@ -10,7 +10,7 @@
 
 import { type ToolManifest, toolManifestSchema } from '@formael/actlint-core';
 import type { IngestSource } from '@formael/actlint-mcp-fetch';
-import type { EnvEntry, RawTarget } from './args.ts';
+import type { EnvEntry, HeaderEntry, RawTarget } from './args.ts';
 import { type CliError, ingestionError, usageError } from './exit-codes.ts';
 
 /** True when the target is the stdin manifest path, which the shell reads directly. */
@@ -47,10 +47,14 @@ export function resolveEnv(
 
 /**
  * Map a non-stdin target onto an mcp-fetch IngestSource. Stdin is handled separately, before this.
- * A resolved stdio environment is threaded onto the stdio arm only; when absent, the source carries
- * no env and the SDK's default sanitized environment is used unchanged.
+ * A resolved stdio environment is threaded onto the stdio arm only; request headers are threaded
+ * onto the http arm only. When either is absent, the source carries neither.
  */
-export function toIngestSource(target: RawTarget, stdioEnv?: Readonly<Record<string, string>>): IngestSource {
+export function toIngestSource(
+  target: RawTarget,
+  stdioEnv?: Readonly<Record<string, string>>,
+  headers?: readonly HeaderEntry[],
+): IngestSource {
   switch (target.kind) {
     case 'stdio':
       return {
@@ -61,7 +65,14 @@ export function toIngestSource(target: RawTarget, stdioEnv?: Readonly<Record<str
         ...(stdioEnv !== undefined ? { env: stdioEnv } : {}),
       };
     case 'http':
-      return { kind: 'live', transport: 'http', url: target.url };
+      return {
+        kind: 'live',
+        transport: 'http',
+        url: target.url,
+        ...(headers !== undefined && headers.length > 0
+          ? { headers: Object.fromEntries(headers.map((h) => [h.name, h.value])) }
+          : {}),
+      };
     case 'card':
       return { kind: 'server-card', origin: target.url };
     case 'registry':

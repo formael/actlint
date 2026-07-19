@@ -25,6 +25,12 @@ export type EnvEntry =
   | { readonly key: string; readonly kind: 'literal'; readonly value: string }
   | { readonly key: string; readonly kind: 'forward' };
 
+/** One --header entry as written. The value is carried verbatim and treated as a secret. */
+export interface HeaderEntry {
+  readonly name: string;
+  readonly value: string;
+}
+
 /** The flags of a scan invocation, exactly as given. Absent overrides are filled by config/defaults. */
 export interface ScanFlags {
   readonly target: RawTarget;
@@ -37,6 +43,7 @@ export interface ScanFlags {
   readonly vocabularyPath?: string;
   readonly experimental?: boolean;
   readonly env?: readonly EnvEntry[];
+  readonly headers?: readonly HeaderEntry[];
 }
 
 export type Command =
@@ -68,6 +75,23 @@ function parseEnvEntry(token: string): EnvEntry | CliError {
     return usageError(`--env expects KEY or KEY=VALUE with a valid variable name (got '${key}')`);
   }
   return eq === -1 ? { key, kind: 'forward' } : { key, kind: 'literal', value: token.slice(eq + 1) };
+}
+
+// An RFC 7230 field-name token: the characters a header name is allowed to contain.
+const HEADER_NAME = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
+
+// Parse one --header token, "Name: value". Splits at the first colon, since a value (e.g. a bearer
+// token) may itself contain colons. The name is trimmed and validated; the value is the remainder
+// with leading whitespace stripped, taken otherwise verbatim. A value is never echoed in an error —
+// a mistyped header may carry a live credential.
+function parseHeaderEntry(token: string): HeaderEntry | CliError {
+  const colon = token.indexOf(':');
+  if (colon === -1) return usageError("--header expects 'Name: value'");
+  const name = token.slice(0, colon).trim();
+  if (!HEADER_NAME.test(name)) {
+    return usageError(`--header expects a valid header name before ':' (got '${name}')`);
+  }
+  return { name, value: token.slice(colon + 1).replace(/^\s+/, '') };
 }
 
 // A single-target invariant, enforced as tokens are read: setting a second target is a usage error,
@@ -206,6 +230,23 @@ export function parseArgv(argv: readonly string[]): ParseResult {
         break;
       }
 
+      case '--header': {
+        const value = valueFor('--header');
+        if (typeof value !== 'string') return { ok: false, error: value };
+        const entry = parseHeaderEntry(value);
+        if (!('name' in entry)) return { ok: false, error: entry };
+        const existing = draft.headers ?? [];
+        // Header names are case-insensitive; a duplicate is a loud error, never a silent last-wins.
+        if (existing.some((h) => h.name.toLowerCase() === entry.name.toLowerCase())) {
+          return {
+            ok: false,
+            error: usageError(`--header ${entry.name} given more than once — set each header once`),
+          };
+        }
+        draft.headers = [...existing, entry];
+        break;
+      }
+
       case '--http': {
         const value = valueFor('--http');
         if (typeof value !== 'string') return { ok: false, error: value };
@@ -277,6 +318,9 @@ export function parseArgv(argv: readonly string[]): ParseResult {
   }
   if (draft.env !== undefined && draft.env.length > 0 && draft.target.kind !== 'stdio') {
     return { ok: false, error: usageError('--env only applies when launching a stdio server') };
+  }
+  if (draft.headers !== undefined && draft.headers.length > 0 && draft.target.kind !== 'http') {
+    return { ok: false, error: usageError('--header only applies to an --http target') };
   }
 
   return { ok: true, command: { kind: 'scan', flags: draft as ScanFlags } };

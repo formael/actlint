@@ -23,6 +23,11 @@ Stdio server:
   --env KEY[=VALUE]         pass an environment variable to the launched server; bare KEY
                             forwards the value from your environment (repeatable)
 
+HTTP server:
+  --header "<name>: <value>"  send a request header when connecting with --http; use an
+                            environment variable for tokens (repeatable). Header values are
+                            never written to captures, reports, or errors
+
 Output:
   (default)                 human scorecard to stdout
   --json                    machine report (a versioned public API)

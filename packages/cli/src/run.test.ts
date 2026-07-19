@@ -331,6 +331,67 @@ describe('--env forwarding', () => {
   });
 });
 
+describe('--header (authenticated http)', () => {
+  // A fake ingest that records the source it was handed and returns a clean manifest.
+  function recordingIngest(): { effect: Effects['ingest']; source: () => IngestSource | undefined } {
+    let seen: IngestSource | undefined;
+    const effect: Effects['ingest'] = async (source) => {
+      seen = source;
+      return { ok: true, value: CLEAN } satisfies Outcome<ToolManifest, IngestError>;
+    };
+    return { effect, source: () => seen };
+  }
+
+  it('threads headers onto the http source as an exact record', async () => {
+    const rec = recordingIngest();
+    const result = await run(
+      ['--http', 'https://x/mcp', '--header', 'Authorization: Bearer t0ken'],
+      ctx({ ingest: rec.effect }),
+    );
+    expect(result.exitCode).toBe(EXIT.clean);
+    const source = rec.source();
+    expect(source?.kind === 'live' && source.transport === 'http' ? source.headers : undefined).toEqual({
+      Authorization: 'Bearer t0ken',
+    });
+    // The credential appears in no output.
+    expect(result.stdout).not.toContain('t0ken');
+    expect(result.stderr).not.toContain('t0ken');
+  });
+
+  it('maps auth-required to exit 3 and hints at --header when none was given', async () => {
+    const failing: Effects['ingest'] = async () => ({
+      ok: false,
+      error: {
+        code: 'auth-required',
+        message: 'the server requires authorization before it will share its tool list (HTTP 401, Bearer)',
+      },
+    });
+    const result = await run(['--http', 'https://x/mcp'], ctx({ ingest: failing }));
+    expect(result.exitCode).toBe(EXIT.ingestion);
+    expect(result.stderr).toMatch(/requires authorization/);
+    expect(result.stderr).toContain('--header');
+    expect(result.stdout).toBe('');
+  });
+
+  it('suppresses the --header hint when a header was supplied', async () => {
+    const failing: Effects['ingest'] = async () => ({
+      ok: false,
+      error: {
+        code: 'auth-required',
+        message: 'the server did not accept the presented credential (HTTP 401, Bearer)',
+      },
+    });
+    const result = await run(
+      ['--http', 'https://x/mcp', '--header', 'Authorization: Bearer wrong'],
+      ctx({ ingest: failing }),
+    );
+    expect(result.exitCode).toBe(EXIT.ingestion);
+    expect(result.stderr).toMatch(/did not accept/);
+    expect(result.stderr).not.toContain('pass a token with --header');
+    expect(result.stderr).not.toContain('wrong');
+  });
+});
+
 describe('no phone-home', () => {
   const fetchSpy = vi.fn();
   beforeEach(() => {
