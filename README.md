@@ -56,11 +56,26 @@ Requires **Node ≥ 22**.
 schema. Reproducing a report needs all four, so you can always say exactly which judgment graded a server:
 
 ```
-actlint        0.1.2
-vocabulary     0.4.0
+actlint        0.3.0
+vocabulary     0.5.0
 crosswalk      0.1.0
-report-schema  1.0.0
+report-schema  1.1.0
 ```
+
+## Use it in CI
+
+Gate a build with the [GitHub Action](./packages/github-action), pinned to a full commit SHA:
+
+```yaml
+- uses: formael/actlint/packages/github-action@df516d81ba3719687d1d72227737887c3534e1db # v0.1.0
+  with:
+    args: --http https://host/mcp --fail-on medium
+```
+
+The step's exit code is the gate: a dishonest server fails the job, a clean one passes. For the
+reproducible shape, split the work in two — a job with network access captures the manifest once, and
+the gated job replays it offline with `--manifest`, which opens no socket. See
+[Gate a build](#gate-a-build) for the exit codes and `--fail-on` thresholds.
 
 ## Usage
 
@@ -184,13 +199,9 @@ actlint --manifest fs.json --fail-on medium
 
 `--fail-on` takes one of `info`, `low`, `medium`, `high`, `critical`.
 
-In CI, use the [GitHub Action](./packages/github-action):
-
-```yaml
-- uses: formael/actlint/packages/github-action@<commit-sha> # v0.1.0 — SHA-pinned; see the action README
-  with:
-    args: --card https://example.com/.well-known/mcp --fail-on medium
-```
+In CI, the [GitHub Action](./packages/github-action) runs the same command and lets this exit code fail
+the job — see [Use it in CI](#use-it-in-ci) above for the SHA-pinned snippet, and the action README for
+its full inputs and version-reference options.
 
 ### Adopt on a noisy server with a baseline
 

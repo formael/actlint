@@ -18,9 +18,17 @@ captured file.
 It only ever lists tools. It issues the MCP handshake and `tools/list`, never `tools/call`. A
 test asserts the call method is absent from the package.
 
+A launched stdio server runs with a sanitized environment — the SDK's minimal defaults plus any
+variables named with `--env`, and nothing else — so a credential reaches the child only when the
+caller asks for it. An `--http` connection may carry a `--header` credential; header values, like
+endpoints, are held only long enough to make the request. A protected server that answers an
+unauthenticated `tools/list` with HTTP 401 becomes a typed `auth-required` ingestion error: actlint
+reads the `WWW-Authenticate` challenge the server already sent, reports what it asked for, and issues
+no request of its own. It maps to exit 3, never a partial score.
+
 Everything is normalized at the boundary. SDK output is translated into actlint's own
 `ToolManifest` types immediately, annotations become three-state `DeclaredHint` values, and
-endpoints that may carry credentials are stored redacted. Any failure becomes a typed
+endpoints or credentials that could leak are stored redacted. Any failure becomes a typed
 `IngestError`.
 
 Any manifest can be written to disk with `--capture` and replayed with `--manifest`. This is how
@@ -50,6 +58,11 @@ Each match yields a contribution: a dimension, a level, a weight, and a confiden
 the vocabulary entry that matched. Schema-shape signals carry the highest weights because they are
 language-independent structure; description phrases carry the lowest because prose is easy to
 write and easy to game.
+
+A schema-shape signal can require a conjunction of a parameter name and its JSON Schema type — for
+example a container-typed parameter keyed `create`, `update`, or `delete`. That lets a write-shaped
+input schema stand as write evidence on its own, so a mutating tool is caught even when its name uses
+a verb the vocabulary has never seen.
 
 ### Composition
 
@@ -135,6 +148,13 @@ by published policy data. Each tool is counted once under its worst verdict, ver
 produce a score in [0, 1], the score selects a band, and the presence of any under-declared tool
 or any critical finding caps the grade regardless of score. Advisory findings never move it. The
 grade measures how honestly a server labels its actions, not how safe the server is.
+
+**Coverage** is reported alongside the grade. A tool no signal spoke to is `unassessed`, and every
+rendering says so — the scorecard qualifies the grade line with "assessed N of M tools" and the JSON
+report carries a `coverage` block. An unassessed tool is never counted as consistent: presenting
+actlint's own recall gap as a clean bill of health would spend the trust the tool exists to hold. This
+makes silence visible without letting it accuse — the Stage 3 rule that a signal-free `unknown` cannot
+contradict a declaration is unchanged.
 
 **Three renderings** of the same `ServerResult`:
 

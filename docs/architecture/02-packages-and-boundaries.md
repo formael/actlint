@@ -52,9 +52,15 @@ A back-edge fails lint. The direction keeps judgment (data), mechanism (core), a
 One boundary matters more than any other: the line between `mcp-fetch` and everything downstream
 of a captured `ToolManifest`.
 
-`mcp-fetch` is impure by design. It opens connections, spawns stdio servers, reads files,
+`mcp-fetch` is impure by design. It opens connections, spawns stdio servers with a sanitized
+environment plus any caller-named variables, sends a caller-supplied request header, reads files,
 enforces timeouts, and reads the clock to timestamp a capture. Every failure it can encounter is
 converted into a typed `IngestError` value before anything downstream sees it.
+
+It may carry a credential for the duration of one scan; it never keeps one. A forwarded environment
+value or request header is used to reach the server and then dropped — it is never written to a
+capture, a report, or an error message, and nothing about it crosses the `ToolManifest` boundary.
+Persisting or brokering credentials is out of scope by design.
 
 `core`, `vocabulary`, and `reporters` are pure. They import no clock, network, filesystem,
 process access, or randomness. Given the same manifest and the same vocabulary version, they
