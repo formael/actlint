@@ -76,8 +76,11 @@ and mechanism belongs in code where it can be property-tested.
 ## Growth discipline
 
 The seed vocabulary covers the high-signal verb families (read, create, mutate, delete, send,
-transfer) and the two strongest schema shapes rather than attempting breadth. Every entry is a
-potential source of false positives, so additions must earn their place.
+transfer) and the strongest schema shapes — free-form code input, external destinations, and
+write- and delete-operation structure — rather than attempting breadth. A schema-shape entry can
+condition on a parameter's type as well as its name, so write-operation structure argues for a
+mutating tool without a matching name verb. Every entry is a potential source of false positives, so
+additions must earn their place.
 
 An addition must carry evidence, and a citation when high-weight. It must pass the eval corpus
 without dropping precision below the committed floor. And it must be reviewed by a human.

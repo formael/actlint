@@ -31,6 +31,17 @@ normalized manifest for replay. `--fail-on <severity>` sets the CI gate threshol
 `high`). `--vocabulary` pins a judgment version. `actlint explain <ruleId>` documents any rule
 from the terminal.
 
+Two repeatable flags feed a credential to the one step that talks to a server:
+
+| Flag | Applies to | Meaning |
+|---|---|---|
+| `--env KEY[=VALUE]` | a launched stdio command | forward a named variable to the child; bare `KEY` forwards it from actlint's own environment, `KEY=VALUE` sets a literal |
+| `--header <name>: <value>` | an `--http` target | send a request header — the home for a bearer token |
+
+Each is valid only with its own target; using either against the wrong one is a usage error (exit 2).
+Both are documented to take a value indirectly through an environment variable, so a secret never lands
+in argv or shell history. A named credential is carried for a single scan and never persisted.
+
 The CLI is a thin shell over the library packages: it parses arguments, resolves config, wires
 fetch through core through reporters, and exits. It contains no analysis logic.
 
@@ -63,8 +74,11 @@ key fails the conformance test rather than shipping an incompatible payload.
 
 The report carries everything a consumer needs to re-explain a verdict without re-running the
 engine: each finding's rationale, standards references, and both the derived and declared profiles,
-plus a per-tool summary, the grade, and the versions that produced the result. Live endpoints are
-rendered redacted; a report never contains a credential-bearing URL.
+plus a per-tool summary, the grade, and the versions that produced the result. It also carries a
+per-server `coverage` block — how many tools actlint could assess, how many it could not, and the
+names of the unassessed ones — so a consumer can tell a clean scan from a thin one. Live endpoints are
+rendered redacted; a report never contains a credential-bearing URL, and a forwarded environment value
+or request header never appears in it, in a capture, or in an error message.
 
 `--sarif` emits SARIF 2.1.0 for code-scanning platforms, keyed by the same stable rule IDs.
 

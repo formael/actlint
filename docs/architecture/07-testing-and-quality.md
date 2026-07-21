@@ -22,7 +22,8 @@ The three properties that matter most:
 **Monotonicity.** Adding signals to a tool can never make its derived profile less concerning.
 Reassuring prose in a description can add contributions but cannot remove them.
 
-**Conservatism.** Silence composes to `unknown`, never to a safe level. Blast-radius confidence
+**Conservatism.** Silence composes to `unknown`, never to a safe level, and a tool derived entirely
+from silence is surfaced as `unassessed` rather than counted consistent. Blast-radius confidence
 never exceeds its least confident input.
 
 **Ordering invariance.** Findings do not depend on tool order or signal order.

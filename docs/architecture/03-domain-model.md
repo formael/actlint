@@ -29,8 +29,8 @@ interface ToolManifest {
 ```
 
 `ManifestSource` is a closed union of the four capture origins: `live` (stdio or HTTP, with the
-endpoint stored redacted), `server-card`, `registry`, and `file`. The source appears in report
-headers so a reader always knows what was scanned.
+endpoint stored redacted and any credential absent), `server-card`, `registry`, and `file`. The
+source appears in report headers so a reader always knows what was scanned.
 
 ### ToolDefinition
 
