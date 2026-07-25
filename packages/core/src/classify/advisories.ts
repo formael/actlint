@@ -64,9 +64,14 @@ export function advisories(
   }
 
   // no-scope-constraint — a sensitive tool whose schema declares parameters but bounds none of them
-  // (no enum, const, pattern, or format anywhere). A tighter schema would scope what it can do.
+  // (no enum, const, pattern, format, or maxLength anywhere). A tighter schema would scope what it
+  // can do. A size bound counts as narrowing here even though it does not fix a string's shape.
   const params = collectParams(inputSchema);
-  if (isSensitive(derived) && params.length > 0 && params.every((p) => p.isFreeformString)) {
+  if (
+    isSensitive(derived) &&
+    params.length > 0 &&
+    params.every((p) => p.isFreeformString && !p.hasSizeBound)
+  ) {
     out.push({
       ruleId: RULE.noScopeConstraint,
       verdict: 'undeclared',

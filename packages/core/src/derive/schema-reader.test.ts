@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Formael
 // SPDX-License-Identifier: Apache-2.0
 
+import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
 
 import type { JsonSchema } from '../manifest.ts';
@@ -77,8 +78,62 @@ describe('collectParams', () => {
     // `properties` that is not an object is ignored rather than crashing the walk.
     expect(collectParams({ properties: 'nonsense' } as unknown as JsonSchema)).toEqual([]);
     expect(collectParams({ properties: { x: null } } as unknown as JsonSchema)).toEqual([
-      { name: 'x', types: [], isFreeformString: false },
+      { name: 'x', types: [], isFreeformString: false, hasSizeBound: false },
     ]);
+  });
+});
+
+describe('collectParams — size bounds are orthogonal to shape', () => {
+  it('a maxLength-only string is both free-form and size-bounded', () => {
+    const schema: JsonSchema = {
+      type: 'object',
+      properties: { channelId: { type: 'string', maxLength: 255 } },
+    };
+    const param = byName(collectParams(schema), 'channelId');
+    expect(param?.isFreeformString).toBe(true);
+    expect(param?.hasSizeBound).toBe(true);
+  });
+
+  it('a plain string is neither shape-fixed nor size-bounded', () => {
+    const schema: JsonSchema = { type: 'object', properties: { raw: { type: 'string' } } };
+    const param = byName(collectParams(schema), 'raw');
+    expect(param?.isFreeformString).toBe(true);
+    expect(param?.hasSizeBound).toBe(false);
+  });
+
+  it('enum / pattern / format strings stay shape-fixed and unbounded', () => {
+    const schema: JsonSchema = {
+      type: 'object',
+      properties: {
+        mode: { type: 'string', enum: ['a', 'b'] },
+        code: { type: 'string', pattern: '^[0-9]{4}$' },
+        link: { type: 'string', format: 'uri' },
+      },
+    };
+    const params = collectParams(schema);
+    for (const name of ['mode', 'code', 'link']) {
+      expect(byName(params, name)?.isFreeformString).toBe(false);
+      expect(byName(params, name)?.hasSizeBound).toBe(false);
+    }
+  });
+
+  it('property: adding a maxLength never changes isFreeformString', () => {
+    const stringNode = fc.record(
+      {
+        type: fc.constant('string'),
+        enum: fc.constant(['a', 'b']),
+        pattern: fc.constant('^x$'),
+        format: fc.constantFrom('uri', 'email'),
+      },
+      { requiredKeys: ['type'] },
+    );
+    fc.assert(
+      fc.property(stringNode, fc.integer({ min: 1, max: 100000 }), (node, cap) => {
+        const without = collectParams({ type: 'object', properties: { p: node } });
+        const with_ = collectParams({ type: 'object', properties: { p: { ...node, maxLength: cap } } });
+        expect(with_[0]?.isFreeformString).toBe(without[0]?.isFreeformString);
+      }),
+    );
   });
 });
 
