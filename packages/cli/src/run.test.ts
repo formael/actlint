@@ -14,17 +14,17 @@ import { reportSchema } from '@formael/actlint-core';
 import type { IngestError, IngestSource } from '@formael/actlint-mcp-fetch';
 import { ingest, writeCapture } from '@formael/actlint-mcp-fetch';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { EXIT } from './exit-codes.ts';
-import { parseStdinManifest } from './ingest-target.ts';
-import { run } from './run.ts';
-import type { Effects, RunContext } from './scan.ts';
 import {
   CLEAN_MANIFEST,
   DISHONEST_MANIFEST,
   SILENT_SERVER_MANIFEST,
   UNASSESSED_MANIFEST,
   UNDECLARED_MANIFEST,
-} from './test-manifests.ts';
+} from './__test-support__/manifests.ts';
+import { EXIT } from './exit-codes.ts';
+import { parseStdinManifest } from './ingest-target.ts';
+import { run } from './run.ts';
+import type { Effects, RunContext } from './scan.ts';
 
 // A ready ToolManifest a fake ingest can hand back without launching anything.
 const CLEAN: ToolManifest = (() => {

@@ -4,9 +4,9 @@
 import { VOCABULARY } from '@formael/action-risk-vocabulary';
 import { classifyManifest, type Finding } from '@formael/actlint-core';
 import { describe, expect, it } from 'vitest';
+import { DISHONEST_MANIFEST } from './__test-support__/manifests.ts';
 import { buildBaseline, fingerprint, partitionByBaseline } from './baseline.ts';
 import { parseStdinManifest } from './ingest-target.ts';
-import { DISHONEST_MANIFEST } from './test-manifests.ts';
 import type { Versions } from './version.ts';
 
 const VERSIONS: Versions = {
