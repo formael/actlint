@@ -1,0 +1,7 @@
+{
+  "extends": ["./tsconfig.json", "../../tsconfig.dts.base.json"],
+  "compilerOptions": {
+    "rootDir": "src"
+  },
+  "include": ["src/**/*.ts"]
+}

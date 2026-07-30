@@ -20,7 +20,7 @@
     "schema"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && tsc -p tsconfig.dts.json",
     "clean": "rm -rf dist"
   },
   "dependencies": {

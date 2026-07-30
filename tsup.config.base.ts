@@ -11,7 +11,7 @@ export function definePackageBuild(overrides: Partial<Options> = {}): Options {
     format: ['esm'],
     target: 'node22',
     outDir: 'dist',
-    dts: true,
+    dts: false,
     clean: true,
     sourcemap: true,
     treeshake: true,
