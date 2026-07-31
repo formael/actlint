@@ -134,6 +134,13 @@ describe('schemaShapeSignals', () => {
     expect(schemaShapeSignals(obj({ sql: { type: 'string', enum: ['a'] } }), vocab)).toEqual([]);
   });
 
+  it('still fires the free-form signal for a code parameter bounded only by maxLength', () => {
+    // A size cap bounds how much can flow through, not the shape — bounded code is still code.
+    expect(ids(schemaShapeSignals(obj({ command: { type: 'string', maxLength: 10000 } }), vocab))).toEqual([
+      'shape.freeform',
+    ]);
+  });
+
   it('matches a destination name by token, not by coincidental substring', () => {
     // `webhook` matches; `curl_opts` tokenizes to [curl, opts] and never matches `url`.
     expect(ids(schemaShapeSignals(obj({ webhook: { type: 'string' } }), vocab))).toEqual(['shape.dest-name']);

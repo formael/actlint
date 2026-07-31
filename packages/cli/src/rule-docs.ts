@@ -102,6 +102,6 @@ export const RULE_DOCS: Readonly<Record<string, RuleDoc>> = {
     reason:
       'Not an honesty verdict and never gating by default. An unconstrained schema means the schema itself tells a reviewer little about how far the tool can reach.',
     example: 'A tool whose only parameter is an open object with additionalProperties allowed.',
-    fix: 'Add the constraints that describe the intended scope — required fields, enums, or patterns — so the schema documents the boundary.',
+    fix: 'Add the constraints that describe the intended scope — required fields, enums, patterns, or a maxLength on a free-form string — so the schema documents the boundary.',
   },
 };

@@ -13,14 +13,17 @@ import type { JsonSchema } from '../manifest.ts';
 
 // A parameter observed in the schema, reduced to exactly what the schema-shape signals ask about:
 // its declared name, its declared string `format` (if any), its declared JSON Schema `type`(s),
-// and whether it is an unconstrained free-form string (a string with no `enum`, `const`, `pattern`,
-// or `format` to bound it). `types` is normalized to an array: a scalar `type` becomes a
-// single-element array, a type union passes through, and an absent or malformed `type` yields `[]`.
+// whether it is an unconstrained free-form string (a string with no `enum`, `const`, `pattern`,
+// or `format` to bound its shape), and whether it carries a size bound (`maxLength`). `types` is
+// normalized to an array: a scalar `type` becomes a single-element array, a type union passes
+// through, and an absent or malformed `type` yields `[]`. `isFreeformString` and `hasSizeBound`
+// are orthogonal — see `isConstrained` and `hasMaxLength`.
 export interface SchemaParam {
   readonly name: string;
   readonly format?: string;
   readonly types: readonly string[];
   readonly isFreeformString: boolean;
+  readonly hasSizeBound: boolean;
 }
 
 // Bound the walk so a self-referential or pathologically deep schema cannot spin. Real tool
@@ -46,20 +49,29 @@ function isStringTyped(node: Record<string, unknown>): boolean {
   return declaredTypes(node).includes('string');
 }
 
-// A string parameter is "constrained" when the schema bounds its value — an enum, a const, a tight
-// pattern, or a declared format. An unconstrained string is the free-form-code-input shape.
+// A string parameter is "shape-fixed" when the schema bounds the FORM of its value — an enum, a
+// const, a tight pattern, or a declared format. This is what makes a string not arbitrary code, so
+// it is the predicate behind `isFreeformString`. A size bound (`maxLength`) deliberately does not
+// belong here: bounded code is still code. Size bounds are scope hygiene — see `hasMaxLength`.
 function isConstrained(node: Record<string, unknown>): boolean {
   return (
     'enum' in node || 'const' in node || typeof node.pattern === 'string' || typeof node.format === 'string'
   );
 }
 
+// A string's upper size bound, read only by the `no-scope-constraint` advisory. Any declared
+// `maxLength` counts regardless of magnitude — the presence of a bound is the signal.
+function hasMaxLength(node: Record<string, unknown>): boolean {
+  return typeof node.maxLength === 'number';
+}
+
 function describeParam(name: string, node: unknown): SchemaParam {
-  if (!isRecord(node)) return { name, types: [], isFreeformString: false };
+  if (!isRecord(node)) return { name, types: [], isFreeformString: false, hasSizeBound: false };
   const format = typeof node.format === 'string' ? node.format : undefined;
   const types = declaredTypes(node);
   const isFreeformString = isStringTyped(node) && !isConstrained(node);
-  return format === undefined ? { name, types, isFreeformString } : { name, format, types, isFreeformString };
+  const base = { name, types, isFreeformString, hasSizeBound: hasMaxLength(node) };
+  return format === undefined ? base : { ...base, format };
 }
 
 // Subschema-bearing keywords whose value is a single schema.

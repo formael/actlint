@@ -59,4 +59,29 @@ describe('no-scope-constraint', () => {
     const out = advisories(unconstrained, derived, [sig('verb.delete')]);
     expect(ids(out)).not.toContain(RULE.noScopeConstraint as string);
   });
+
+  it('stays quiet when the only param is bounded by maxLength', () => {
+    const bounded: JsonSchema = {
+      type: 'object',
+      properties: { channelId: { type: 'string', maxLength: 255 } },
+    };
+    const derived = profile({ destructiveness: dim('deleting', 'high', [sig('verb.delete')]) });
+    const out = advisories(bounded, derived, [sig('verb.delete')]);
+    expect(ids(out)).not.toContain(RULE.noScopeConstraint as string);
+  });
+
+  it('stays quiet when at least one param is bounded, like a single enum silences it', () => {
+    // The advisory fires only when NO param carries any narrowing. A maxLength on one param is a
+    // scope constraint, so — as with an enum — the nudge goes quiet even if a sibling is unbounded.
+    const mixed: JsonSchema = {
+      type: 'object',
+      properties: {
+        channelId: { type: 'string', maxLength: 255 },
+        message: { type: 'string' },
+      },
+    };
+    const derived = profile({ destructiveness: dim('deleting', 'high', [sig('verb.delete')]) });
+    const out = advisories(mixed, derived, [sig('verb.delete')]);
+    expect(ids(out)).not.toContain(RULE.noScopeConstraint as string);
+  });
 });
