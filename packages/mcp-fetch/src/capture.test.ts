@@ -86,6 +86,25 @@ describe('capture-and-replay round-trip', () => {
     expect(replay.value.source).toEqual({ kind: 'file', path });
   });
 
+  it('preserves the negotiated protocolRevision across capture and replay', async () => {
+    const withRevision = toManifest(
+      { tools: [{ name: 'only', inputSchema: { type: 'object' }, annotations: {} }] },
+      LIVE_SOURCE,
+      AT,
+      '2026-07-28',
+    );
+    if (!withRevision.ok) throw new Error('fixture manifest failed to build');
+    const path = join(dir, 'with-revision.json');
+
+    const write = await writeCapture(withRevision.value, path);
+    expect(write.ok).toBe(true);
+
+    const replay = await readManifestFile(path);
+    expect(replay.ok).toBe(true);
+    if (!replay.ok) return;
+    expect(replay.value.protocolRevision).toBe('2026-07-28');
+  });
+
   it('re-capturing a replayed manifest is byte-identical in its tools', async () => {
     const path = join(dir, 'roundtrip.json');
     await writeCapture(buildManifest(), path);

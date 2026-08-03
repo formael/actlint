@@ -37,6 +37,10 @@ Pick exactly one target:
 | `--registry <serverId>` | a server resolved from the MCP Registry |
 | `--manifest <path\|->` | a previously captured manifest, or `-` for stdin |
 
+When scanning a stdio server, actlint detects which protocol version the server speaks; on stdio this
+may briefly start the server command a second time to probe it, then reads the tool list once the
+version is known.
+
 Output defaults to a human scorecard; `--json` emits the machine report (a versioned public API) and
 `--sarif` emits SARIF 2.1.0 for code scanning. `-o, --output <path>` writes to a file. The CI gate is
 `--fail-on <severity>` (default `high`); `--baseline <path>` suppresses already-accepted findings. Run

@@ -5,6 +5,10 @@
 // there is no `tools/call` code path anywhere in the project, by design and by this test. This is
 // the structural expression of "it does not run, route, or block anything."
 //
+// The complete set of wire methods actlint's client ever sends is: the legacy `initialize`-family
+// handshake, `server/discover` (issued by the SDK's era probe during connect — metadata only), and
+// `tools/list`. Reading a tool list is discovery; invoking a tool is not, and never happens here.
+//
 // The scan strips comments first, so documentation is free to name the rule it enforces; only real
 // code is checked. The forbidden tokens are assembled from fragments so this file never matches
 // itself.
