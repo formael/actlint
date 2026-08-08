@@ -4,6 +4,7 @@
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { ManifestSource, ToolManifest } from '@formael/actlint-core/contracts';
 import { isoTimestampSchema, Redacted } from '@formael/actlint-core/contracts';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -86,6 +87,25 @@ describe('capture-and-replay round-trip', () => {
     expect(replay.value.source).toEqual({ kind: 'file', path });
   });
 
+  it('preserves the negotiated protocolRevision across capture and replay', async () => {
+    const withRevision = toManifest(
+      { tools: [{ name: 'only', inputSchema: { type: 'object' }, annotations: {} }] },
+      LIVE_SOURCE,
+      AT,
+      '2026-07-28',
+    );
+    if (!withRevision.ok) throw new Error('fixture manifest failed to build');
+    const path = join(dir, 'with-revision.json');
+
+    const write = await writeCapture(withRevision.value, path);
+    expect(write.ok).toBe(true);
+
+    const replay = await readManifestFile(path);
+    expect(replay.ok).toBe(true);
+    if (!replay.ok) return;
+    expect(replay.value.protocolRevision).toBe('2026-07-28');
+  });
+
   it('re-capturing a replayed manifest is byte-identical in its tools', async () => {
     const path = join(dir, 'roundtrip.json');
     await writeCapture(buildManifest(), path);
@@ -95,6 +115,38 @@ describe('capture-and-replay round-trip', () => {
     const recapture = serializeManifest(replay.value);
     // The tools block is identical across the round-trip (only provenance differs).
     expect(JSON.parse(recapture).tools).toEqual(JSON.parse(serializeManifest(buildManifest())).tools);
+  });
+});
+
+// A permanent 2026-era regression input: a real capture of a reference server speaking the
+// 2026-07-28 revision, committed so the repo always carries a modern-era manifest to replay. Its
+// job here is to pin `protocolRevision` provenance travelling through capture → replay; the tools
+// are valid ToolManifest forever, so keeping the file is itself the backward-compatibility test.
+const FIXTURE_2026 = fileURLToPath(new URL('./__fixtures__/capture-2026-era.json', import.meta.url));
+
+describe('a committed 2026-era capture', () => {
+  it('loads as a valid manifest carrying the negotiated 2026-07-28 revision', async () => {
+    const loaded = await readManifestFile(FIXTURE_2026);
+    expect(loaded.ok).toBe(true);
+    if (!loaded.ok) return;
+    expect(loaded.value.protocolRevision).toBe('2026-07-28');
+    expect(loaded.value.tools.map((t) => t.name)).toEqual(['read_document', 'purge_record', 'fetch_url']);
+  });
+
+  it('round-trips capture → replay with its revision and tools byte-identical', async () => {
+    const loaded = await readManifestFile(FIXTURE_2026);
+    expect(loaded.ok).toBe(true);
+    if (!loaded.ok) return;
+
+    const path = join(dir, 'replayed-2026.json');
+    const write = await writeCapture(loaded.value, path);
+    expect(write.ok).toBe(true);
+
+    const replay = await readManifestFile(path);
+    expect(replay.ok).toBe(true);
+    if (!replay.ok) return;
+    expect(replay.value.protocolRevision).toBe('2026-07-28');
+    expect(JSON.stringify(replay.value.tools)).toBe(JSON.stringify(loaded.value.tools));
   });
 });
 
