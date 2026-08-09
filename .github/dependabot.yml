@@ -27,5 +27,10 @@ updates:
         dependency-type: development
       production-dependencies:
         dependency-type: production
+    ignore:
+      # @modelcontextprotocol/client is pinned to an exact version on purpose: the package is new,
+      # so we hold the exact pin (plus lockfile) until a subsequent v2 release has been reviewed
+      # uneventfully. Remove this entry — and move to a caret range — once that review has happened.
+      - dependency-name: "@modelcontextprotocol/client"
     commit-message:
       prefix: "chore(deps)"

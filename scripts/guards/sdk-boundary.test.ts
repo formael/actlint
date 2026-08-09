@@ -12,9 +12,22 @@ describe('check-sdk-boundary', () => {
     expect(checkSdkBoundary([fixture('sdk/clean')])).toEqual([]);
   });
 
-  it('fails on a planted MCP SDK import outside mcp-fetch', () => {
+  it('flags the v1 SDK specifier (@modelcontextprotocol/sdk)', () => {
     const violations = checkSdkBoundary([fixture('sdk/violation')]);
-    expect(violations.some((v) => v.rule === 'sdk-boundary')).toBe(true);
+    expect(violations.some((v) => v.file.endsWith('imports-sdk.ts'))).toBe(true);
+  });
+
+  it('flags v2 scope specifiers, including subpaths (@modelcontextprotocol/client/stdio)', () => {
+    const violations = checkSdkBoundary([fixture('sdk/violation')]);
+    const v2 = violations.find((v) => v.file.endsWith('imports-sdk-v2.ts'));
+    expect(v2).toBeDefined();
+    expect(v2?.rule).toBe('sdk-boundary');
+    expect(v2?.detail).toContain('@modelcontextprotocol/client/stdio');
+  });
+
+  it('does not flag near-miss names outside the @modelcontextprotocol/ scope', () => {
+    const violations = checkSdkBoundary([fixture('sdk/clean')]);
+    expect(violations).toEqual([]);
   });
 
   it('holds the real non-mcp-fetch packages clean', () => {

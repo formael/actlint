@@ -10,11 +10,16 @@
 
 import type { ManifestSource, Outcome, Redacted, ToolManifest } from '@formael/actlint-core/contracts';
 import { err, ok } from '@formael/actlint-core/contracts';
-import { extractWWWAuthenticateParams } from '@modelcontextprotocol/sdk/client/auth.js';
-import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import { getDefaultEnvironment, StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
-import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
-import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js';
+import {
+  Client,
+  extractWWWAuthenticateParams,
+  SdkHttpError,
+  StreamableHTTPClientTransport,
+  type Transport,
+  UnauthorizedError,
+  UnsupportedProtocolVersionError,
+} from '@modelcontextprotocol/client';
+import { getDefaultEnvironment, StdioClientTransport } from '@modelcontextprotocol/client/stdio';
 import { nowIso } from '../clock.ts';
 import type { IngestError } from '../errors.ts';
 import { authRequired, connectFailed, malformedTools, timedOut } from '../errors.ts';
@@ -63,13 +68,6 @@ function observeAuth(): { fetch: typeof fetch; challenge: () => AuthChallenge | 
   return { fetch: observer, challenge: () => seen };
 }
 
-// The SDK transports are not written against `exactOptionalPropertyTypes`, so their concrete
-// classes are not structurally assignable to `Transport` under our strict config. Bridge that gap
-// once, here at the SDK boundary, rather than loosening the whole workspace.
-function asTransport(transport: StdioClientTransport | StreamableHTTPClientTransport): Transport {
-  return transport as unknown as Transport;
-}
-
 /**
  * The child's environment: the SDK's sanitized defaults with the caller's named variables on top.
  * The SDK treats a supplied `env` as the entire child environment — the defaults (PATH, HOME, …) are
@@ -91,7 +89,7 @@ function wire(source: LiveSource): Wired {
       ...(source.env !== undefined ? { env: childEnv(source.env) } : {}),
     });
     return {
-      transport: asTransport(transport),
+      transport,
       endpoint,
       provenance: { kind: 'live', transport: 'stdio', endpoint },
       challenge: () => undefined,
@@ -104,7 +102,7 @@ function wire(source: LiveSource): Wired {
     ...(source.headers !== undefined ? { requestInit: { headers: { ...source.headers } } } : {}),
   });
   return {
-    transport: asTransport(transport),
+    transport,
     endpoint,
     provenance: { kind: 'live', transport: 'http', endpoint },
     challenge: observer.challenge,
@@ -128,7 +126,13 @@ function authMessage(source: LiveSource, challenge: AuthChallenge): string {
     : base;
 }
 
-function edgeError(
+/** True when the SDK reported a 401 itself — an unauthorized error, or an HTTP 401 status. */
+function isUnauthorized(error: unknown): boolean {
+  if (error instanceof UnauthorizedError) return true;
+  return error instanceof SdkHttpError && error.status === 401;
+}
+
+export function edgeError(
   error: unknown,
   endpoint: Redacted,
   source: LiveSource,
@@ -138,6 +142,16 @@ function edgeError(
   // A 401 was observed on the connection: the failure is authorization, not an unreachable server.
   if (challenge !== undefined) {
     return authRequired(authMessage(source, challenge), endpoint, challenge);
+  }
+  // The SDK can surface a 401 before the observer's fetch sees a second request. Treat it as the
+  // same authorization failure, with the no-challenge message variant.
+  if (isUnauthorized(error)) {
+    return authRequired(authMessage(source, {}), endpoint);
+  }
+  // The server and actlint share no protocol version: a calm, specific connect failure — never a
+  // crash, never a finding.
+  if (error instanceof UnsupportedProtocolVersionError) {
+    return connectFailed('the server and actlint share no protocol version', endpoint);
   }
   const detail = sanitizedDetail(error);
   return connectFailed(
@@ -157,7 +171,13 @@ export async function captureLive(
   const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   const clientInfo = options.clientInfo ?? DEFAULT_CLIENT_INFO;
   const { transport, endpoint, provenance, challenge } = wire(source);
-  const client = new Client({ name: clientInfo.name, version: clientInfo.version }, { capabilities: {} });
+  // `versionNegotiation: 'auto'` reads both protocol eras: it probes with `server/discover` and
+  // falls back to the legacy `initialize` handshake when there is no modern evidence. actlint
+  // declares no capabilities. The probe reads metadata only — it never invokes a tool.
+  const client = new Client(
+    { name: clientInfo.name, version: clientInfo.version },
+    { versionNegotiation: { mode: 'auto' } },
+  );
 
   let raw: unknown;
   try {
@@ -168,9 +188,11 @@ export async function captureLive(
     await close(client);
     return err(edgeError(error, endpoint, source, challenge()));
   }
+  const protocolRevision = client.getNegotiatedProtocolVersion();
   await close(client);
 
-  const manifest = toManifest(raw, provenance, nowIso());
+  // Record the negotiated protocol revision verbatim; an unknown future version is stored as-is.
+  const manifest = toManifest(raw, provenance, nowIso(), protocolRevision);
   if (!manifest.ok) return err(malformedTools(manifest.error.message));
   return ok(manifest.value);
 }
